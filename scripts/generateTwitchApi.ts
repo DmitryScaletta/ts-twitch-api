@@ -5,7 +5,7 @@ import type {
   ResponsesObject,
   Templates,
 } from './types';
-import { RESPONSE_CODES } from './constants.js';
+import responseCodes from './responseCodes.json' assert { type: 'json' };
 
 type Line = [indentation: number, text: string];
 
@@ -44,7 +44,7 @@ const parseResponseCodes = (responses: ResponsesObject) => {
   for (const [code, response] of Object.entries(responses)) {
     const { description } = response as ResponseObject;
     const desc = description!.split('__Examples__')[0]!.trim();
-    const codeText = RESPONSE_CODES[code];
+    const codeText = responseCodes[code as keyof typeof responseCodes];
     if (!codeText) throw new Error('No response code: ' + code);
     responseCodesText.push(`_${code} ${codeText}_`);
     if (desc) responseCodesText.push(desc);
