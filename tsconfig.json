@@ -6,11 +6,11 @@
   "display": "Node 18 + ESM + Strictest",
   "compilerOptions": {
     "lib": [
-      "es2022",
+      "ESNext",
       "DOM"
     ],
-    "module": "es2022",
-    "target": "es2022",
+    "module": "ESNext",
+    "target": "ESNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -27,6 +27,7 @@
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
     "importsNotUsedAsValues": "error",
-    "checkJs": true
+    "checkJs": true,
+    "resolveJsonModule": true
   }
 }
