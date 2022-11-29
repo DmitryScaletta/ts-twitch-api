@@ -94,6 +94,8 @@ export type GetUserActiveExtensionsParams = operations['get-user-active-extensio
 export type GetVideosParams = operations['get-videos']['parameters']['query'];
 export type DeleteVideosParams = operations['delete-videos']['parameters']['query'];
 export type SendWhisperParams = operations['send-whisper']['parameters']['query'];
+export type GetGlobalBadgesParams = operations['get-global-badges']['parameters']['query'];
+export type GetChannelBadgesParams = operations['get-channel-badges']['parameters']['query'];
 export type StartCommercialBody = Schema<'StartCommercialBody'>;
 export type StartCommercialResponse = Schema<'StartCommercialResponse'>;
 export type ExtensionAnalytics = Schema<'ExtensionAnalytics'>;
@@ -281,6 +283,10 @@ export type Video = Schema<'Video'>;
 export type GetVideosResponse = Schema<'GetVideosResponse'>;
 export type DeleteVideosResponse = Schema<'DeleteVideosResponse'>;
 export type SendWhisperBody = Schema<'SendWhisperBody'>;
+export type BadgeVersion = Schema<'BadgeVersion'>;
+export type Badge = Schema<'Badge'>;
+export type GetGlobalBadgesResponse = Schema<'GetGlobalBadgesResponse'>;
+export type GetChannelBadgesResponse = Schema<'GetChannelBadgesResponse'>;
 
 type SuccessCode = 200 | 202 | 204;
 type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
@@ -295,8 +301,8 @@ export type ApiResponse<
 
 const getApiResponse = async <
   TData,
-  TSuccessCode extends SuccessCode,
-  TErrorCode extends ErrorCode,
+  TSuccessCode extends SuccessCode = SuccessCode,
+  TErrorCode extends ErrorCode = ErrorCode,
 >(
   response: Response,
 ): ApiResponse<TData, TSuccessCode, TErrorCode> => ({
@@ -6170,6 +6176,62 @@ export class TwitchApi {
         },
       });
       return getApiResponse<void, 204, 400 | 401 | 403 | 404 | 429>(response);
+    },
+  };
+  badges = {
+    /**
+     * Gets a list of all global badges.
+     *
+     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+     *
+     * **NOTE:** This endpoint is not documented.
+     *
+     * __Authorization:__
+     *
+     * The Client-Id and Authorization headers are not required.
+     *
+     * __URL:__
+     *
+     * `GET https://badges.twitch.tv/v1/badges/global/display`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the global badges.
+     */
+    getGlobalBadges: async (params: GetGlobalBadgesParams) => {
+      const s = getSearchParams(params);
+      const url = `https://badges.twitch.tv/v1/badges/global/display?${s}`;
+      const response = await fetch(url);
+      return getApiResponse<GetGlobalBadgesResponse, 200>(response);
+    },
+    /**
+     * Gets a list of badges that belongs to the channel.
+     *
+     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+     *
+     * **NOTE:** This endpoint is not documented.
+     *
+     * __Authorization:__
+     *
+     * The Client-Id and Authorization headers are not required.
+     *
+     * __URL:__
+     *
+     * `GET https://badges.twitch.tv/v1/badges/channels/{channel_id}/display`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the channel's badges.
+     */
+    getChannelBadges: async (params: GetChannelBadgesParams) => {
+      const s = getSearchParams(params);
+      const url = `https://badges.twitch.tv/v1/badges/channels/{channel_id}/display?${s}`;
+      const response = await fetch(url);
+      return getApiResponse<GetChannelBadgesResponse, 200>(response);
     },
   };
 }

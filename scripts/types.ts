@@ -76,6 +76,12 @@ export type ReferenceObject = {
   $ref: `#/components/schemas/${string}`;
 };
 
+export type ServerObject = {
+  url: string;
+  description?: string;
+  // variables?: Record<string, ServerVariableObject>;
+};
+
 export type OperationObject = {
   tags?: string[];
   summary?: string;
@@ -88,7 +94,7 @@ export type OperationObject = {
   // callbacks?: Record<string, CallbackObject | ReferenceObject>;
   // deprecated?: boolean;
   // security? SecurityRequirementObject[];
-  // servers?: ServerObject[];
+  servers?: ServerObject[];
 };
 
 export type Method =
@@ -153,10 +159,7 @@ export type OpenApi = {
     description: string;
     version: string;
   };
-  servers: {
-    url: string;
-    description: string;
-  }[];
+  servers: ServerObject[];
   security: [];
   tags: { name: string; description?: string }[];
   paths: Record<string, PathItemObject>;

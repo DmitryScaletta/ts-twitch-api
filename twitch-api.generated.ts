@@ -1336,6 +1336,34 @@ export interface paths {
      */
     post: operations["send-whisper"];
   };
+  "/badges/global/display": {
+    /**
+     * Gets a list of all global badges.
+     *
+     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+     *
+     * **NOTE:** This endpoint is not documented.
+     *
+     * __Authorization:__
+     *
+     * The Client-Id and Authorization headers are not required.
+     */
+    get: operations["get-global-badges"];
+  };
+  "/badges/channels/{channel_id}/display": {
+    /**
+     * Gets a list of badges that belongs to the channel.
+     *
+     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+     *
+     * **NOTE:** This endpoint is not documented.
+     *
+     * __Authorization:__
+     *
+     * The Client-Id and Authorization headers are not required.
+     */
+    get: operations["get-channel-badges"];
+  };
 }
 
 export interface components {
@@ -4314,6 +4342,23 @@ export interface components {
        * Messages that exceed the maximum length are truncated.
        */
       message: string;
+    };
+    BadgeVersion: {
+      image_url_1x: string;
+      image_url_2x?: string;
+      image_url_4x: string;
+      description: string;
+      title: string;
+      click_action: string;
+      click_url: "none" | "visit_url" | "subscribe_to_channel" | "turbo";
+      last_updated: string | null;
+    };
+    Badge: { [key: string]: components["schemas"]["BadgeVersion"] };
+    GetGlobalBadgesResponse: {
+      badge_sets: { [key: string]: components["schemas"]["Badge"] };
+    };
+    GetChannelBadgesResponse: {
+      badge_sets: { [key: string]: components["schemas"]["Badge"] };
     };
   };
 }
@@ -9754,6 +9799,64 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["SendWhisperBody"];
+      };
+    };
+  };
+  /**
+   * Gets a list of all global badges.
+   *
+   * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+   *
+   * **NOTE:** This endpoint is not documented.
+   *
+   * __Authorization:__
+   *
+   * The Client-Id and Authorization headers are not required.
+   */
+  "get-global-badges": {
+    parameters: {
+      query: {
+        /** The ISO 639-1 two-letter language code */
+        language?: string;
+      };
+    };
+    responses: {
+      /** Successfully retrieved the global badges. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetGlobalBadgesResponse"];
+        };
+      };
+    };
+  };
+  /**
+   * Gets a list of badges that belongs to the channel.
+   *
+   * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
+   *
+   * **NOTE:** This endpoint is not documented.
+   *
+   * __Authorization:__
+   *
+   * The Client-Id and Authorization headers are not required.
+   */
+  "get-channel-badges": {
+    parameters: {
+      path: {
+        /** The ID of the channel whose chat badges you want to get. */
+        channel_id: string;
+      };
+      query: {
+        /** The ISO 639-1 two-letter language code */
+        language?: string;
+      };
+    };
+    responses: {
+      /** Successfully retrieved the channel's badges. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetChannelBadgesResponse"];
+        };
       };
     };
   };

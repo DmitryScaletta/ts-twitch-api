@@ -65,6 +65,7 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   const typeExports: string[] = [];
   let api: Line[] = [];
 
+  const globalBaseUrl = openApi.servers[0]!.url;
   const mainTemplate = templates['main']!;
   const methodCommentTemplate = templates['method-comment']!;
 
@@ -87,23 +88,40 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
     api.push([1, `${tag} = {`]);
 
     for (const { path, method, endpoint } of endpoints) {
-      const { description, externalDocs, parameters, requestBody, responses } =
-        endpoint;
-      const id = externalDocs!.url.replace(
-        'https://dev.twitch.tv/docs/api/reference#',
-        '',
-      );
-      const url = `https://api.twitch.tv/helix${path}`;
-      const { url: docsUrl, description: name } = externalDocs!;
+      const {
+        description,
+        externalDocs,
+        parameters,
+        requestBody,
+        responses,
+        servers,
+        operationId,
+      } = endpoint;
+      const id = operationId;
+
+      const baseUrl = servers?.[0]?.url || globalBaseUrl;
+      const url = `${baseUrl}${path}`;
+
+      let docsUrl = externalDocs?.url;
+      let name = externalDocs?.description;
+      if (id === 'get-global-badges') name = 'Get Global Badges';
+      if (id === 'get-channel-badges') name = 'Get Channel Badges';
+
       const { responseCodesText, responseCodeSuccess, responseCodeError } =
         parseResponseCodes(responses!);
 
-      const comment = methodCommentTemplate
+      let comment = methodCommentTemplate
         .replace('%DESCRIPTION%', description!)
         .replace('%METHOD%', method.toUpperCase())
         .replace('%URL%', url)
-        .replace('%RESPONSE_CODES%', responseCodesText)
-        .replace('%DOCS_URL%', docsUrl);
+        .replace('%RESPONSE_CODES%', responseCodesText);
+
+      if (docsUrl) {
+        comment = comment.replace('%DOCS_URL%', docsUrl);
+      } else {
+        comment = comment.replace('@see %DOCS_URL%', '').trim();
+      }
+
       api.push([2, '/**']);
       comment
         .split('\n')
@@ -127,6 +145,9 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
       }
       if (hasParams && hasBody) {
         methodTemplate = templates['method-signature-params-body']!;
+      }
+      if (id === 'get-global-badges' || id === 'get-channel-badges') {
+        methodTemplate = templates['method-signature-badges']!;
       }
 
       const methodName = getMethodName(name!);

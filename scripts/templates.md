@@ -22,8 +22,8 @@ export type ApiResponse<
 
 const getApiResponse = async <
   TData,
-  TSuccessCode extends SuccessCode,
-  TErrorCode extends ErrorCode,
+  TSuccessCode extends SuccessCode = SuccessCode,
+  TErrorCode extends ErrorCode = ErrorCode,
 >(
   response: Response,
 ): ApiResponse<TData, TSuccessCode, TErrorCode> => ({
@@ -156,5 +156,16 @@ __URL:__
     },
   });
   return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>(response);
+},
+```
+
+## method-signature-badges
+
+```ts
+%METHOD_NAME%: async (params: %PARAMS_TYPE%) => {
+  const s = getSearchParams(params);
+  const url = `%URL%?${s}`;
+  const response = await fetch(url);
+  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%>(response);
 },
 ```
