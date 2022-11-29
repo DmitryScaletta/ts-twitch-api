@@ -4353,7 +4353,9 @@ export interface components {
       click_url: "none" | "visit_url" | "subscribe_to_channel" | "turbo";
       last_updated: string | null;
     };
-    Badge: { [key: string]: components["schemas"]["BadgeVersion"] };
+    Badge: {
+      versions: { [key: string]: components["schemas"]["BadgeVersion"] };
+    };
     GetGlobalBadgesResponse: {
       badge_sets: { [key: string]: components["schemas"]["Badge"] };
     };
