@@ -1145,10 +1145,6 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
      *
      * A Twitch extensions may use an app access token if the broadcaster has granted the **user:read:subscriptions** scope from within the Twitch Extensions manager.
-     *
-     * __Request Query Parameters:__
-     *
-     * | Parameter | Type | Required? | Description | | — | — | — | — | | broadcaster\_id | String | Yes | The ID of a partner or affiliate broadcaster. | | user\_id | String | Yes | The ID of the user that you’re checking to see whether they subscribe to the broadcaster in _broadcaster\_id_. This ID must match the user ID in the access Token. |
      */
     get: operations["check-user-subscription"];
   };
@@ -4345,7 +4341,7 @@ export interface components {
     };
     BadgeVersion: {
       image_url_1x: string;
-      image_url_2x?: string;
+      image_url_2x: string;
       image_url_4x: string;
       description: string;
       title: string;
@@ -8917,20 +8913,12 @@ export interface operations {
    */
   "get-broadcaster-subscriptions": {
     responses: {
-      /**
-       * Successfully retrieved the broadcaster’s list of subscribers.
-       *
-       * __Examples__
-       *
-       * _Request:_
-       *
-       * ```bash
-       * curl -X GET 'https://api.twitch.tv/helix/subscriptions?broadcaster_id=141981764' \
-       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
-       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
-       * ```
-       */
-      204: never;
+      /** Successfully retrieved the broadcaster’s list of subscribers. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetBroadcasterSubscriptionsResponse"];
+        };
+      };
       /** * The _broadcaster\_id_ query parameter is required. */
       400: unknown;
       /**
@@ -8951,12 +8939,16 @@ export interface operations {
    * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
    *
    * A Twitch extensions may use an app access token if the broadcaster has granted the **user:read:subscriptions** scope from within the Twitch Extensions manager.
-   *
-   * __Request Query Parameters:__
-   *
-   * | Parameter | Type | Required? | Description | | — | — | — | — | | broadcaster\_id | String | Yes | The ID of a partner or affiliate broadcaster. | | user\_id | String | Yes | The ID of the user that you’re checking to see whether they subscribe to the broadcaster in _broadcaster\_id_. This ID must match the user ID in the access Token. |
    */
   "check-user-subscription": {
+    parameters: {
+      query: {
+        /** The ID of a partner or affiliate broadcaster. */
+        broadcaster_id: string;
+        /** The ID of the user that you’re checking to see whether they subscribe to the broadcaster in _broadcaster\_id_. This ID must match the user ID in the access Token. */
+        user_id: string;
+      };
+    };
     responses: {
       /** The user subscribes to the broadcaster. */
       200: {

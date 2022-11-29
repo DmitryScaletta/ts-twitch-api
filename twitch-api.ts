@@ -79,6 +79,7 @@ export type GetSoundtrackPlaylistsParams = operations['get-soundtrack-playlists'
 export type GetStreamKeyParams = operations['get-stream-key']['parameters']['query'];
 export type GetStreamsParams = operations['get-streams']['parameters']['query'];
 export type GetFollowedStreamsParams = operations['get-followed-streams']['parameters']['query'];
+export type CheckUserSubscriptionParams = operations['check-user-subscription']['parameters']['query'];
 export type GetAllStreamTagsParams = operations['get-all-stream-tags']['parameters']['query'];
 export type GetStreamTagsParams = operations['get-stream-tags']['parameters']['query'];
 export type ReplaceStreamTagsParams = operations['replace-stream-tags']['parameters']['query'];
@@ -5287,7 +5288,7 @@ export class TwitchApi {
      *
      * __Response Codes:__
      *
-     * _204 No Content_
+     * _200 OK_
      *
      * Successfully retrieved the broadcaster’s list of subscribers.
      *
@@ -5310,7 +5311,7 @@ export class TwitchApi {
       const response = await fetch(url, {
         headers: this.getAuthHeaders(accessToken, clientId),
       });
-      return getApiResponse<void, 204, 400 | 401>(response);
+      return getApiResponse<GetBroadcasterSubscriptionsResponse, 200, 400 | 401>(response);
     },
     /**
      * Checks whether the user subscribes to the broadcaster’s channel.
@@ -5320,10 +5321,6 @@ export class TwitchApi {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
      *
      * A Twitch extensions may use an app access token if the broadcaster has granted the **user:read:subscriptions** scope from within the Twitch Extensions manager.
-     *
-     * __Request Query Parameters:__
-     *
-     * | Parameter | Type | Required? | Description | | — | — | — | — | | broadcaster\_id | String | Yes | The ID of a partner or affiliate broadcaster. | | user\_id | String | Yes | The ID of the user that you’re checking to see whether they subscribe to the broadcaster in _broadcaster\_id_. This ID must match the user ID in the access Token. |
      *
      * __URL:__
      *
@@ -5354,8 +5351,13 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#check-user-subscription
      */
-    checkUserSubscription: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/subscriptions/user';
+    checkUserSubscription: async (
+      params: CheckUserSubscriptionParams,
+      accessToken = '',
+      clientId = '',
+    ) => {
+      const s = getSearchParams(params);
+      const url = `https://api.twitch.tv/helix/subscriptions/user?${s}`;
       const response = await fetch(url, {
         headers: this.getAuthHeaders(accessToken, clientId),
       });
