@@ -5421,6 +5421,12 @@ export interface operations {
    * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
    */
   "get-channel-chat-badges": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster whose chat badges you want to get. */
+        broadcaster_id: string;
+      };
+    };
     responses: {
       /** Successfully retrieved the broadcaster’s custom chat badges. */
       200: {
@@ -8831,6 +8837,28 @@ export interface operations {
    * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** scope.
    */
   "get-stream-markers": {
+    parameters: {
+      query: {
+        /**
+         * A user ID. The request returns the markers from this user’s most recent video. This ID must match the user ID in the access token or the user in the access token must be one of the broadcaster’s editors.
+         *
+         * This parameter and the _video\_id_ query parameter are mutually exclusive.
+         */
+        user_id?: string;
+        /**
+         * A video on demand (VOD)/video ID. The request returns the markers from this VOD/video. The user in the access token must own the video or the user must be one of the broadcaster’s editors.
+         *
+         * This parameter and the _user\_id_ query parameter are mutually exclusive.
+         */
+        video_id?: string;
+        /** The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20. */
+        first?: string;
+        /** The cursor used to get the previous page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+        before?: string;
+        /** The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+        after?: string;
+      };
+    };
     responses: {
       /** Successfully retrieved the list of markers. */
       200: {
@@ -8912,6 +8940,20 @@ export interface operations {
    * A Twitch extensions may use an app access token if the broadcaster has granted the **channel:read:subscriptions** scope from within the Twitch Extensions manager.
    */
   "get-broadcaster-subscriptions": {
+    parameters: {
+      query: {
+        /** The broadcaster’s ID. This ID must match the user ID in the access token. */
+        broadcaster_id: string;
+        /** Filters the list to include only the specified subscribers. To specify more than one subscriber, include this parameter for each subscriber. For example, `&user_id=1234&user_id=5678`. You may specify a maximum of 100 subscribers. */
+        user_id?: string[];
+        /** The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20. */
+        first?: string;
+        /** The cursor used to get the next page of results. Do not specify if you set the _user\_id_ query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+        after?: string;
+        /** The cursor used to get the previous page of results. Do not specify if you set the _user\_id_ query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+        before?: string;
+      };
+    };
     responses: {
       /** Successfully retrieved the broadcaster’s list of subscribers. */
       200: {

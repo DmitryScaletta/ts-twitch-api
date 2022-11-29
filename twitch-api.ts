@@ -21,6 +21,7 @@ export type GetCharityCampaignDonationsParams = operations['get-charity-campaign
 export type GetChattersParams = operations['get-chatters']['parameters']['query'];
 export type GetChannelEmotesParams = operations['get-channel-emotes']['parameters']['query'];
 export type GetEmoteSetsParams = operations['get-emote-sets']['parameters']['query'];
+export type GetChannelChatBadgesParams = operations['get-channel-chat-badges']['parameters']['query'];
 export type GetChatSettingsParams = operations['get-chat-settings']['parameters']['query'];
 export type UpdateChatSettingsParams = operations['update-chat-settings']['parameters']['query'];
 export type SendChatAnnouncementParams = operations['send-chat-announcement']['parameters']['query'];
@@ -79,6 +80,8 @@ export type GetSoundtrackPlaylistsParams = operations['get-soundtrack-playlists'
 export type GetStreamKeyParams = operations['get-stream-key']['parameters']['query'];
 export type GetStreamsParams = operations['get-streams']['parameters']['query'];
 export type GetFollowedStreamsParams = operations['get-followed-streams']['parameters']['query'];
+export type GetStreamMarkersParams = operations['get-stream-markers']['parameters']['query'];
+export type GetBroadcasterSubscriptionsParams = operations['get-broadcaster-subscriptions']['parameters']['query'];
 export type CheckUserSubscriptionParams = operations['check-user-subscription']['parameters']['query'];
 export type GetAllStreamTagsParams = operations['get-all-stream-tags']['parameters']['query'];
 export type GetStreamTagsParams = operations['get-stream-tags']['parameters']['query'];
@@ -1484,8 +1487,13 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-chat-badges
      */
-    getChannelChatBadges: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/chat/badges';
+    getChannelChatBadges: async (
+      params: GetChannelChatBadgesParams,
+      accessToken = '',
+      clientId = '',
+    ) => {
+      const s = getSearchParams(params);
+      const url = `https://api.twitch.tv/helix/chat/badges?${s}`;
       const response = await fetch(url, {
         headers: this.getAuthHeaders(accessToken, clientId),
       });
@@ -5264,8 +5272,13 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-markers
      */
-    getStreamMarkers: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/streams/markers';
+    getStreamMarkers: async (
+      params: GetStreamMarkersParams,
+      accessToken = '',
+      clientId = '',
+    ) => {
+      const s = getSearchParams(params);
+      const url = `https://api.twitch.tv/helix/streams/markers?${s}`;
       const response = await fetch(url, {
         headers: this.getAuthHeaders(accessToken, clientId),
       });
@@ -5306,8 +5319,13 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-broadcaster-subscriptions
      */
-    getBroadcasterSubscriptions: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/subscriptions';
+    getBroadcasterSubscriptions: async (
+      params: GetBroadcasterSubscriptionsParams,
+      accessToken = '',
+      clientId = '',
+    ) => {
+      const s = getSearchParams(params);
+      const url = `https://api.twitch.tv/helix/subscriptions?${s}`;
       const response = await fetch(url, {
         headers: this.getAuthHeaders(accessToken, clientId),
       });
