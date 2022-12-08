@@ -98,8 +98,6 @@ export type GetUserActiveExtensionsParams = operations['get-user-active-extensio
 export type GetVideosParams = operations['get-videos']['parameters']['query'];
 export type DeleteVideosParams = operations['delete-videos']['parameters']['query'];
 export type SendWhisperParams = operations['send-whisper']['parameters']['query'];
-export type GetGlobalBadgesParams = operations['get-global-badges']['parameters']['query'];
-export type GetChannelBadgesParams = operations['get-channel-badges']['parameters']['query'];
 export type StartCommercialBody = Schema<'StartCommercialBody'>;
 export type StartCommercialResponse = Schema<'StartCommercialResponse'>;
 export type ExtensionAnalytics = Schema<'ExtensionAnalytics'>;
@@ -296,24 +294,12 @@ type SuccessCode = 200 | 202 | 204;
 type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
 export type ApiResponse<
   TData,
-  TSuccessCode extends SuccessCode,
-  TErrorCode extends ErrorCode,
+  TSuccessCode extends SuccessCode = SuccessCode,
+  TErrorCode extends ErrorCode = ErrorCode,
 > = Promise<
   | { ok: true; status: TSuccessCode; data: TData }
   | { ok: false; status: TErrorCode; data: unknown }
 >;
-
-const getApiResponse = async <
-  TData,
-  TSuccessCode extends SuccessCode = SuccessCode,
-  TErrorCode extends ErrorCode = ErrorCode,
->(
-  response: Response,
-): ApiResponse<TData, TSuccessCode, TErrorCode> => ({
-  ok: response.ok,
-  status: response.status as any,
-  data: await response.json(),
-});
 
 const getSearchParams = <T extends Record<string, any>>(params: T) => {
   const kvPairs: string[] = [];
@@ -327,6 +313,17 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
   }
   return kvPairs.join('&');
 };
+
+type CallApiOptions = {
+  baseUrl?: string;
+  path: string;
+  method?: string;
+  params?: any;
+  body?: any;
+  clientId?: string;
+  accessToken?: string;
+  requiresAuth?: boolean;
+}
 
 export type TwitchApiOptions = {
   accessToken?: string;
@@ -342,10 +339,35 @@ export class TwitchApi {
     this._clientId = clientId;
   }
 
-  private getAuthHeaders(accessToken: string, clientId: string) {
+  private async callApi({
+    baseUrl = 'https://api.twitch.tv/helix',
+    path,
+    method = 'GET',
+    params,
+    body,
+    clientId,
+    accessToken,
+    requiresAuth = true,
+  }: CallApiOptions): Promise<any> {
+    const url = params
+      ? `${baseUrl}${path}?${getSearchParams(params)}`
+      : `${baseUrl}${path}`;
+    const options: RequestInit = { method };
+    const headers = new Headers();
+    options.headers = headers;
+    if (body) {
+      headers.set('Content-Type', 'application/json');
+      options.body = JSON.stringify(body);
+    }
+    if (requiresAuth) {
+      options.headers.set('Authorization', `Bearer ${accessToken || this._accessToken}`);
+      options.headers.set('Client-Id', clientId || this._clientId);
+    }
+    const response = await fetch(url, body);
     return {
-      Authorization: `Bearer ${accessToken || this._accessToken}`,
-      'Client-Id': clientId || this._clientId,
+      ok: response.ok,
+      status: response.status as any,
+      data: await response.json(),
     };
   }
 
@@ -401,18 +423,14 @@ export class TwitchApi {
       body: StartCommercialBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/channels/commercial';
-      const response = await fetch(url, {
+    ): ApiResponse<StartCommercialResponse, 200, 400 | 401 | 404 | 429> => 
+      this.callApi({
+        path: '/channels/commercial',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<StartCommercialResponse, 200, 400 | 401 | 404 | 429>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   analytics = {
     /**
@@ -458,14 +476,13 @@ export class TwitchApi {
       params: GetExtensionAnalyticsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/analytics/extensions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionAnalyticsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetExtensionAnalyticsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/analytics/extensions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets an analytics report for one or more games. The response contains the URLs used to download the reports (CSV files). [Learn more](https://dev.twitch.tv/docs/insights)
      *
@@ -509,14 +526,13 @@ export class TwitchApi {
       params: GetGameAnalyticsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/analytics/games?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetGameAnalyticsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetGameAnalyticsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/analytics/games',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   bits = {
     /**
@@ -557,14 +573,13 @@ export class TwitchApi {
       params: GetBitsLeaderboardParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/bits/leaderboard?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetBitsLeaderboardResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetBitsLeaderboardResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/bits/leaderboard',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of Cheermotes that users can use to cheer Bits in any Bits-enabled channel’s chat room. Cheermotes are animated emotes that viewers can assign Bits to.
      *
@@ -593,14 +608,13 @@ export class TwitchApi {
       params: GetCheermotesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/bits/cheermotes?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCheermotesResponse, 200, 401>(response);
-    },
+    ): ApiResponse<GetCheermotesResponse, 200, 401> => 
+      this.callApi({
+        path: '/bits/cheermotes',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of transactions for an extension. A transaction records the exchange of a currency (for example, Bits) for a digital product.
      *
@@ -641,14 +655,13 @@ export class TwitchApi {
       params: GetExtensionTransactionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/transactions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionTransactionsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetExtensionTransactionsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/extensions/transactions',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   channels = {
     /**
@@ -692,14 +705,13 @@ export class TwitchApi {
       params: GetChannelInformationParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelInformationResponse, 200, 400 | 401 | 429 | 500>(response);
-    },
+    ): ApiResponse<GetChannelInformationResponse, 200, 400 | 401 | 429 | 500> => 
+      this.callApi({
+        path: '/channels',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates a channel’s properties.
      *
@@ -746,19 +758,15 @@ export class TwitchApi {
       body: ModifyChannelInformationBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 500> => 
+      this.callApi({
+        path: '/channels',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401 | 500>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of users that are editors for the specified broadcaster.
      *
@@ -794,14 +802,13 @@ export class TwitchApi {
       params: GetChannelEditorsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels/editors?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelEditorsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetChannelEditorsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/channels/editors',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   channelPoints = {
     /**
@@ -855,19 +862,15 @@ export class TwitchApi {
       body: CreateCustomRewardsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<CreateCustomRewardsResponse, 200, 400 | 401 | 403 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreateCustomRewardsResponse, 200, 400 | 401 | 403 | 500>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Deletes a custom reward that the broadcaster created.
      *
@@ -916,15 +919,14 @@ export class TwitchApi {
       params: DeleteCustomRewardParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404 | 500>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of custom rewards that the specified broadcaster created.
      *
@@ -972,14 +974,13 @@ export class TwitchApi {
       params: GetCustomRewardParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>(response);
-    },
+    ): ApiResponse<GetCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates a custom reward. The app used to create the reward is the only app that may update the reward.
      *
@@ -1038,19 +1039,15 @@ export class TwitchApi {
       body: UpdateCustomRewardBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of redemptions for the specified custom reward. The app used to create the reward is the only app that may get the redemptions.
      *
@@ -1100,14 +1097,13 @@ export class TwitchApi {
       params: GetCustomRewardRedemptionParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCustomRewardRedemptionResponse, 200, 400 | 401 | 403 | 404 | 500>(response);
-    },
+    ): ApiResponse<GetCustomRewardRedemptionResponse, 200, 400 | 401 | 403 | 404 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards/redemptions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates a redemption’s status. You may update a redemption only if its status is UNFULFILLED. The app used to create the reward is the only app that may update the redemption.
      *
@@ -1158,19 +1154,15 @@ export class TwitchApi {
       body: UpdateRedemptionStatusBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateRedemptionStatusResponse, 200, 400 | 401 | 403 | 404 | 500> => 
+      this.callApi({
+        path: '/channel_points/custom_rewards/redemptions',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateRedemptionStatusResponse, 200, 400 | 401 | 403 | 404 | 500>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   charity = {
     /**
@@ -1215,14 +1207,13 @@ export class TwitchApi {
       params: GetCharityCampaignParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/charity/campaigns?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCharityCampaignResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetCharityCampaignResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/charity/campaigns',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the list of donations that users have made to the broadcaster’s active charity campaign.
      *
@@ -1265,14 +1256,13 @@ export class TwitchApi {
       params: GetCharityCampaignDonationsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/charity/donations?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCharityCampaignDonationsResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetCharityCampaignDonationsResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/charity/donations',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   chat = {
     /**
@@ -1321,14 +1311,13 @@ export class TwitchApi {
       params: GetChattersParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/chatters?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChattersResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetChattersResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/chat/chatters',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets all emotes that the specified Twitch channel created. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
      *
@@ -1366,14 +1355,13 @@ export class TwitchApi {
       params: GetChannelEmotesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/emotes?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelEmotesResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetChannelEmotesResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/chat/emotes',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets all [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
      *
@@ -1405,13 +1393,12 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/chat/emotes/global';
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetGlobalEmotesResponse, 200, 401>(response);
-    },
+    getGlobalEmotes: async (accessToken = '', clientId = ''): ApiResponse<GetGlobalEmotesResponse, 200, 401> => 
+      this.callApi({
+        path: '/chat/emotes/global',
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets emotes for one or more specified emote sets.
      *
@@ -1450,14 +1437,13 @@ export class TwitchApi {
       params: GetEmoteSetsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/emotes/set?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetEmoteSetsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetEmoteSetsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/chat/emotes/set',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets all badges that the specified broadcaster created. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
      *
@@ -1491,14 +1477,13 @@ export class TwitchApi {
       params: GetChannelChatBadgesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/badges?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelChatBadgesResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetChannelChatBadgesResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/chat/badges',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the list of chat badges that Twitch created. Users can use these badges in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
      *
@@ -1528,13 +1513,12 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/chat/badges/global';
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetGlobalChatBadgesResponse, 200, 401>(response);
-    },
+    getGlobalChatBadges: async (accessToken = '', clientId = ''): ApiResponse<GetGlobalChatBadgesResponse, 200, 401> => 
+      this.callApi({
+        path: '/chat/badges/global',
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the broadcaster’s chat settings.
      *
@@ -1570,14 +1554,13 @@ export class TwitchApi {
       params: GetChatSettingsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/settings?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChatSettingsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetChatSettingsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/chat/settings',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the broadcaster’s chat settings.
      *
@@ -1632,19 +1615,15 @@ export class TwitchApi {
       body: UpdateChatSettingsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/settings?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateChatSettingsResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/chat/settings',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateChatSettingsResponse, 200, 400 | 401 | 403>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Sends an announcement to the broadcaster’s chat room.
      *
@@ -1681,19 +1660,15 @@ export class TwitchApi {
       body: SendChatAnnouncementBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/announcements?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/chat/announcements',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the color used for the user’s name in chat.
      *
@@ -1727,14 +1702,13 @@ export class TwitchApi {
       params: GetUserChatColorParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/color?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUserChatColorResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetUserChatColorResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/chat/color',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the color used for the user’s name in chat.
      *
@@ -1773,15 +1747,14 @@ export class TwitchApi {
       params: UpdateUserChatColorParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/chat/color?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/chat/color',
         method: 'PUT',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   clips = {
     /**
@@ -1834,15 +1807,14 @@ export class TwitchApi {
       params: CreateClipParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/clips?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<CreateClipResponse, 202, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/clips',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<CreateClipResponse, 202, 400 | 401 | 403 | 404>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets one or more video clips that were captured from streams. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
      *
@@ -1885,14 +1857,13 @@ export class TwitchApi {
       params: GetClipsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/clips?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetClipsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetClipsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/clips',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   entitlements = {
     /**
@@ -1938,14 +1909,13 @@ export class TwitchApi {
       params: GetCodeStatusParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/entitlements/codes?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCodeStatusResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetCodeStatusResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/entitlements/codes',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Redeems one or more redemption codes. Redeeming a code credits the user’s account with the entitlement; for example, a Bits reward earned by playing a game.
      *
@@ -1991,15 +1961,14 @@ export class TwitchApi {
       params: RedeemCodeParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/entitlements/codes?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<RedeemCodeResponse, 200, 400 | 401 | 403 | 500> => 
+      this.callApi({
+        path: '/entitlements/codes',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<RedeemCodeResponse, 200, 400 | 401 | 403 | 500>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets an organization’s list of entitlements that have been granted to a game, a user, or both.
      *
@@ -2057,14 +2026,13 @@ export class TwitchApi {
       params: GetDropsEntitlementsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/entitlements/drops?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetDropsEntitlementsResponse, 200, 400 | 401 | 403 | 500>(response);
-    },
+    ): ApiResponse<GetDropsEntitlementsResponse, 200, 400 | 401 | 403 | 500> => 
+      this.callApi({
+        path: '/entitlements/drops',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the Drop entitlement’s fulfillment status.
      *
@@ -2110,18 +2078,14 @@ export class TwitchApi {
       body: UpdateDropsEntitlementsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/entitlements/drops';
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateDropsEntitlementsResponse, 200, 400 | 401 | 500> => 
+      this.callApi({
+        path: '/entitlements/drops',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateDropsEntitlementsResponse, 200, 400 | 401 | 500>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   extensions = {
     /**
@@ -2165,14 +2129,13 @@ export class TwitchApi {
       params: GetExtensionConfigurationSegmentParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/configurations?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionConfigurationSegmentResponse, 200, 400 | 401 | 429>(response);
-    },
+    ): ApiResponse<GetExtensionConfigurationSegmentResponse, 200, 400 | 401 | 429> => 
+      this.callApi({
+        path: '/extensions/configurations',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates a configuration segment. The segment is limited to 5 KB. Extensions that are active on a channel do not receive the updated configuration.
      *
@@ -2208,18 +2171,14 @@ export class TwitchApi {
       body: SetExtensionConfigurationSegmentBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/extensions/configurations';
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/extensions/configurations',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the extension’s required\_configuration string. Use this endpoint if your extension requires the broadcaster to configure the extension before activating it (to require configuration, you must select **Custom/My Own Service** in Extension [Capabilities](https://dev.twitch.tv/docs/extensions/life-cycle/#capabilities)). For more information, see [Required Configurations](https://dev.twitch.tv/docs/extensions/building#required-configurations) and [Setting Required Configuration](https://dev.twitch.tv/docs/extensions/building#setting-required-configuration-with-the-configuration-service-optional).
      *
@@ -2257,19 +2216,15 @@ export class TwitchApi {
       body: SetExtensionRequiredConfigurationBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/required_configuration?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/extensions/required_configuration',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Sends a message to one or more viewers. You can send messages to a specific channel or to all channels where your extension is active. This endpoint uses the same mechanism as the [send](https://dev.twitch.tv/docs/extensions/reference#send) JavaScript helper function used to send messages.
      *
@@ -2343,18 +2298,14 @@ export class TwitchApi {
       body: SendExtensionPubSubMessageBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/extensions/pubsub';
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 422> => 
+      this.callApi({
+        path: '/extensions/pubsub',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401 | 422>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of broadcasters that are streaming live and have installed or activated the extension.
      *
@@ -2395,14 +2346,13 @@ export class TwitchApi {
       params: GetExtensionLiveChannelsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/live?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionLiveChannelsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetExtensionLiveChannelsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/extensions/live',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets an extension’s list of shared secrets.
      *
@@ -2432,13 +2382,12 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/extensions/jwt/secrets';
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionSecretsResponse, 200, 400 | 401>(response);
-    },
+    getExtensionSecrets: async (accessToken = '', clientId = ''): ApiResponse<GetExtensionSecretsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/extensions/jwt/secrets',
+        clientId,
+        accessToken,
+      }),
     /**
      * Creates a shared secret used to sign and verify JWT tokens. Creating a new secret removes the current secrets from service. Use this function only when you are ready to use the new secret it returns.
      *
@@ -2473,15 +2422,14 @@ export class TwitchApi {
       params: CreateExtensionSecretParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/jwt/secrets?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<CreateExtensionSecretResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/extensions/jwt/secrets',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<CreateExtensionSecretResponse, 200, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Sends a message to the specified broadcaster’s chat room. The extension’s name is used as the username for the message in the chat room. To send a chat message, your extension must enable **Chat Capabilities** (under your extension’s **Capabilities** tab).
      *
@@ -2523,19 +2471,15 @@ export class TwitchApi {
       body: SendExtensionChatMessageBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/chat?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/extensions/chat',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets information about an extension.
      *
@@ -2574,14 +2518,13 @@ export class TwitchApi {
       params: GetExtensionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetExtensionsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/extensions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets information about a released extension. Returns extensions whose `state` is Released.
      *
@@ -2619,14 +2562,13 @@ export class TwitchApi {
       params: GetReleasedExtensionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/extensions/released?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetReleasedExtensionsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetReleasedExtensionsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/extensions/released',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the list of Bits products that belongs to the extension. The client ID in the app access token identifies the extension.
      *
@@ -2660,14 +2602,13 @@ export class TwitchApi {
       params: GetExtensionBitsProductsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/bits/extensions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetExtensionBitsProductsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetExtensionBitsProductsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/bits/extensions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds or updates a Bits product that the extension created. If the SKU doesn’t exist, the product is added. You may update all fields except the `sku` field.
      *
@@ -2708,18 +2649,14 @@ export class TwitchApi {
       body: UpdateExtensionBitsProductBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/bits/extensions';
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateExtensionBitsProductResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/bits/extensions',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateExtensionBitsProductResponse, 200, 400 | 401>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   eventSub = {
     /**
@@ -2779,18 +2716,14 @@ export class TwitchApi {
       body: CreateEventSubSubscriptionBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/eventsub/subscriptions';
-      const response = await fetch(url, {
+    ): ApiResponse<CreateEventSubSubscriptionResponse, 202, 400 | 401 | 403 | 409 | 429> => 
+      this.callApi({
+        path: '/eventsub/subscriptions',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreateEventSubSubscriptionResponse, 202, 400 | 401 | 403 | 409 | 429>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Deletes an EventSub subscription.
      *
@@ -2830,15 +2763,14 @@ export class TwitchApi {
       params: DeleteEventSubSubscriptionParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/eventsub/subscriptions?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/eventsub/subscriptions',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 404>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of EventSub subscriptions that the client in the access token created.
      *
@@ -2881,14 +2813,13 @@ export class TwitchApi {
       params: GetEventSubSubscriptionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/eventsub/subscriptions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetEventSubSubscriptionsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetEventSubSubscriptionsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/eventsub/subscriptions',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   games = {
     /**
@@ -2925,14 +2856,13 @@ export class TwitchApi {
       params: GetTopGamesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/games/top?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetTopGamesResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetTopGamesResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/games/top',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets information about specified categories or games.
      *
@@ -2969,14 +2899,13 @@ export class TwitchApi {
       params: GetGamesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/games?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetGamesResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetGamesResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/games',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   goals = {
     /**
@@ -3016,14 +2945,13 @@ export class TwitchApi {
       params: GetCreatorGoalsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/goals?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetCreatorGoalsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetCreatorGoalsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/goals',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   hypeTrain = {
     /**
@@ -3059,14 +2987,13 @@ export class TwitchApi {
       params: GetHypeTrainEventsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/hypetrain/events?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetHypeTrainEventsResponse, 200, 401>(response);
-    },
+    ): ApiResponse<GetHypeTrainEventsResponse, 200, 401> => 
+      this.callApi({
+        path: '/hypetrain/events',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   moderation = {
     /**
@@ -3128,19 +3055,15 @@ export class TwitchApi {
       body: CheckAutoModStatusBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/enforcements/status?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<CheckAutoModStatusResponse, 200, 400 | 401 | 403 | 429> => 
+      this.callApi({
+        path: '/moderation/enforcements/status',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CheckAutoModStatusResponse, 200, 400 | 401 | 403 | 429>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Allow or deny the message that AutoMod flagged for review. For information about AutoMod, see [How to Use AutoMod](https://help.twitch.tv/s/article/how-to-use-automod).
      *
@@ -3189,18 +3112,14 @@ export class TwitchApi {
       body: ManageHeldAutoModMessagesBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/moderation/automod/message';
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/moderation/automod/message',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the broadcaster’s AutoMod settings. The settings are used to automatically block inappropriate or harassing messages from appearing in the broadcaster’s chat room.
      *
@@ -3241,14 +3160,13 @@ export class TwitchApi {
       params: GetAutoModSettingsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/automod/settings?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetAutoModSettingsResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetAutoModSettingsResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/automod/settings',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the broadcaster’s AutoMod settings. The settings are used to automatically block inappropriate or harassing messages from appearing in the broadcaster’s chat room.
      *
@@ -3306,19 +3224,15 @@ export class TwitchApi {
       body: UpdateAutoModSettingsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/automod/settings?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateAutoModSettingsResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/automod/settings',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateAutoModSettingsResponse, 200, 400 | 401 | 403>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets all users that the broadcaster banned or put in a timeout.
      *
@@ -3354,14 +3268,13 @@ export class TwitchApi {
       params: GetBannedUsersParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/banned?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetBannedUsersResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetBannedUsersResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/moderation/banned',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Bans a user from participating in the specified broadcaster’s chat room or puts them in a timeout.
      *
@@ -3423,19 +3336,15 @@ export class TwitchApi {
       body: BanUserBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/bans?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<BanUserResponse, 200, 400 | 401 | 403 | 409 | 429> => 
+      this.callApi({
+        path: '/moderation/bans',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<BanUserResponse, 200, 400 | 401 | 403 | 409 | 429>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes the ban or timeout that was placed on the specified user.
      *
@@ -3488,15 +3397,14 @@ export class TwitchApi {
       params: UnbanUserParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/bans?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 409 | 429> => 
+      this.callApi({
+        path: '/moderation/bans',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 409 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the broadcaster’s list of non-private, blocked words or phrases. These are the terms that the broadcaster or moderator added manually or that were denied by AutoMod.
      *
@@ -3537,14 +3445,13 @@ export class TwitchApi {
       params: GetBlockedTermsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/blocked_terms?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetBlockedTermsResponse, 200, 400 | 401 | 403>(response);
-    },
+    ): ApiResponse<GetBlockedTermsResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/blocked_terms',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds a word or phrase to the broadcaster’s list of blocked terms. These are the terms that the broadcaster doesn’t want used in their chat room.
      *
@@ -3588,19 +3495,15 @@ export class TwitchApi {
       body: AddBlockedTermBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/blocked_terms?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<AddBlockedTermResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/blocked_terms',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<AddBlockedTermResponse, 200, 400 | 401 | 403>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes the word or phrase from the broadcaster’s list of blocked terms.
      *
@@ -3642,15 +3545,14 @@ export class TwitchApi {
       params: RemoveBlockedTermParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/blocked_terms?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/blocked_terms',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes a single chat message or all chat messages from the broadcaster’s chat room.
      *
@@ -3695,15 +3597,14 @@ export class TwitchApi {
       params: DeleteChatMessagesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/chat?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/moderation/chat',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets all users allowed to moderate the broadcaster’s chat room.
      *
@@ -3739,14 +3640,13 @@ export class TwitchApi {
       params: GetModeratorsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/moderators?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetModeratorsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetModeratorsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/moderation/moderators',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds a moderator to the broadcaster’s chat room.
      *
@@ -3795,15 +3695,14 @@ export class TwitchApi {
       params: AddChannelModeratorParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/moderators?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 422 | 429> => 
+      this.callApi({
+        path: '/moderation/moderators',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 422 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes a moderator from the broadcaster’s chat room.
      *
@@ -3847,15 +3746,14 @@ export class TwitchApi {
       params: RemoveChannelModeratorParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/moderation/moderators?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 429> => 
+      this.callApi({
+        path: '/moderation/moderators',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of the broadcaster’s VIPs.
      *
@@ -3893,14 +3791,13 @@ export class TwitchApi {
       params: GetVIPsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels/vips?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetVIPsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetVIPsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/channels/vips',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds the specified user as a VIP in the broadcaster’s channel.
      *
@@ -3966,15 +3863,14 @@ export class TwitchApi {
       params: AddChannelVIPParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels/vips?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429> => 
+      this.callApi({
+        path: '/channels/vips',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes the specified user as a VIP in the broadcaster’s channel.
      *
@@ -4032,15 +3928,14 @@ export class TwitchApi {
       params: RemoveChannelVIPParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/channels/vips?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404 | 422 | 429> => 
+      this.callApi({
+        path: '/channels/vips',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404 | 422 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   polls = {
     /**
@@ -4084,14 +3979,13 @@ export class TwitchApi {
       params: GetPollsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/polls?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetPollsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetPollsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/polls',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Creates a poll that viewers in the broadcaster’s channel can vote on.
      *
@@ -4140,18 +4034,14 @@ export class TwitchApi {
       body: CreatePollBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/polls';
-      const response = await fetch(url, {
+    ): ApiResponse<CreatePollResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/polls',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreatePollResponse, 200, 400 | 401>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Ends an active poll. You have the option to end it or end it and archive it.
      *
@@ -4191,18 +4081,14 @@ export class TwitchApi {
       body: EndPollBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/polls';
-      const response = await fetch(url, {
+    ): ApiResponse<EndPollResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/polls',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<EndPollResponse, 200, 400 | 401>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   predictions = {
     /**
@@ -4240,14 +4126,13 @@ export class TwitchApi {
       params: GetPredictionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/predictions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetPredictionsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetPredictionsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/predictions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Creates a Channel Points Prediction.
      *
@@ -4296,18 +4181,14 @@ export class TwitchApi {
       body: CreatePredictionBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/predictions';
-      const response = await fetch(url, {
+    ): ApiResponse<CreatePredictionResponse, 200, 400 | 401 | 429> => 
+      this.callApi({
+        path: '/predictions',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreatePredictionResponse, 200, 400 | 401 | 429>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Locks, resolves, or cancels a Channel Points Prediction.
      *
@@ -4354,18 +4235,14 @@ export class TwitchApi {
       body: EndPredictionBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/predictions';
-      const response = await fetch(url, {
+    ): ApiResponse<EndPredictionResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/predictions',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<EndPredictionResponse, 200, 400 | 401 | 404>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   raids = {
     /**
@@ -4428,15 +4305,14 @@ export class TwitchApi {
       params: StartRaidParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/raids?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<StartRaidResponse, 200, 400 | 401 | 404 | 409 | 429> => 
+      this.callApi({
+        path: '/raids',
         method: 'POST',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<StartRaidResponse, 200, 400 | 401 | 404 | 409 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Cancel a pending raid.
      *
@@ -4484,15 +4360,14 @@ export class TwitchApi {
       params: CancelRaidParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/raids?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 404 | 429> => 
+      this.callApi({
+        path: '/raids',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 404 | 429>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   schedule = {
     /**
@@ -4539,14 +4414,13 @@ export class TwitchApi {
       params: GetChannelStreamScheduleParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelStreamScheduleResponse, 200, 400 | 401 | 403 | 404>(response);
-    },
+    ): ApiResponse<GetChannelStreamScheduleResponse, 200, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/schedule',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the broadcaster’s streaming schedule as an [iCalendar](https://datatracker.ietf.org/doc/html/rfc5545).
      *
@@ -4581,14 +4455,13 @@ export class TwitchApi {
       params: GetChannelICalendarParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule/icalendar?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<string, 200, 400>(response);
-    },
+    ): ApiResponse<string, 200, 400> => 
+      this.callApi({
+        path: '/schedule/icalendar',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the broadcaster’s schedule settings, such as scheduling a vacation.
      *
@@ -4632,15 +4505,14 @@ export class TwitchApi {
       params: UpdateChannelStreamScheduleParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule/settings?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/schedule/settings',
         method: 'PATCH',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401 | 404>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds a single or recurring broadcast to the broadcaster’s streaming schedule. For information about scheduling broadcasts, see [Stream Schedule](https://help.twitch.tv/s/article/channel-page-setup#Schedule).
      *
@@ -4687,19 +4559,15 @@ export class TwitchApi {
       body: CreateChannelStreamScheduleSegmentBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule/segment?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<CreateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/schedule/segment',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 403>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates a scheduled broadcast segment.
      *
@@ -4750,19 +4618,15 @@ export class TwitchApi {
       body: UpdateChannelStreamScheduleSegmentBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule/segment?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/schedule/segment',
         method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 404>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes a broadcast segment from the broadcaster’s streaming schedule.
      *
@@ -4803,15 +4667,14 @@ export class TwitchApi {
       params: DeleteChannelStreamScheduleSegmentParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/schedule/segment?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/schedule/segment',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   search = {
     /**
@@ -4849,14 +4712,13 @@ export class TwitchApi {
       params: SearchCategoriesParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/search/categories?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<SearchCategoriesResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<SearchCategoriesResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/search/categories',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the channels that match the specified query and have streamed content within the past 6 months.
      *
@@ -4896,14 +4758,13 @@ export class TwitchApi {
       params: SearchChannelsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/search/channels?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<SearchChannelsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<SearchChannelsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/search/channels',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   music = {
     /**
@@ -4943,14 +4804,13 @@ export class TwitchApi {
       params: GetSoundtrackCurrentTrackParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/soundtrack/current_track?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetSoundtrackCurrentTrackResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetSoundtrackCurrentTrackResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/soundtrack/current_track',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the Soundtrack playlist’s tracks.
      *
@@ -4989,14 +4849,13 @@ export class TwitchApi {
       params: GetSoundtrackPlaylistParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/soundtrack/playlist?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetSoundtrackPlaylistResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetSoundtrackPlaylistResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/soundtrack/playlist',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of Soundtrack playlists.
      *
@@ -5032,14 +4891,13 @@ export class TwitchApi {
       params: GetSoundtrackPlaylistsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/soundtrack/playlists?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetSoundtrackPlaylistsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetSoundtrackPlaylistsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/soundtrack/playlists',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   streams = {
     /**
@@ -5078,14 +4936,13 @@ export class TwitchApi {
       params: GetStreamKeyParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams/key?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetStreamKeyResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetStreamKeyResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/streams/key',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of all broadcasters that are streaming. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
      *
@@ -5119,14 +4976,13 @@ export class TwitchApi {
       params: GetStreamsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetStreamsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetStreamsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/streams',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of live streams of broadcasters that the specified user follows.
      *
@@ -5162,14 +5018,13 @@ export class TwitchApi {
       params: GetFollowedStreamsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams/followed?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetFollowedStreamsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetFollowedStreamsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/streams/followed',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Adds a marker to a live stream. A marker is an arbitrary point in a live stream that the broadcaster or editor wants to mark, so they can return to that spot later to create video highlights (see Video Producer, Highlights in the Twitch UX).
      *
@@ -5222,18 +5077,14 @@ export class TwitchApi {
       body: CreateStreamMarkerBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/streams/markers';
-      const response = await fetch(url, {
+    ): ApiResponse<CreateStreamMarkerResponse, 200, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/streams/markers',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<CreateStreamMarkerResponse, 200, 400 | 401 | 403 | 404>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of markers from the user’s most recent stream or from the specified VOD/video. A marker is an arbitrary point in a live stream that the broadcaster or editor marked, so they can return to that spot later to create video highlights (see Video Producer, Highlights in the Twitch UX).
      *
@@ -5276,14 +5127,13 @@ export class TwitchApi {
       params: GetStreamMarkersParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams/markers?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetStreamMarkersResponse, 200, 400 | 401 | 403 | 404>(response);
-    },
+    ): ApiResponse<GetStreamMarkersResponse, 200, 400 | 401 | 403 | 404> => 
+      this.callApi({
+        path: '/streams/markers',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   subscriptions = {
     /**
@@ -5323,14 +5173,13 @@ export class TwitchApi {
       params: GetBroadcasterSubscriptionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/subscriptions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetBroadcasterSubscriptionsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetBroadcasterSubscriptionsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/subscriptions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Checks whether the user subscribes to the broadcaster’s channel.
      *
@@ -5373,14 +5222,13 @@ export class TwitchApi {
       params: CheckUserSubscriptionParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/subscriptions/user?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<CheckUserSubscriptionResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<CheckUserSubscriptionResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/subscriptions/user',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   tags = {
     /**
@@ -5419,14 +5267,13 @@ export class TwitchApi {
       params: GetAllStreamTagsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/tags/streams?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetAllStreamTagsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetAllStreamTagsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/tags/streams',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the list of stream tags that the broadcaster or Twitch added to their channel.
      *
@@ -5461,14 +5308,13 @@ export class TwitchApi {
       params: GetStreamTagsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams/tags?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetStreamTagsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetStreamTagsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/streams/tags',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Applies one or more tags to the specified channel, overwriting existing tags.
      *
@@ -5512,19 +5358,15 @@ export class TwitchApi {
       body: ReplaceStreamTagsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/streams/tags?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/streams/tags',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   teams = {
     /**
@@ -5565,14 +5407,13 @@ export class TwitchApi {
       params: GetChannelTeamsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/teams/channel?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetChannelTeamsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetChannelTeamsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/teams/channel',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets information about the specified Twitch team. [Read More](https://help.twitch.tv/s/article/twitch-teams)
      *
@@ -5612,14 +5453,13 @@ export class TwitchApi {
       params: GetTeamsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/teams?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetTeamsResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetTeamsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/teams',
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   users = {
     /**
@@ -5662,14 +5502,13 @@ export class TwitchApi {
       params: GetUsersParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUsersResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetUsersResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/users',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates the specified user’s information. The user ID in the OAuth token identifies the user whose information you want to update.
      *
@@ -5706,15 +5545,14 @@ export class TwitchApi {
       params: UpdateUserParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateUserResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/users',
         method: 'PUT',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<UpdateUserResponse, 200, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
      *
@@ -5750,14 +5588,13 @@ export class TwitchApi {
       params: GetUsersFollowsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users/follows?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUsersFollowsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetUsersFollowsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/users/follows',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the list of users that the broadcaster has blocked. [Read More](https://help.twitch.tv/s/article/how-to-manage-harassment-in-chat?language=en%5FUS#BlockWhispersandMessagesfromStrangers)
      *
@@ -5793,14 +5630,13 @@ export class TwitchApi {
       params: GetUserBlockListParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users/blocks?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUserBlockListResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetUserBlockListResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/users/blocks',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Blocks the specified user from interacting with or having contact with the broadcaster. The user ID in the OAuth token identifies the broadcaster who is blocking the user.
      *
@@ -5840,15 +5676,14 @@ export class TwitchApi {
       params: BlockUserParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users/blocks?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/users/blocks',
         method: 'PUT',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Removes the user from the broadcaster’s list of blocked users. The user ID in the OAuth token identifies the broadcaster who’s removing the block.
      *
@@ -5883,15 +5718,14 @@ export class TwitchApi {
       params: UnblockUserParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users/blocks?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401> => 
+      this.callApi({
+        path: '/users/blocks',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<void, 204, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets a list of all extensions (both active and inactive) that the broadcaster has installed. The user ID in the access token identifies the broadcaster.
      *
@@ -5918,13 +5752,12 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: async (accessToken = '', clientId = '') => {
-      const url = 'https://api.twitch.tv/helix/users/extensions/list';
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUserExtensionsResponse, 200, 401>(response);
-    },
+    getUserExtensions: async (accessToken = '', clientId = ''): ApiResponse<GetUserExtensionsResponse, 200, 401> => 
+      this.callApi({
+        path: '/users/extensions/list',
+        clientId,
+        accessToken,
+      }),
     /**
      * Gets the active extensions that the broadcaster has installed for each configuration.
      *
@@ -5960,14 +5793,13 @@ export class TwitchApi {
       params: GetUserActiveExtensionsParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/users/extensions?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetUserActiveExtensionsResponse, 200, 400 | 401>(response);
-    },
+    ): ApiResponse<GetUserActiveExtensionsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/users/extensions',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Updates an installed extension’s information. You can update the extension’s activation state, ID, and version number. The user ID in the access token identifies the broadcaster whose extensions you’re updating.
      *
@@ -6008,18 +5840,14 @@ export class TwitchApi {
       body: UpdateUserExtensionsBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const url = 'https://api.twitch.tv/helix/users/extensions';
-      const response = await fetch(url, {
+    ): ApiResponse<UpdateUserExtensionsResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/users/extensions',
         method: 'PUT',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<UpdateUserExtensionsResponse, 200, 400 | 401 | 404>(response);
-    },
+        body,
+        clientId,
+        accessToken,
+      }),
   };
   videos = {
     /**
@@ -6068,14 +5896,13 @@ export class TwitchApi {
       params: GetVideosParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/videos?${s}`;
-      const response = await fetch(url, {
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<GetVideosResponse, 200, 400 | 401 | 404>(response);
-    },
+    ): ApiResponse<GetVideosResponse, 200, 400 | 401 | 404> => 
+      this.callApi({
+        path: '/videos',
+        params,
+        clientId,
+        accessToken,
+      }),
     /**
      * Deletes one or more videos. You may delete past broadcasts, highlights, or uploads.
      *
@@ -6112,15 +5939,14 @@ export class TwitchApi {
       params: DeleteVideosParams,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/videos?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<DeleteVideosResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/videos',
         method: 'DELETE',
-        headers: this.getAuthHeaders(accessToken, clientId),
-      });
-      return getApiResponse<DeleteVideosResponse, 200, 400 | 401>(response);
-    },
+        params,
+        clientId,
+        accessToken,
+      }),
   };
   whispers = {
     /**
@@ -6184,74 +6010,14 @@ export class TwitchApi {
       body: SendWhisperBody,
       accessToken = '',
       clientId = '',
-    ) => {
-      const s = getSearchParams(params);
-      const url = `https://api.twitch.tv/helix/whispers?${s}`;
-      const response = await fetch(url, {
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 404 | 429> => 
+      this.callApi({
+        path: '/whispers',
         method: 'POST',
-        body: JSON.stringify(body),
-        headers: {
-          ...this.getAuthHeaders(accessToken, clientId),
-          'Content-Type': 'application/json',
-        },
-      });
-      return getApiResponse<void, 204, 400 | 401 | 403 | 404 | 429>(response);
-    },
-  };
-  badges = {
-    /**
-     * Gets a list of all global badges.
-     *
-     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-     *
-     * **NOTE:** This endpoint is not documented.
-     *
-     * __Authorization:__
-     *
-     * The Client-Id and Authorization headers are not required.
-     *
-     * __URL:__
-     *
-     * `GET https://badges.twitch.tv/v1/badges/global/display`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the global badges.
-     */
-    getGlobalBadges: async (params: GetGlobalBadgesParams) => {
-      const s = getSearchParams(params);
-      const url = `https://badges.twitch.tv/v1/badges/global/display?${s}`;
-      const response = await fetch(url);
-      return getApiResponse<GetGlobalBadgesResponse, 200>(response);
-    },
-    /**
-     * Gets a list of badges that belongs to the channel.
-     *
-     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-     *
-     * **NOTE:** This endpoint is not documented.
-     *
-     * __Authorization:__
-     *
-     * The Client-Id and Authorization headers are not required.
-     *
-     * __URL:__
-     *
-     * `GET https://badges.twitch.tv/v1/badges/channels/{channel_id}/display`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the channel's badges.
-     */
-    getChannelBadges: async (params: GetChannelBadgesParams) => {
-      const s = getSearchParams(params);
-      const url = `https://badges.twitch.tv/v1/badges/channels/{channel_id}/display?${s}`;
-      const response = await fetch(url);
-      return getApiResponse<GetChannelBadgesResponse, 200>(response);
-    },
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
   };
 }

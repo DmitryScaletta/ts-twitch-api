@@ -85,6 +85,9 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   }
 
   for (const [tag, endpoints] of Object.entries(endpointsByTags)) {
+    // skip get badges for now
+    if (tag === 'badges') continue;
+
     api.push([1, `${tag} = {`]);
 
     for (const { path, method, endpoint } of endpoints) {
@@ -160,7 +163,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
 
       let methodSignature = methodTemplate
         .replace('%METHOD_NAME%', methodName)
-        .replace('%URL%', url)
+        .replace('%BASE_URL%', baseUrl)
+        .replace('%PATH%', path)
         .replace('%METHOD%', method.toUpperCase())
         .replace("    method: 'GET',\n", '');
 

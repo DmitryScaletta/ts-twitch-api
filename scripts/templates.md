@@ -13,24 +13,12 @@ type SuccessCode = 200 | 202 | 204;
 type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
 export type ApiResponse<
   TData,
-  TSuccessCode extends SuccessCode,
-  TErrorCode extends ErrorCode,
+  TSuccessCode extends SuccessCode = SuccessCode,
+  TErrorCode extends ErrorCode = ErrorCode,
 > = Promise<
   | { ok: true; status: TSuccessCode; data: TData }
   | { ok: false; status: TErrorCode; data: unknown }
 >;
-
-const getApiResponse = async <
-  TData,
-  TSuccessCode extends SuccessCode = SuccessCode,
-  TErrorCode extends ErrorCode = ErrorCode,
->(
-  response: Response,
-): ApiResponse<TData, TSuccessCode, TErrorCode> => ({
-  ok: response.ok,
-  status: response.status as any,
-  data: await response.json(),
-});
 
 const getSearchParams = <T extends Record<string, any>>(params: T) => {
   const kvPairs: string[] = [];
@@ -44,6 +32,17 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
   }
   return kvPairs.join('&');
 };
+
+type CallApiOptions = {
+  baseUrl?: string;
+  path: string;
+  method?: string;
+  params?: any;
+  body?: any;
+  clientId?: string;
+  accessToken?: string;
+  requiresAuth?: boolean;
+}
 
 export type TwitchApiOptions = {
   accessToken?: string;
@@ -59,10 +58,35 @@ export class TwitchApi {
     this._clientId = clientId;
   }
 
-  private getAuthHeaders(accessToken: string, clientId: string) {
+  private async callApi({
+    baseUrl = 'https://api.twitch.tv/helix',
+    path,
+    method = 'GET',
+    params,
+    body,
+    clientId,
+    accessToken,
+    requiresAuth = true,
+  }: CallApiOptions): Promise<any> {
+    const url = params
+      ? `${baseUrl}${path}?${getSearchParams(params)}`
+      : `${baseUrl}${path}`;
+    const options: RequestInit = { method };
+    const headers = new Headers();
+    options.headers = headers;
+    if (body) {
+      headers.set('Content-Type', 'application/json');
+      options.body = JSON.stringify(body);
+    }
+    if (requiresAuth) {
+      options.headers.set('Authorization', `Bearer ${accessToken || this._accessToken}`);
+      options.headers.set('Client-Id', clientId || this._clientId);
+    }
+    const response = await fetch(url, options);
     return {
-      Authorization: `Bearer ${accessToken || this._accessToken}`,
-      'Client-Id': clientId || this._clientId,
+      ok: response.ok,
+      status: response.status as any,
+      data: await response.json(),
     };
   }
 
@@ -87,14 +111,13 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: async (accessToken = '', clientId = '') => {
-  const url = '%URL%';
-  const response = await fetch(url, {
+%METHOD_NAME%: async (accessToken = '', clientId = ''): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
+  this.callApi({
+    path: '%PATH%',
     method: '%METHOD%',
-    headers: this.getAuthHeaders(accessToken, clientId),
-  });
-  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>(response);
-},
+    clientId,
+    accessToken,
+  }),
 ```
 
 ## method-signature-no-params-body
@@ -104,18 +127,14 @@ __URL:__
   body: %BODY_TYPE%,
   accessToken = '',
   clientId = '',
-) => {
-  const url = '%URL%';
-  const response = await fetch(url, {
+): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
+  this.callApi({
+    path: '%PATH%',
     method: '%METHOD%',
-    body: JSON.stringify(body),
-    headers: {
-      ...this.getAuthHeaders(accessToken, clientId),
-      'Content-Type': 'application/json',
-    },
-  });
-  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>(response);
-},
+    body,
+    clientId,
+    accessToken,
+  }),
 ```
 
 ## method-signature-params-no-body
@@ -125,15 +144,14 @@ __URL:__
   params: %PARAMS_TYPE%,
   accessToken = '',
   clientId = '',
-) => {
-  const s = getSearchParams(params);
-  const url = `%URL%?${s}`;
-  const response = await fetch(url, {
+): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
+  this.callApi({
+    path: '%PATH%',
     method: '%METHOD%',
-    headers: this.getAuthHeaders(accessToken, clientId),
-  });
-  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>(response);
-},
+    params,
+    clientId,
+    accessToken,
+  }),
 ```
 
 ## method-signature-params-body
@@ -144,28 +162,13 @@ __URL:__
   body: %BODY_TYPE%,
   accessToken = '',
   clientId = '',
-) => {
-  const s = getSearchParams(params);
-  const url = `%URL%?${s}`;
-  const response = await fetch(url, {
+): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
+  this.callApi({
+    path: '%PATH%',
     method: '%METHOD%',
-    body: JSON.stringify(body),
-    headers: {
-      ...this.getAuthHeaders(accessToken, clientId),
-      'Content-Type': 'application/json',
-    },
-  });
-  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>(response);
-},
-```
-
-## method-signature-badges
-
-```ts
-%METHOD_NAME%: async (params: %PARAMS_TYPE%) => {
-  const s = getSearchParams(params);
-  const url = `%URL%?${s}`;
-  const response = await fetch(url);
-  return getApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%>(response);
-},
+    params,
+    body,
+    clientId,
+    accessToken,
+  }),
 ```
