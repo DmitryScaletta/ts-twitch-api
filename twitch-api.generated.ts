@@ -186,7 +186,7 @@ export interface paths {
   };
   "/chat/chatters": {
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the list of users that are connected to the broadcaster’s chat session.
+     * Gets the list of users that are connected to the broadcaster’s chat session.
      *
      * **NOTE**: There is a delay between when users join and leave a chat and when the list is updated accordingly.
      *
@@ -854,6 +854,28 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:vips** scope.
      */
     delete: operations["remove-channel-vip"];
+  };
+  "/moderation/shield_mode": {
+    /**
+     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the broadcaster’s Shield Mode activation status.
+     *
+     * To receive notification when the broadcaster activates and deactivates Shield Mode, subscribe to the [channel.shield\_mode.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodebegin) and [channel.shield\_mode.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodeend) subscription types.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+     */
+    get: operations["get-shield-mode-status"];
+    /**
+     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Activates or deactivates the broadcaster’s Shield Mode.
+     *
+     * Twitch’s Shield Mode feature is like a panic button that broadcasters can push to protect themselves from chat abuse coming from one or more accounts. When activated, Shield Mode applies the overrides that the broadcaster configured in the Twitch UX. If the broadcaster hasn’t configured Shield Mode, it applies default overrides.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope.
+     */
+    put: operations["update-shield-mode-status"];
   };
   "/polls": {
     /**
@@ -1596,7 +1618,7 @@ export interface components {
       game_id: string;
       /** The title of the stream that the broadcaster is currently streaming or last streamed. The value is an empty string if the broadcaster has never streamed. */
       title: string;
-      /** The value of the broadcaster’s stream delay setting, in seconds. Reserved for users with Partner status. */
+      /** The value of the broadcaster’s stream delay setting, in seconds. This field’s value defaults to zero unless 1) the request specifies a user access token, 2) the ID in the _broadcaster\_id_ query parameter matches the user ID in the access token, and 3) the broadcaster has partner status and they set a non-zero stream delay value. */
       delay: number;
     };
     GetChannelInformationResponse: {
@@ -3275,6 +3297,40 @@ export interface components {
         cursor?: string;
       };
     };
+    UpdateShieldModeStatusBody: {
+      /** A Boolean value that determines whether to activate Shield Mode. Set to **true** to activate Shield Mode; otherwise, **false** to deactivate Shield Mode. */
+      is_active: boolean;
+    };
+    UpdateShieldModeStatusResponse: {
+      /** A list that contains a single object with the broadcaster’s updated Shield Mode status. */
+      data: {
+        /** A Boolean value that determines whether Shield Mode is active. Is **true** if Shield Mode is active; otherwise, **false**. */
+        is_active: boolean;
+        /** An ID that identifies the moderator that last activated Shield Mode. */
+        moderator_id: string;
+        /** The moderator’s login name. */
+        moderator_login: string;
+        /** The moderator’s display name. */
+        moderator_name: string;
+        /** The UTC timestamp (in RFC3339 format) of when Shield Mode was last activated. */
+        last_activated_at: string;
+      }[];
+    };
+    GetShieldModeStatusResponse: {
+      /** A list that contains a single object with the broadcaster’s Shield Mode status. */
+      data: {
+        /** A Boolean value that determines whether Shield Mode is active. Is **true** if the broadcaster activated Shield Mode; otherwise, **false**. */
+        is_active: boolean;
+        /** An ID that identifies the moderator that last activated Shield Mode. Is an empty string if Shield Mode hasn’t been previously activated. */
+        moderator_id: string;
+        /** The moderator’s login name. Is an empty string if Shield Mode hasn’t been previously activated. */
+        moderator_login: string;
+        /** The moderator’s display name. Is an empty string if Shield Mode hasn’t been previously activated. */
+        moderator_name: string;
+        /** The UTC timestamp (in RFC3339 format) of when Shield Mode was last activated. Is an empty string if Shield Mode hasn’t been previously activated. */
+        last_activated_at: string;
+      }[];
+    };
     Poll: {
       /** An ID that identifies the poll. */
       id: string;
@@ -3943,9 +3999,9 @@ export interface components {
       /** A Boolean value that determines whether the tag is an automatic tag. An automatic tag is one that Twitch adds to the stream. Broadcasters may not add automatic tags to their channel. The value is **true** if the tag is an automatic tag; otherwise, **false**. */
       is_auto: boolean;
       /** A dictionary that contains the localized names of the tag. The key is in the form, <locale>-<coutry/region>. For example, en-us. The value is the localized name. */
-      localization_names: { [key: string]: any };
+      localization_names: { [key: string]: string };
       /** A dictionary that contains the localized descriptions of the tag. The key is in the form, <locale>-<coutry/region>. For example, en-us. The value is the localized description. */
-      localization_descriptions: { [key: string]: any };
+      localization_descriptions: { [key: string]: string };
     };
     GetAllStreamTagsResponse: {
       /** The list of stream tags that the broadcaster can apply to their channel. */
@@ -5258,7 +5314,7 @@ export interface operations {
     };
   };
   /**
-   * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the list of users that are connected to the broadcaster’s chat session.
+   * Gets the list of users that are connected to the broadcaster’s chat session.
    *
    * **NOTE**: There is a delay between when users join and leave a chat and when the list is updated accordingly.
    *
@@ -6821,7 +6877,7 @@ export interface operations {
         /** The name of the category or game to get. The name must exactly match the category’s or game’s title. Include this parameter for each category or game you want to get. For example, `&name=foo&name=bar`. You may specify a maximum of 100 names. The endpoint ignores duplicate names and names that weren’t found. */
         name?: string[];
         /** The [IGDB](https://www.igdb.com/) ID of the game to get. Include this parameter for each game you want to get. For example, `&igdb_id=1234&igdb_id=5678`. You may specify a maximum of 100 IDs. The endpoint ignores duplicate and invalid IDs or IDs that weren’t found. */
-        igdb_id?: string;
+        igdb_id?: string[];
       };
     };
     responses: {
@@ -7844,6 +7900,97 @@ export interface operations {
       422: unknown;
       /** The broadcaster exceeded the number of VIPs that they may remove within a 10-second window. See Rate Limits for this endpoint above. */
       429: unknown;
+    };
+  };
+  /**
+   * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the broadcaster’s Shield Mode activation status.
+   *
+   * To receive notification when the broadcaster activates and deactivates Shield Mode, subscribe to the [channel.shield\_mode.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodebegin) and [channel.shield\_mode.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodeend) subscription types.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+   */
+  "get-shield-mode-status": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster whose Shield Mode activation status you want to get. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token. */
+        moderator_id: string;
+      };
+    };
+    responses: {
+      /** Successfully retrieved the broadcaster’s Shield Mode activation status. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetShieldModeStatusResponse"];
+        };
+      };
+      /**
+       * * The _broadcaster\_id_ query parameter is required.
+       * * The ID in the _broadcaster\_id_ query parameter is not valid.
+       */
+      400: unknown;
+      /**
+       * * The ID in _moderator\_id_ must match the user ID in the user access token.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token must include the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+       * * The access token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+       */
+      401: unknown;
+      /** * The user in _moderator\_id_ is not one of the broadcaster's moderators. */
+      403: unknown;
+    };
+  };
+  /**
+   * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Activates or deactivates the broadcaster’s Shield Mode.
+   *
+   * Twitch’s Shield Mode feature is like a panic button that broadcasters can push to protect themselves from chat abuse coming from one or more accounts. When activated, Shield Mode applies the overrides that the broadcaster configured in the Twitch UX. If the broadcaster hasn’t configured Shield Mode, it applies default overrides.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope.
+   */
+  "update-shield-mode-status": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster whose Shield Mode you want to activate or deactivate. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token. */
+        moderator_id: string;
+      };
+    };
+    responses: {
+      /** Successfully updated the broadcaster’s Shield Mode status. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UpdateShieldModeStatusResponse"];
+        };
+      };
+      /**
+       * * The _broadcaster\_id_ query parameter is required.
+       * * The ID in the _broadcaster\_id_ query parameter is not valid.
+       * * The `is_active` field is required.
+       * * The value in the `is_active` field is not valid.
+       */
+      400: unknown;
+      /**
+       * * The ID in _moderator\_id_ must match the user ID in the user access token.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token must include the **moderator:manage:shield\_mode** scope.
+       * * The access token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+       */
+      401: unknown;
+      /** * The user in _moderator\_id_ is not one of the broadcaster's moderators. */
+      403: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateShieldModeStatusBody"];
+      };
     };
   };
   /**

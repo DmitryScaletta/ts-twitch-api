@@ -62,6 +62,8 @@ export type RemoveChannelModeratorParams = operations['remove-channel-moderator'
 export type GetVIPsParams = operations['get-vips']['parameters']['query'];
 export type AddChannelVIPParams = operations['add-channel-vip']['parameters']['query'];
 export type RemoveChannelVIPParams = operations['remove-channel-vip']['parameters']['query'];
+export type UpdateShieldModeStatusParams = operations['update-shield-mode-status']['parameters']['query'];
+export type GetShieldModeStatusParams = operations['get-shield-mode-status']['parameters']['query'];
 export type GetPollsParams = operations['get-polls']['parameters']['query'];
 export type GetPredictionsParams = operations['get-predictions']['parameters']['query'];
 export type StartRaidParams = operations['start-a-raid']['parameters']['query'];
@@ -212,6 +214,9 @@ export type UserModerator = Schema<'UserModerator'>;
 export type GetModeratorsResponse = Schema<'GetModeratorsResponse'>;
 export type UserVip = Schema<'UserVip'>;
 export type GetVIPsResponse = Schema<'GetVIPsResponse'>;
+export type UpdateShieldModeStatusBody = Schema<'UpdateShieldModeStatusBody'>;
+export type UpdateShieldModeStatusResponse = Schema<'UpdateShieldModeStatusResponse'>;
+export type GetShieldModeStatusResponse = Schema<'GetShieldModeStatusResponse'>;
 export type Poll = Schema<'Poll'>;
 export type GetPollsResponse = Schema<'GetPollsResponse'>;
 export type CreatePollBody = Schema<'CreatePollBody'>;
@@ -363,7 +368,7 @@ export class TwitchApi {
       options.headers.set('Authorization', `Bearer ${accessToken || this._accessToken}`);
       options.headers.set('Client-Id', clientId || this._clientId);
     }
-    const response = await fetch(url, body);
+    const response = await fetch(url, options);
     return {
       ok: response.ok,
       status: response.status as any,
@@ -1266,7 +1271,7 @@ export class TwitchApi {
   };
   chat = {
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the list of users that are connected to the broadcaster’s chat session.
+     * Gets the list of users that are connected to the broadcaster’s chat session.
      *
      * **NOTE**: There is a delay between when users join and leave a chat and when the list is updated accordingly.
      *
@@ -3932,6 +3937,109 @@ export class TwitchApi {
       this.callApi({
         path: '/channels/vips',
         method: 'DELETE',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Activates or deactivates the broadcaster’s Shield Mode.
+     *
+     * Twitch’s Shield Mode feature is like a panic button that broadcasters can push to protect themselves from chat abuse coming from one or more accounts. When activated, Shield Mode applies the overrides that the broadcaster configured in the Twitch UX. If the broadcaster hasn’t configured Shield Mode, it applies default overrides.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope.
+     *
+     * __URL:__
+     *
+     * `PUT https://api.twitch.tv/helix/moderation/shield_mode`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully updated the broadcaster’s Shield Mode status.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The ID in the _broadcaster\_id_ query parameter is not valid.
+     * * The `is_active` field is required.
+     * * The value in the `is_active` field is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:manage:shield\_mode** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * * The user in _moderator\_id_ is not one of the broadcaster's moderators.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-shield-mode-status
+     */
+    updateShieldModeStatus: async (
+      params: UpdateShieldModeStatusParams,
+      body: UpdateShieldModeStatusBody,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<UpdateShieldModeStatusResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/shield_mode',
+        method: 'PUT',
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the broadcaster’s Shield Mode activation status.
+     *
+     * To receive notification when the broadcaster activates and deactivates Shield Mode, subscribe to the [channel.shield\_mode.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodebegin) and [channel.shield\_mode.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodeend) subscription types.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/moderation/shield_mode`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the broadcaster’s Shield Mode activation status.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The ID in the _broadcaster\_id_ query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * * The user in _moderator\_id_ is not one of the broadcaster's moderators.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-shield-mode-status
+     */
+    getShieldModeStatus: async (
+      params: GetShieldModeStatusParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetShieldModeStatusResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/moderation/shield_mode',
         params,
         clientId,
         accessToken,
