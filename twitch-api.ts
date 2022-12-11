@@ -621,7 +621,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets a list of transactions for an extension. A transaction records the exchange of a currency (for example, Bits) for a digital product.
+     * Gets an extension’s list of transactions. A transaction records the exchange of a currency (for example, Bits) for a digital product.
      *
      * __Authentication:__
      *
@@ -635,7 +635,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Sccessfully retrieved the list of transactions.
+     * Successfully retrieved the list of transactions.
      *
      * _400 Bad Request_
      *
@@ -773,7 +773,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets a list of users that are editors for the specified broadcaster.
+     * Gets the broadcaster’s list editors.
      *
      * __Authentication:__
      *
@@ -787,7 +787,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the list of editors.
+     * Successfully retrieved the broadcaster’s list of editors.
      *
      * _400 Bad Request_
      *
@@ -831,7 +831,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully created the Custom Reward.
+     * Successfully created the custom reward.
      *
      * _400 Bad Request_
      *
@@ -949,7 +949,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s list of the Custom Rewards.
+     * Successfully retrieved the broadcaster’s list of custom rewards.
      *
      * _400 Bad Request_
      *
@@ -1005,7 +1005,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully updated the Custom Reward.
+     * Successfully updated the custom reward.
      *
      * _400 Bad Request_
      *
@@ -1324,7 +1324,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets all emotes that the specified Twitch channel created. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
+     * Gets the broadcaster’s list of custom emotes. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
      *
      * For information about the custom emotes, see [subscriber emotes](https://help.twitch.tv/s/article/subscriber-emote-guide), [Bits tier emotes](https://help.twitch.tv/s/article/custom-bit-badges-guide?language=bg#slots), and [follower emotes](https://blog.twitch.tv/en/2021/06/04/kicking-off-10-years-with-our-biggest-emote-update-ever/).
      *
@@ -1342,7 +1342,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the custom emotes for the specified broadcaster.
+     * Successfully retrieved broadcaster’s list of custom emotes.
      *
      * _400 Bad Request_
      *
@@ -1368,7 +1368,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets all [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
+     * Gets the list of [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
      *
      * [Learn More](https://dev.twitch.tv/docs/irc/emotes)
      *
@@ -1388,7 +1388,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the global emotes.
+     * Successfully retrieved Twitch’s list of global emotes.
      *
      * _401 Unauthorized_
      *
@@ -1450,7 +1450,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets all badges that the specified broadcaster created. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
+     * Gets the broadcaster’s list of custom chat badges. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
      *
      * __Authorization:__
      *
@@ -1490,7 +1490,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets the list of chat badges that Twitch created. Users can use these badges in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
+     * Gets Twitch’s list of chat badges, which users may use in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
      *
      * __Authorization:__
      *
@@ -2500,7 +2500,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Sccessfully retrieved the list of extensions.
+     * Successfully retrieved the list of extensions.
      *
      * _400 Bad Request_
      *
@@ -2531,7 +2531,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets information about a released extension. Returns extensions whose `state` is Released.
+     * Gets information about a released extension. Returns the extension if its `state` is Released.
      *
      * __Authorization:__
      *
@@ -3201,7 +3201,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Success.
+     * Successfully updated the broadcaster’s AutoMod settings.
      *
      * _400 Bad Request_
      *
@@ -4312,7 +4312,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully updated the prediction.
+     * Successfully ended the prediction.
      *
      * _400 Bad Request_
      *
@@ -5052,7 +5052,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets a list of all broadcasters that are streaming. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
+     * Gets a list of all streams. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
      *
      * __Authentication:__
      *
@@ -5092,7 +5092,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * Gets a list of live streams of broadcasters that the specified user follows.
+     * Gets the list of broadcasters that the user follows and that are streaming live.
      *
      * __Authentication:__
      *
@@ -5106,7 +5106,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the list of tags.
+     * Successfully retrieved the list of broadcasters that the user follows and that are streaming live.
      *
      * _400 Bad Request_
      *

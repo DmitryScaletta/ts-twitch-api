@@ -60,7 +60,7 @@ export interface paths {
   };
   "/extensions/transactions": {
     /**
-     * Gets a list of transactions for an extension. A transaction records the exchange of a currency (for example, Bits) for a digital product.
+     * Gets an extension’s list of transactions. A transaction records the exchange of a currency (for example, Bits) for a digital product.
      *
      * __Authentication:__
      *
@@ -92,7 +92,7 @@ export interface paths {
   };
   "/channels/editors": {
     /**
-     * Gets a list of users that are editors for the specified broadcaster.
+     * Gets the broadcaster’s list editors.
      *
      * __Authentication:__
      *
@@ -200,7 +200,7 @@ export interface paths {
   };
   "/chat/emotes": {
     /**
-     * Gets all emotes that the specified Twitch channel created. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
+     * Gets the broadcaster’s list of custom emotes. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
      *
      * For information about the custom emotes, see [subscriber emotes](https://help.twitch.tv/s/article/subscriber-emote-guide), [Bits tier emotes](https://help.twitch.tv/s/article/custom-bit-badges-guide?language=bg#slots), and [follower emotes](https://blog.twitch.tv/en/2021/06/04/kicking-off-10-years-with-our-biggest-emote-update-ever/).
      *
@@ -214,7 +214,7 @@ export interface paths {
   };
   "/chat/emotes/global": {
     /**
-     * Gets all [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
+     * Gets the list of [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
      *
      * [Learn More](https://dev.twitch.tv/docs/irc/emotes)
      *
@@ -244,7 +244,7 @@ export interface paths {
   };
   "/chat/badges": {
     /**
-     * Gets all badges that the specified broadcaster created. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
+     * Gets the broadcaster’s list of custom chat badges. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
      *
      * __Authorization:__
      *
@@ -254,7 +254,7 @@ export interface paths {
   };
   "/chat/badges/global": {
     /**
-     * Gets the list of chat badges that Twitch created. Users can use these badges in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
+     * Gets Twitch’s list of chat badges, which users may use in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
      *
      * __Authorization:__
      *
@@ -546,7 +546,7 @@ export interface paths {
   };
   "/extensions/released": {
     /**
-     * Gets information about a released extension. Returns extensions whose `state` is Released.
+     * Gets information about a released extension. Returns the extension if its `state` is Released.
      *
      * __Authorization:__
      *
@@ -1103,7 +1103,7 @@ export interface paths {
   };
   "/streams": {
     /**
-     * Gets a list of all broadcasters that are streaming. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
+     * Gets a list of all streams. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
      *
      * __Authentication:__
      *
@@ -1113,7 +1113,7 @@ export interface paths {
   };
   "/streams/followed": {
     /**
-     * Gets a list of live streams of broadcasters that the specified user follows.
+     * Gets the list of broadcasters that the user follows and that are streaming live.
      *
      * __Authentication:__
      *
@@ -3614,7 +3614,7 @@ export interface components {
       /** The length of time, in minutes, that the broadcast is scheduled to run. The duration must be in the range 30 through 1380 (23 hours). */
       duration: string;
       /** A Boolean value that determines whether the broadcast recurs weekly. Is **true** if the broadcast recurs weekly. Only partners and affiliates may add non-recurring broadcasts. */
-      is_recurring: boolean;
+      is_recurring?: boolean;
       /** The ID of the category that best represents the broadcast’s content. To get the category ID, use the [Search Categories](https://dev.twitch.tv/docs/api/reference#search-categories) endpoint. */
       category_id?: string;
       /** The broadcast’s title. The title may contain a maximum of 140 characters. */
@@ -4700,7 +4700,7 @@ export interface operations {
     };
   };
   /**
-   * Gets a list of transactions for an extension. A transaction records the exchange of a currency (for example, Bits) for a digital product.
+   * Gets an extension’s list of transactions. A transaction records the exchange of a currency (for example, Bits) for a digital product.
    *
    * __Authentication:__
    *
@@ -4720,7 +4720,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Sccessfully retrieved the list of transactions. */
+      /** Successfully retrieved the list of transactions. */
       200: {
         content: {
           "application/json": components["schemas"]["GetExtensionTransactionsResponse"];
@@ -4841,7 +4841,7 @@ export interface operations {
     };
   };
   /**
-   * Gets a list of users that are editors for the specified broadcaster.
+   * Gets the broadcaster’s list editors.
    *
    * __Authentication:__
    *
@@ -4855,7 +4855,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully retrieved the list of editors. */
+      /** Successfully retrieved the broadcaster’s list of editors. */
       200: {
         content: {
           "application/json": components["schemas"]["GetChannelEditorsResponse"];
@@ -4898,7 +4898,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully retrieved the broadcaster’s list of the Custom Rewards. */
+      /** Successfully retrieved the broadcaster’s list of custom rewards. */
       200: {
         content: {
           "application/json": components["schemas"]["GetCustomRewardResponse"];
@@ -4938,7 +4938,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully created the Custom Reward. */
+      /** Successfully created the custom reward. */
       200: {
         content: {
           "application/json": components["schemas"]["CreateCustomRewardsResponse"];
@@ -5053,7 +5053,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully updated the Custom Reward. */
+      /** Successfully updated the custom reward. */
       200: {
         content: {
           "application/json": components["schemas"]["UpdateCustomRewardResponse"];
@@ -5364,7 +5364,7 @@ export interface operations {
     };
   };
   /**
-   * Gets all emotes that the specified Twitch channel created. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
+   * Gets the broadcaster’s list of custom emotes. Broadcasters create these custom emotes for users who subscribe to or follow the channel or cheer Bits in the channel’s chat window. [Learn More](https://dev.twitch.tv/docs/irc/emotes)
    *
    * For information about the custom emotes, see [subscriber emotes](https://help.twitch.tv/s/article/subscriber-emote-guide), [Bits tier emotes](https://help.twitch.tv/s/article/custom-bit-badges-guide?language=bg#slots), and [follower emotes](https://blog.twitch.tv/en/2021/06/04/kicking-off-10-years-with-our-biggest-emote-update-ever/).
    *
@@ -5382,7 +5382,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully retrieved the custom emotes for the specified broadcaster. */
+      /** Successfully retrieved broadcaster’s list of custom emotes. */
       200: {
         content: {
           "application/json": components["schemas"]["GetChannelEmotesResponse"];
@@ -5399,7 +5399,7 @@ export interface operations {
     };
   };
   /**
-   * Gets all [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
+   * Gets the list of [global emotes](https://www.twitch.tv/creatorcamp/en/learn-the-basics/emotes/). Global emotes are Twitch-created emotes that users can use in any Twitch chat.
    *
    * [Learn More](https://dev.twitch.tv/docs/irc/emotes)
    *
@@ -5413,7 +5413,7 @@ export interface operations {
    */
   "get-global-emotes": {
     responses: {
-      /** Successfully retrieved the global emotes. */
+      /** Successfully retrieved Twitch’s list of global emotes. */
       200: {
         content: {
           "application/json": components["schemas"]["GetGlobalEmotesResponse"];
@@ -5470,7 +5470,7 @@ export interface operations {
     };
   };
   /**
-   * Gets all badges that the specified broadcaster created. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
+   * Gets the broadcaster’s list of custom chat badges. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
    *
    * __Authorization:__
    *
@@ -5501,7 +5501,7 @@ export interface operations {
     };
   };
   /**
-   * Gets the list of chat badges that Twitch created. Users can use these badges in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
+   * Gets Twitch’s list of chat badges, which users may use in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
    *
    * __Authorization:__
    *
@@ -6531,7 +6531,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Sccessfully retrieved the list of extensions. */
+      /** Successfully retrieved the list of extensions. */
       200: {
         content: {
           "application/json": components["schemas"]["GetExtensionsResponse"];
@@ -6551,7 +6551,7 @@ export interface operations {
     };
   };
   /**
-   * Gets information about a released extension. Returns extensions whose `state` is Released.
+   * Gets information about a released extension. Returns the extension if its `state` is Released.
    *
    * __Authorization:__
    *
@@ -7159,7 +7159,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Success. */
+      /** Successfully updated the broadcaster’s AutoMod settings. */
       200: {
         content: {
           "application/json": components["schemas"]["UpdateAutoModSettingsResponse"];
@@ -8219,7 +8219,7 @@ export interface operations {
    */
   "end-prediction": {
     responses: {
-      /** Successfully updated the prediction. */
+      /** Successfully ended the prediction. */
       200: {
         content: {
           "application/json": components["schemas"]["EndPredictionResponse"];
@@ -8884,7 +8884,7 @@ export interface operations {
     };
   };
   /**
-   * Gets a list of all broadcasters that are streaming. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
+   * Gets a list of all streams. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
    *
    * __Authentication:__
    *
@@ -8940,7 +8940,7 @@ export interface operations {
     };
   };
   /**
-   * Gets a list of live streams of broadcasters that the specified user follows.
+   * Gets the list of broadcasters that the user follows and that are streaming live.
    *
    * __Authentication:__
    *
@@ -8958,7 +8958,7 @@ export interface operations {
       };
     };
     responses: {
-      /** Successfully retrieved the list of tags. */
+      /** Successfully retrieved the list of broadcasters that the user follows and that are streaming live. */
       200: {
         content: {
           "application/json": components["schemas"]["GetFollowedStreamsResponse"];
