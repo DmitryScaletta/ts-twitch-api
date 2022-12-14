@@ -2334,14 +2334,16 @@ export interface components {
       data: components["schemas"]["UserChatColor"][];
     };
     CreateClipResponse: {
-      /**
-       * A URL that you can use to edit the clip’s title, identify the part of the clip to publish, and publish the clip. [Learn More](https://help.twitch.tv/s/article/how-to-use-clips)
-       *
-       * The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
-       */
-      edit_url: string;
-      /** An ID that uniquely identifies the clip. */
-      id: string;
+      data: {
+        /**
+         * A URL that you can use to edit the clip’s title, identify the part of the clip to publish, and publish the clip. [Learn More](https://help.twitch.tv/s/article/how-to-use-clips)
+         *
+         * The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
+         */
+        edit_url: string;
+        /** An ID that uniquely identifies the clip. */
+        id: string;
+      }[];
     };
     Clip: {
       /** An ID that uniquely identifies the clip. */
@@ -2863,14 +2865,23 @@ export interface components {
       /** An ID that identifies the subscription. */
       id: string;
       /**
-       * The subscription’s status. Possible values are:
+       * The subscription’s status. The subscriber receives events only for **enabled** subscriptions. Possible values are:
        *
        * * enabled — The subscription is enabled.
        * * webhook\_callback\_verification\_pending — The subscription is pending verification of the specified callback URL.
        * * webhook\_callback\_verification\_failed — The specified callback URL failed verification.
        * * notification\_failures\_exceeded — The notification delivery failure rate was too high.
        * * authorization\_revoked — The authorization was revoked for one or more users specified in the **Condition** object.
+       * * moderator\_removed — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
        * * user\_removed — One of the users specified in the **Condition** object was removed.
+       * * version\_removed — The subscribed to subscription type and version is no longer supported.
+       * * websocket\_disconnected — The client closed the connection.
+       * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
+       * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+       * * websocket\_connection\_unused — The client failed to subscribe to events within the required time.
+       * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
+       * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
+       * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
        */
       status:
         | "enabled"
@@ -2878,7 +2889,16 @@ export interface components {
         | "webhook_callback_verification_failed"
         | "notification_failures_exceeded"
         | "authorization_revoked"
-        | "user_removed";
+        | "moderator_removed"
+        | "user_removed"
+        | "version_removed"
+        | "websocket_disconnected"
+        | "websocket_failed_ping_pong"
+        | "websocket_received_inbound_traffic"
+        | "websocket_connection_unused"
+        | "websocket_internal_error"
+        | "websocket_network_timeout"
+        | "websocket_network_error";
       /** The subscription’s type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
       type: string;
       /** The version number that identifies this definition of the subscription’s data. */
@@ -6679,8 +6699,16 @@ export interface operations {
          * * webhook\_callback\_verification\_failed — The specified callback URL failed verification.
          * * notification\_failures\_exceeded — The notification delivery failure rate was too high.
          * * authorization\_revoked — The authorization was revoked for one or more users specified in the **Condition** object.
+         * * moderator\_removed — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
          * * user\_removed — One of the users specified in the **Condition** object was removed.
          * * version\_removed — The subscribed to subscription type and version is no longer supported.
+         * * websocket\_disconnected — The client closed the connection.
+         * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
+         * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+         * * websocket\_connection\_unused — The client failed to subscribe to events within the required time.
+         * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
+         * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
+         * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
          */
         status?:
           | "enabled"
@@ -6688,8 +6716,16 @@ export interface operations {
           | "webhook_callback_verification_failed"
           | "notification_failures_exceeded"
           | "authorization_revoked"
+          | "moderator_removed"
           | "user_removed"
-          | "version_removed";
+          | "version_removed"
+          | "websocket_disconnected"
+          | "websocket_failed_ping_pong"
+          | "websocket_received_inbound_traffic"
+          | "websocket_connection_unused"
+          | "websocket_internal_error"
+          | "websocket_network_timeout"
+          | "websocket_network_error";
         /** Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
         type?: string;
         /** Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
