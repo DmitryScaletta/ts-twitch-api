@@ -25,6 +25,7 @@ export type GetChannelChatBadgesParams = operations['get-channel-chat-badges']['
 export type GetChatSettingsParams = operations['get-chat-settings']['parameters']['query'];
 export type UpdateChatSettingsParams = operations['update-chat-settings']['parameters']['query'];
 export type SendChatAnnouncementParams = operations['send-chat-announcement']['parameters']['query'];
+export type SendaShoutoutParams = operations['send-a-shoutout']['parameters']['query'];
 export type GetUserChatColorParams = operations['get-user-chat-color']['parameters']['query'];
 export type UpdateUserChatColorParams = operations['update-user-chat-color']['parameters']['query'];
 export type CreateClipParams = operations['create-clip']['parameters']['query'];
@@ -384,7 +385,7 @@ export class TwitchApi {
      *
      * **NOTE**: Only the broadcaster may start a commercial; the broadcaster’s editors and moderators may not start commercials on behalf of the broadcaster.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:edit:commercial** scope.
      *
@@ -441,7 +442,7 @@ export class TwitchApi {
     /**
      * Gets an analytics report for one or more extensions. The response contains the URLs used to download the reports (CSV files). [Learn More](https://dev.twitch.tv/docs/insights)
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **analytics:read:extensions** scope.
      *
@@ -491,7 +492,7 @@ export class TwitchApi {
     /**
      * Gets an analytics report for one or more games. The response contains the URLs used to download the reports (CSV files). [Learn more](https://dev.twitch.tv/docs/insights)
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **analytics:read:games** scope.
      *
@@ -543,7 +544,7 @@ export class TwitchApi {
     /**
      * Gets the Bits leaderboard for the authenticated broadcaster.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **bits:read** scope.
      *
@@ -588,7 +589,7 @@ export class TwitchApi {
     /**
      * Gets a list of Cheermotes that users can use to cheer Bits in any Bits-enabled channel’s chat room. Cheermotes are animated emotes that viewers can assign Bits to.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -623,7 +624,7 @@ export class TwitchApi {
     /**
      * Gets an extension’s list of transactions. A transaction records the exchange of a currency (for example, Bits) for a digital product.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
@@ -672,7 +673,7 @@ export class TwitchApi {
     /**
      * Gets information about one or more channels.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -720,7 +721,7 @@ export class TwitchApi {
     /**
      * Updates a channel’s properties.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
      *
@@ -745,6 +746,11 @@ export class TwitchApi {
      * * The `title` field may not contain an empty string.
      * * The ID in `game_id` is not valid.
      * * To update the `delay` field, the broadcaster must have partner status.
+     * * The list in the `tags` field exceeds the maximum number of tags allowed.
+     * * A tag in the `tags` field exceeds the maximum length allowed.
+     * * A tag in the `tags` field is empty.
+     * * A tag in the `tags` field contains special characters or spaces.
+     * * One or more tags in the `tags` field failed AutoMod review.
      *
      * _401 Unauthorized_
      *
@@ -775,7 +781,7 @@ export class TwitchApi {
     /**
      * Gets the broadcaster’s list editors.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:editors** scope.
      *
@@ -819,7 +825,7 @@ export class TwitchApi {
     /**
      * Creates a Custom Reward in the broadcaster’s channel. The maximum number of custom rewards per channel is 50, which includes both enabled and disabled rewards.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
@@ -881,7 +887,7 @@ export class TwitchApi {
      *
      * The app used to create the reward is the only app that may delete it. If the reward’s redemption status is UNFULFILLED at the time the reward is deleted, its redemption status is marked as FULFILLED.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
@@ -935,11 +941,11 @@ export class TwitchApi {
     /**
      * Gets a list of custom rewards that the specified broadcaster created.
      *
-     * __Authentication:__
-     *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** scope.
-     *
      * **NOTE**: A channel may offer a maximum of 50 rewards, which includes both enabled and disabled rewards.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** or **channel:manage:redemptions** scope.
      *
      * __URL:__
      *
@@ -989,7 +995,7 @@ export class TwitchApi {
     /**
      * Updates a custom reward. The app used to create the reward is the only app that may update the reward.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
@@ -1056,9 +1062,9 @@ export class TwitchApi {
     /**
      * Gets a list of redemptions for the specified custom reward. The app used to create the reward is the only app that may get the redemptions.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** or **channel:manage:redemptions** scope.
      *
      * __URL:__
      *
@@ -1112,7 +1118,7 @@ export class TwitchApi {
     /**
      * Updates a redemption’s status. You may update a redemption only if its status is UNFULFILLED. The app used to create the reward is the only app that may update the redemption.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
@@ -1171,7 +1177,7 @@ export class TwitchApi {
   };
   charity = {
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets information about the charity campaign that a broadcaster is running. For example, the campaign’s fundraising goal and the current amount of donations.
+     * Gets information about the charity campaign that a broadcaster is running. For example, the campaign’s fundraising goal and the current amount of donations.
      *
      * To receive events when progress is made towards the campaign’s goal or the broadcaster changes the fundraising goal, subscribe to the [channel.charity\_campaign.progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelcharity%5Fcampaignprogress) subscription type.
      *
@@ -1220,7 +1226,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the list of donations that users have made to the broadcaster’s active charity campaign.
+     * Gets the list of donations that users have made to the broadcaster’s active charity campaign.
      *
      * To receive events as donations occur, subscribe to the [channel.charity\_campaign.donate](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelcharity%5Fcampaigndonate) subscription type.
      *
@@ -1569,9 +1575,9 @@ export class TwitchApi {
     /**
      * Updates the broadcaster’s chat settings.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `moderator:manage:chat_settings` scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_settings** scope.
      *
      * __Request Body:__
      *
@@ -1649,6 +1655,9 @@ export class TwitchApi {
      * _400 Bad Request_
      *
      * * The `message` field in the request's body is required.
+     * * The `message` field may not contain an empty string.
+     * * The `message` field may not contain an empty string.
+     * * The string in the `message` field failed review.
      * * The specified color is not valid.
      *
      * _401 Unauthorized_
@@ -1671,6 +1680,70 @@ export class TwitchApi {
         method: 'POST',
         params,
         body,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
+     *
+     * Twitch’s Shoutout feature is a great way for you to show support for other broadcasters and help them grow. Viewers who do not follow the other broadcaster will see a pop-up Follow button in your chat that they can click to follow the other broadcaster. [Learn More](https://help.twitch.tv/s/article/shoutouts)
+     *
+     * **Rate Limits** The broadcaster may send a Shoutout once every 2 minutes. They may send the same broadcaster a Shoutout once every 60 minutes.
+     *
+     * To receive notifications when a Shoutout is sent or received, subscribe to the [channel.shoutout.create](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshoutoutcreate) and [channel.shoutout.receive](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshoutoutreceive) subscription types. The **channel.shoutout.create** event includes cooldown periods that indicate when the broadcaster may send another Shoutout without exceeding the endpoint’s rate limit.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shoutouts** scope.
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/chat/shoutouts`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully sent the specified broadcaster a Shoutout.
+     *
+     * _400 Bad Request_
+     *
+     * * The _from\_broadcaster\_id_ query parameter is required.
+     * * The ID in the _from\_broadcaster\_id_ query parameter is not valid.
+     * * The _to\_broadcaster\_id_ query parameter is required.
+     * * The ID in the _to\_broadcaster\_id_ query parameter is not valid.
+     * * The broadcaster may not give themselves a Shoutout.
+     * * The broadcaster is not streaming live or does not have one or more viewers.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:manage:shoutouts** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * * The user in _moderator\_id_ is not one of the broadcaster's moderators.
+     * * The broadcaster may not send the specified broadcaster a Shoutout.
+     *
+     * _429 Too Many Requests_
+     *
+     * * The broadcaster exceeded the number of Shoutouts they may send within a given window. See the endpoint's Rate Limits.
+     * * The broadcaster exceeded the number of Shoutouts they may send the same broadcaster within a given window. See the endpoint's Rate Limits.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#send-a-shoutout
+     */
+    sendaShoutout: async (
+      params: SendaShoutoutParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 429> => 
+      this.callApi({
+        path: '/chat/shoutouts',
+        method: 'POST',
+        params,
         clientId,
         accessToken,
       }),
@@ -1771,7 +1844,7 @@ export class TwitchApi {
      *
      * Creating a clip is an asynchronous process that can take a short amount of time to complete. To determine whether the clip was successfully created, call [Get Clips](https://dev.twitch.tv/docs/api/reference#get-clips) using the clip ID that this request returned. If Get Clips returns the clip, the clip was successfully created. If after 15 seconds Get Clips hasn’t returned the clip, assume it failed.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **clips:edit** scope.
      *
@@ -1823,7 +1896,7 @@ export class TwitchApi {
     /**
      * Gets one or more video clips that were captured from streams. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -1876,7 +1949,7 @@ export class TwitchApi {
      *
      * Rate limit: You may send at most one request per second per user.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the access token must match a client ID that Twitch has approved to provide entitlements.
      *
@@ -1926,7 +1999,7 @@ export class TwitchApi {
      *
      * Rate limit: You may send at most one request per second per user.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). Only client IDs approved by Twitch may redeem codes on behalf of any Twitch user account.
      *
@@ -1991,7 +2064,7 @@ export class TwitchApi {
      * | User | game_id | The request returns all entitlements that the specified game granted to the user identified in the access token. |
      *
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
      *
@@ -2049,7 +2122,7 @@ export class TwitchApi {
      * | User | Updates all entitlements owned by the user in the access token and where the benefits are owned by the organization in the access token. |
      *
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
      *
@@ -2619,7 +2692,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the app access token must be the extension’s client ID.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the app access token must match the extension’s client ID.
      *
      * __URL:__
      *
@@ -2667,7 +2740,7 @@ export class TwitchApi {
     /**
      * Creates an EventSub subscription.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token. If the subscription type requires user authorization, the user must have granted your app (client ID) permissions to receive those events before you subscribe to them. For example, to subscribe to [channel.subscribe](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) events, your app must get a user access token that includes the `channel:read:subscriptions` scope, which adds the required permission to your app access token’s client ID.
      *
@@ -2732,7 +2805,7 @@ export class TwitchApi {
     /**
      * Deletes an EventSub subscription.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token.
      *
@@ -2779,7 +2852,7 @@ export class TwitchApi {
     /**
      * Gets a list of EventSub subscriptions that the client in the access token created.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token.
      *
@@ -2830,7 +2903,7 @@ export class TwitchApi {
     /**
      * Gets information about all broadcasts on Twitch.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -2873,7 +2946,7 @@ export class TwitchApi {
      *
      * You may get up to 100 categories or games by specifying their ID or name. You may specify all IDs, all names, or a combination of IDs and names. If you specify a combination of IDs and names, the total number of IDs and names must not exceed 100.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -2964,7 +3037,7 @@ export class TwitchApi {
      *
      * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:hype\_train** scope.
      *
@@ -3241,9 +3314,9 @@ export class TwitchApi {
     /**
      * Gets all users that the broadcaster banned or put in a timeout.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** or **moderator:manage:banned\_users** scope.
      *
      * __URL:__
      *
@@ -3289,7 +3362,7 @@ export class TwitchApi {
      *
      * To remove a ban or end a timeout, see [Unban user](https://dev.twitch.tv/docs/api/reference#unban-user).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
      *
@@ -3355,7 +3428,7 @@ export class TwitchApi {
      *
      * To ban a user, see [Ban user](https://dev.twitch.tv/docs/api/reference#ban-user).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
      *
@@ -3415,7 +3488,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked\_terms** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope.
      *
      * __URL:__
      *
@@ -3460,7 +3533,7 @@ export class TwitchApi {
     /**
      * Adds a word or phrase to the broadcaster’s list of blocked terms. These are the terms that the broadcaster doesn’t want used in their chat room.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
      *
@@ -3512,7 +3585,7 @@ export class TwitchApi {
     /**
      * Removes the word or phrase from the broadcaster’s list of blocked terms.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
      *
@@ -3561,7 +3634,7 @@ export class TwitchApi {
     /**
      * Removes a single chat message or all chat messages from the broadcaster’s chat room.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
      *
@@ -3942,7 +4015,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Activates or deactivates the broadcaster’s Shield Mode.
+     * Activates or deactivates the broadcaster’s Shield Mode.
      *
      * Twitch’s Shield Mode feature is like a panic button that broadcasters can push to protect themselves from chat abuse coming from one or more accounts. When activated, Shield Mode applies the overrides that the broadcaster configured in the Twitch UX. If the broadcaster hasn’t configured Shield Mode, it applies default overrides.
      *
@@ -3996,7 +4069,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Gets the broadcaster’s Shield Mode activation status.
+     * Gets the broadcaster’s Shield Mode activation status.
      *
      * To receive notification when the broadcaster activates and deactivates Shield Mode, subscribe to the [channel.shield\_mode.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodebegin) and [channel.shield\_mode.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshield%5Fmodeend) subscription types.
      *
@@ -4053,7 +4126,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:polls** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:polls** or **channel:manage:polls** scope.
      *
      * __URL:__
      *
@@ -4204,7 +4277,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:predictions** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:predictions** or **channel:manage:predictions** scope.
      *
      * __URL:__
      *
@@ -4790,7 +4863,7 @@ export class TwitchApi {
      *
      * To match, the category’s name must contain all parts of the query string. For example, if the query string is 42, the response includes any category name that contains 42 in the title. If the query string is a phrase like _love computer_, the response includes any category name that contains the words love and computer anywhere in the name. The comparison is case insensitive.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -4836,7 +4909,7 @@ export class TwitchApi {
      *
      * By default, the results include both live and offline channels. To get only live channels set the _live\_only_ query parameter to **true**.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5011,7 +5084,7 @@ export class TwitchApi {
     /**
      * Gets the channel’s stream key.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:stream\_key** scope.
      *
@@ -5054,7 +5127,7 @@ export class TwitchApi {
     /**
      * Gets a list of all streams. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5094,7 +5167,7 @@ export class TwitchApi {
     /**
      * Gets the list of broadcasters that the user follows and that are streaming live.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
      *
@@ -5143,7 +5216,7 @@ export class TwitchApi {
      * * If the stream is a premiere (a live, first-viewing event that combines uploaded videos with live chat)
      * * If the stream is a rerun of a past broadcast, including past premieres.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
      *
@@ -5196,9 +5269,9 @@ export class TwitchApi {
     /**
      * Gets a list of markers from the user’s most recent stream or from the specified VOD/video. A marker is an arbitrary point in a live stream that the broadcaster or editor marked, so they can return to that spot later to create video highlights (see Video Producer, Highlights in the Twitch UX).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** or **channel:manage:broadcast** scope.
      *
      * __URL:__
      *
@@ -5247,7 +5320,7 @@ export class TwitchApi {
     /**
      * Gets a list of users that subscribe to the specified broadcaster.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:subscriptions** scope.
      *
@@ -5291,7 +5364,7 @@ export class TwitchApi {
     /**
      * Checks whether the user subscribes to the broadcaster’s channel.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
      *
@@ -5340,11 +5413,11 @@ export class TwitchApi {
   };
   tags = {
     /**
-     * Gets a list of all stream tags that Twitch defines. The broadcaster may apply any of these to their channel except automatic tags.
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023).
      *
-     * For an online list of the possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags).
+     * Gets a list of all stream tags that Twitch defines. The broadcaster may apply any of these to their channel except automatic tags. For an online list of the possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5383,9 +5456,11 @@ export class TwitchApi {
         accessToken,
       }),
     /**
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
+     *
      * Gets the list of stream tags that the broadcaster or Twitch added to their channel.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5424,11 +5499,13 @@ export class TwitchApi {
         accessToken,
       }),
     /**
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Modify Channel Information](https://dev.twitch.tv/docs/api/reference#modify-channel-information).
+     *
      * Applies one or more tags to the specified channel, overwriting existing tags.
      *
      * **NOTE**: You may not specify automatic tags; the call fails if you specify automatic tags. Automatic tags are tags that Twitch applies to the channel. For a list of automatic tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). To get the list of possible tags programmatically, see [Get All Stream Tags](https://dev.twitch.tv/docs/api/reference#get-all-stream-tags).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
      *
@@ -5480,7 +5557,7 @@ export class TwitchApi {
     /**
      * Gets the list of Twitch teams that the broadcaster is a member of.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5525,7 +5602,7 @@ export class TwitchApi {
     /**
      * Gets information about the specified Twitch team. [Read More](https://help.twitch.tv/s/article/twitch-teams)
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5579,7 +5656,7 @@ export class TwitchApi {
      *
      * To include the user’s verified email address in the response, you must use a user access token that includes the **user:read:email** scope.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5622,7 +5699,7 @@ export class TwitchApi {
      *
      * To include the user’s verified email address in the response, the user access token must also include the **user:read:email** scope.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit** scope.
      *
@@ -5664,7 +5741,7 @@ export class TwitchApi {
     /**
      * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5706,7 +5783,7 @@ export class TwitchApi {
     /**
      * Gets the list of users that the broadcaster has blocked. [Read More](https://help.twitch.tv/s/article/how-to-manage-harassment-in-chat?language=en%5FUS#BlockWhispersandMessagesfromStrangers)
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:blocked\_users** scope.
      *
@@ -5750,7 +5827,7 @@ export class TwitchApi {
      *
      * To learn more about blocking users, see [Block Other Users on Twitch](https://help.twitch.tv/s/article/how-to-manage-harassment-in-chat?language=en%5FUS#BlockWhispersandMessagesfromStrangers).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:blocked\_users** scope.
      *
@@ -5795,7 +5872,7 @@ export class TwitchApi {
     /**
      * Removes the user from the broadcaster’s list of blocked users. The user ID in the OAuth token identifies the broadcaster who’s removing the block.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:blocked\_users** scope.
      *
@@ -5837,7 +5914,7 @@ export class TwitchApi {
     /**
      * Gets a list of all extensions (both active and inactive) that the broadcaster has installed. The user ID in the access token identifies the broadcaster.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** or **user:edit:broadcast** scope. To include inactive extensions, you must include the **user:edit:broadcast** scope.
      *
@@ -5871,7 +5948,7 @@ export class TwitchApi {
      *
      * NOTE: To include extensions that you have under development, you must specify a user access token that includes the **user:read:broadcast** or **user:edit:broadcast** scope.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -5913,7 +5990,7 @@ export class TwitchApi {
      *
      * NOTE: If you try to activate an extension under multiple extension types, the last write wins (and there is no guarantee of write order).
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit:broadcast** scope.
      *
@@ -5963,7 +6040,7 @@ export class TwitchApi {
      *
      * You may apply several filters to get a subset of the videos. The filters are applied as an AND operation to each video. For example, if _language_ is set to ‘de’ and _game\_id_ is set to 21779, the response includes only videos that show playing League of Legends by users that stream in German. The filters apply only if you get videos by user ID or game ID.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
@@ -6014,7 +6091,7 @@ export class TwitchApi {
     /**
      * Deletes one or more videos. You may delete past broadcasts, highlights, or uploads.
      *
-     * __Authentication:__
+     * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:videos** scope.
      *
