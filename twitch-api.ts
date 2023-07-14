@@ -2070,7 +2070,7 @@ export class TwitchApi {
         accessToken,
       }),
   };
-  cCLs = {
+  ccls = {
     /**
      * Gets information about Twitch content classification labels.
      *

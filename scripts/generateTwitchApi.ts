@@ -78,7 +78,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   for (const [path, methods] of Object.entries(openApi.paths)) {
     for (const [method, endpoint] of Object.entries(methods)) {
       const tag = endpoint.tags![0]!;
-      const tagName = lowerFirstLetter(tag!.replaceAll(' ', ''));
+      let tagName = lowerFirstLetter(tag!.replaceAll(' ', ''));
+      if (tag === 'CCLs') tagName = 'ccls';
       if (!endpointsByTags[tagName]) endpointsByTags[tagName] = [];
       endpointsByTags[tagName]!.push({ path, method, endpoint });
     }
