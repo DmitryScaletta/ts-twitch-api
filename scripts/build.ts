@@ -2,7 +2,8 @@ import fs from 'fs/promises';
 import generateTwitchApi from './generateTwitchApi.js';
 import parseTemplates from './parseTemplates.js';
 
-const OPEN_API_URL = 'https://twitch-api-swagger.surge.sh/openapi.json';
+const OPEN_API_URL =
+  'https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json';
 
 const fetchOpenApi = async () => {
   const response = await fetch(OPEN_API_URL);

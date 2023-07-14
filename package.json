@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "build": "ts-node-esm ./scripts/build.ts",
-    "gen": "npx openapi-typescript https://twitch-api-swagger.surge.sh/openapi.json --output twitch-api.generated.ts"
+    "gen": "npx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
