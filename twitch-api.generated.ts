@@ -100,6 +100,26 @@ export interface paths {
      */
     get: operations["get-channel-editors"];
   };
+  "/channels/followed": {
+    /**
+     * Gets a list of broadcasters that the specified user follows. You can also use this endpoint to see whether a user follows a specific broadcaster.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
+     */
+    get: operations["get-followed-channels"];
+  };
+  "/channels/followers": {
+    /**
+     * Gets a list of users that follow the specified broadcaster. You can also use this endpoint to see whether a specific user follows the broadcaster.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:followers** scope. The ID in the broadcaster\_id query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster. If a scope is not provided, only the total follower count will be included in the response.
+     */
+    get: operations["get-channel-followers"];
+  };
   "/channel_points/custom_rewards": {
     /**
      * Gets a list of custom rewards that the specified broadcaster created.
@@ -308,7 +328,7 @@ export interface paths {
   };
   "/chat/shoutouts": {
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
+     * Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
      *
      * Twitch’s Shoutout feature is a great way for you to show support for other broadcasters and help them grow. Viewers who do not follow the other broadcaster will see a pop-up Follow button in your chat that they can click to follow the other broadcaster. [Learn More](https://help.twitch.tv/s/article/shoutouts)
      *
@@ -368,27 +388,15 @@ export interface paths {
      */
     post: operations["create-clip"];
   };
-  "/entitlements/codes": {
+  "/content_classification_labels": {
     /**
-     * Gets the status of one or more redemption codes for a Bits reward. Only client IDs approved by Twitch may request a redemption code’s status.
-     *
-     * Rate limit: You may send at most one request per second per user.
+     * Gets information about Twitch content classification labels.
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the access token must match a client ID that Twitch has approved to provide entitlements.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      */
-    get: operations["get-code-status"];
-    /**
-     * Redeems one or more redemption codes. Redeeming a code credits the user’s account with the entitlement; for example, a Bits reward earned by playing a game.
-     *
-     * Rate limit: You may send at most one request per second per user.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). Only client IDs approved by Twitch may redeem codes on behalf of any Twitch user account.
-     */
-    post: operations["redeem-code"];
+    get: operations["get-content-classification-labels"];
   };
   "/entitlements/drops": {
     /**
@@ -657,6 +665,124 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:goals** scope.
      */
     get: operations["get-creator-goals"];
+  };
+  "/guest_star/channel_settings": {
+    /**
+     * BETA Gets the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     */
+    get: operations["get-channel-guest-star-settings"];
+    /**
+     * BETA Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     */
+    put: operations["update-channel-guest-star-settings"];
+  };
+  "/guest_star/session": {
+    /**
+     * BETA Gets information about an ongoing Guest Star session for a particular channel.
+     *
+     * __Authorization:__
+     *
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     * * Guests must be either invited or assigned a slot within the session
+     */
+    get: operations["get-guest-star-session"];
+    /**
+     * BETA Programmatically creates a Guest Star session on behalf of the broadcaster. Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     */
+    post: operations["create-guest-star-session"];
+    /**
+     * BETA Programmatically ends a Guest Star session on behalf of the broadcaster. Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     */
+    delete: operations["end-guest-star-session"];
+  };
+  "/guest_star/invites": {
+    /**
+     * BETA Provides the caller with a list of pending invites to a Guest Star session, including the invitee’s ready status while joining the waiting room.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     */
+    get: operations["get-guest-star-invites"];
+    /**
+     * BETA Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    post: operations["send-guest-star-invite"];
+    /**
+     * BETA Revokes a previously sent invite for a Guest Star session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    delete: operations["delete-guest-star-invite"];
+  };
+  "/guest_star/slot": {
+    /**
+     * BETA Allows a previously invited user to be assigned a slot within the active Guest Star session, once that guest has indicated they are ready to join.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    post: operations["assign-guest-star-slot"];
+    /**
+     * BETA Allows a caller to remove a slot assignment from a user participating in an active Guest Star session. This revokes their access to the session immediately and disables their access to publish or subscribe to media within the session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    delete: operations["delete-guest-star-slot"];
+    /**
+     * BETA Allows a user to update the assigned slot for a particular user within the active Guest Star session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    patch: operations["update-guest-star-slot"];
+  };
+  "/guest_star/slot_settings": {
+    /**
+     * BETA Allows a user to update slot settings for a particular guest within a Guest Star session, such as allowing the user to share audio or video within the call as a host. These settings will be broadcasted to all subscribers which control their view of the guest in that slot. One or more of the optional parameters to this API can be specified at any time.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     */
+    patch: operations["update-guest-star-slot-settings"];
   };
   "/hypetrain/events": {
     /**
@@ -1188,7 +1314,7 @@ export interface paths {
   };
   "/tags/streams": {
     /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023).
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response.
      *
      * Gets a list of all stream tags that Twitch defines. The broadcaster may apply any of these to their channel except automatic tags. For an online list of the possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags).
      *
@@ -1200,7 +1326,7 @@ export interface paths {
   };
   "/streams/tags": {
     /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response. If you use this endpoint, please update your code to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
      *
      * Gets the list of stream tags that the broadcaster or Twitch added to their channel.
      *
@@ -1209,18 +1335,6 @@ export interface paths {
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      */
     get: operations["get-stream-tags"];
-    /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Modify Channel Information](https://dev.twitch.tv/docs/api/reference#modify-channel-information).
-     *
-     * Applies one or more tags to the specified channel, overwriting existing tags.
-     *
-     * **NOTE**: You may not specify automatic tags; the call fails if you specify automatic tags. Automatic tags are tags that Twitch applies to the channel. For a list of automatic tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). To get the list of possible tags programmatically, see [Get All Stream Tags](https://dev.twitch.tv/docs/api/reference#get-all-stream-tags).
-     *
-     * __Authorization:__
-     *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
-     */
-    put: operations["replace-stream-tags"];
   };
   "/teams/channel": {
     /**
@@ -1271,6 +1385,8 @@ export interface paths {
   "/users/follows": {
     /**
      * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
+     *
+     * **_Deprecation Notice:_** This endpoint is deprecated and will be decommissioned on [August 3, 2023](https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322). Access to this endpoint is limited to client IDs that have called the endpoint on or before February 17, 2023.
      *
      * __Authorization:__
      *
@@ -1642,6 +1758,10 @@ export interface components {
       delay: number;
       /** The tags applied to the channel. */
       tags: string[];
+      /** The CCLs applied to the channel. */
+      content_classification_labels: string[];
+      /** Boolean flag indicating if the channel has branded content. */
+      is_branded_content: boolean;
     };
     GetChannelInformationResponse: {
       /** A list that contains information about the specified channels. The list is empty if the specified channels weren’t found. */
@@ -1662,6 +1782,28 @@ export interface components {
        * A channel may specify a maximum of 10 tags. Each tag is limited to a maximum of 25 characters and may not be an empty string or contain spaces or special characters. Tags are case insensitive. For readability, consider using camelCasing or PascalCasing.
        */
       tags?: string[];
+      /** List of labels that should be set as the Channel’s CCLs. */
+      content_classification_labels?: {
+        /**
+         * ID of the [Content Classification Labels](https://blog.twitch.tv/en/2023/06/20/introducing-content-classification-labels/) that must be added/removed from the channel. Can be one of the following values:
+         *
+         * * DrugsIntoxication
+         * * SexualThemes
+         * * ViolentGraphic
+         * * Gambling
+         * * ProfanityVulgarity
+         */
+        id:
+          | "DrugsIntoxication"
+          | "SexualThemes"
+          | "ViolentGraphic"
+          | "Gambling"
+          | "ProfanityVulgarity";
+        /** Boolean flag indicating whether the label should be enabled (true) or disabled for the channel. */
+        is_enabled: boolean;
+      }[];
+      /** Boolean flag indicating if the channel has branded content. */
+      is_branded_content?: boolean;
     };
     ChannelEditor: {
       /** An ID that uniquely identifies a user with editor permissions. */
@@ -1674,6 +1816,46 @@ export interface components {
     GetChannelEditorsResponse: {
       /** A list of users that are editors for the specified broadcaster. The list is empty if the broadcaster doesn’t have editors. */
       data: components["schemas"]["ChannelEditor"][];
+    };
+    GetFollowedChannelsResponse: {
+      /** The list of broadcasters that the user follows. The list is in descending order by `followed_at` (with the most recently followed broadcaster first). The list is empty if the user doesn’t follow anyone. */
+      data: {
+        /** An ID that uniquely identifies the broadcaster that this user is following. */
+        broadcaster_id: string;
+        /** The broadcaster’s login name. */
+        broadcaster_login: string;
+        /** The broadcaster’s display name. */
+        broadcaster_name: string;
+        /** The UTC timestamp when the user started following the broadcaster. */
+        followed_at: string;
+      }[];
+      /** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read more](https://dev.twitch.tv/docs/api/guide#pagination). */
+      pagination?: {
+        /** The cursor used to get the next page of results. Use the cursor to set the request’s _after_ query parameter. */
+        cursor?: string;
+      };
+      /** The total number of broadcasters that the user follows. As someone pages through the list, the number may change as the user follows or unfollows broadcasters. */
+      total: number;
+    };
+    GetChannelFollowersResponse: {
+      /** The list of users that follow the specified broadcaster. The list is in descending order by `followed_at` (with the most recent follower first). The list is empty if nobody follows the broadcaster. */
+      data: {
+        /** The UTC timestamp when the user started following the broadcaster. */
+        followed_at: string;
+        /** An ID that uniquely identifies the user that’s following the broadcaster. */
+        user_id: string;
+        /** The user’s login name. */
+        user_login: string;
+        /** The user’s display name. */
+        user_name: string;
+      }[];
+      /** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read more](https://dev.twitch.tv/docs/api/guide#pagination). */
+      pagination?: {
+        /** The cursor used to get the next page of results. Use the cursor to set the request’s _after_ query parameter. */
+        cursor?: string;
+      };
+      /** The total number of users that follow this broadcaster. As someone pages through the list, the number of users may change as users follow or unfollow the broadcaster. */
+      total: number;
     };
     CreateCustomRewardsBody: {
       /** The custom reward’s title. The title may contain a maximum of 45 characters and it must be unique amongst all of the broadcaster’s custom rewards. */
@@ -2153,6 +2335,14 @@ export interface components {
         image_url_2x: string;
         /** A URL to the large version (72px x 72px) of the badge. */
         image_url_4x: string;
+        /** The title of the badge. */
+        title: string;
+        /** The description of the badge. */
+        description: string;
+        /** The action to take when clicking on the badge. Set to `null` if no action is specified. */
+        click_action: string;
+        /** The URL to navigate to when clicking on the badge. Set to `null` if no URL is specified. */
+        click_url: string;
       }[];
     };
     GetChannelChatBadgesResponse: {
@@ -2422,34 +2612,17 @@ export interface components {
         cursor?: string;
       };
     };
-    CodeStatus: {
-      /** The redemption code. */
-      code: string;
-      /**
-       * The redemption code’s status. Possible values are:
-       *
-       * * ALREADY\_CLAIMED — The code has already been claimed. All codes are single-use.
-       * * EXPIRED — The code has expired and can no longer be claimed.
-       * * INACTIVE — The code has not been activated.
-       * * INCORRECT\_FORMAT — The code is not properly formatted.
-       * * INTERNAL\_ERROR — An internal or unknown error occurred when checking the code. Retry later.
-       * * NOT\_FOUND — The code was not found.
-       * * UNUSED — The code has not been claimed.
-       * * USER\_NOT\_ELIGIBLE — The user is not eligible to redeem this code.
-       */
-      status:
-        | "ALREADY_CLAIMED"
-        | "EXPIRED"
-        | "INACTIVE"
-        | "INCORRECT_FORMAT"
-        | "INTERNAL_ERROR"
-        | "NOT_FOUND"
-        | "UNUSED"
-        | "USER_NOT_ELIGIBLE";
+    ContentClassificationLabel: {
+      /** Unique identifier for the CCL. */
+      id: string;
+      /** Localized description of the CCL. */
+      description: string;
+      /** Localized name of the CCL. */
+      name: string;
     };
-    GetCodeStatusResponse: {
-      /** The list of redemption codes and their status values. */
-      data: components["schemas"]["CodeStatus"][];
+    GetContentClassificationLabelsResponse: {
+      /** A list that contains information about the available content classification labels. */
+      data: components["schemas"]["ContentClassificationLabel"][];
     };
     DropsEntitlement: {
       /** An ID that identifies the entitlement. */
@@ -2514,36 +2687,6 @@ export interface components {
     UpdateDropsEntitlementsResponse: {
       /** A list that indicates which entitlements were successfully updated and those that weren’t. */
       data: components["schemas"]["DropsEntitlementUpdated"][];
-    };
-    RedeemCodeResponse: {
-      /** The list of redeemed codes. */
-      data: {
-        /** The redemption code. */
-        code: string;
-        /**
-         * The redemption code’s status. Possible values are:
-         *
-         * * ALREADY\_CLAIMED — The code has already been claimed. All codes are single-use.
-         * * EXPIRED — The code has expired and can no longer be claimed.
-         * * INACTIVE — The code has not been activated.
-         * * INCORRECT\_FORMAT — The code is not properly formatted.
-         * * INTERNAL\_ERROR — An internal or unknown error occurred when accessing the code. Retry later.
-         * * NOT\_FOUND — The code was not found.
-         * * SUCCESSFULLY\_REDEEMED — Successfully redeemed the code and credited the user's account with the entitlement.
-         * * UNUSED — The code has not been claimed.
-         * * USER\_NOT\_ELIGIBLE — The user is not eligible to redeem this code.
-         */
-        status:
-          | "ALREADY_CLAIMED"
-          | "EXPIRED"
-          | "INACTIVE"
-          | "INCORRECT_FORMAT"
-          | "INTERNAL_ERROR"
-          | "NOT_FOUND"
-          | "SUCCESSFULLY_REDEEMED"
-          | "UNUSED"
-          | "USER_NOT_ELIGIBLE";
-      }[];
     };
     ExtensionConfigurationSegment: {
       /**
@@ -2868,6 +3011,11 @@ export interface components {
         | "channel.unban"
         | "channel.moderator.add"
         | "channel.moderator.remove"
+        | "channel.guest_star_session.begin"
+        | "channel.guest_star_session.end"
+        | "channel.guest_star_guest.update"
+        | "channel.guest_star_slot.update"
+        | "channel.guest_star_settings.update"
         | "channel.channel_points_custom_reward.add"
         | "channel.channel_points_custom_reward.update"
         | "channel.channel_points_custom_reward.remove"
@@ -2988,6 +3136,11 @@ export interface components {
         | "channel.unban"
         | "channel.moderator.add"
         | "channel.moderator.remove"
+        | "channel.guest_star_session.begin"
+        | "channel.guest_star_session.end"
+        | "channel.guest_star_guest.update"
+        | "channel.guest_star_slot.update"
+        | "channel.guest_star_settings.update"
         | "channel.channel_points_custom_reward.add"
         | "channel.channel_points_custom_reward.update"
         | "channel.channel_points_custom_reward.remove"
@@ -3142,6 +3295,129 @@ export interface components {
     GetCreatorGoalsResponse: {
       /** The list of goals. The list is empty if the broadcaster hasn’t created goals. */
       data: components["schemas"]["CreatorGoal"][];
+    };
+    GetChannelGuestStarSettingsResponse: {
+      /** Flag determining if Guest Star moderators have access to control whether a guest is live once assigned to a slot. */
+      is_moderator_send_live_enabled: boolean;
+      /** Number of slots the Guest Star call interface will allow the host to add to a call. Required to be between 1 and 6. */
+      slot_count: number;
+      /** Flag determining if Browser Sources subscribed to sessions on this channel should output audio */
+      is_browser_source_audio_enabled: boolean;
+      /**
+       * This setting determines how the guests within a session should be laid out within the browser source. Can be one of the following values:
+       *
+       * * `TILED_LAYOUT`: All live guests are tiled within the browser source with the same size.
+       * * `SCREENSHARE_LAYOUT`: All live guests are tiled within the browser source with the same size. If there is an active screen share, it is sized larger than the other guests.
+       */
+      group_layout: "TILED_LAYOUT" | "SCREENSHARE_LAYOUT";
+      /** View only token to generate browser source URLs */
+      browser_source_token: string;
+    };
+    UpdateChannelGuestStarSettingsBody: {
+      /** Flag determining if Guest Star moderators have access to control whether a guest is live once assigned to a slot. */
+      is_moderator_send_live_enabled?: boolean;
+      /** Number of slots the Guest Star call interface will allow the host to add to a call. Required to be between 1 and 6. */
+      slot_count?: number;
+      /** Flag determining if Browser Sources subscribed to sessions on this channel should output audio */
+      is_browser_source_audio_enabled?: boolean;
+      /**
+       * This setting determines how the guests within a session should be laid out within the browser source. Can be one of the following values:
+       *
+       * * `TILED_LAYOUT`: All live guests are tiled within the browser source with the same size.
+       * * `SCREENSHARE_LAYOUT`: All live guests are tiled within the browser source with the same size. If there is an active screen share, it is sized larger than the other guests.
+       * * `HORIZONTAL_LAYOUT`: All live guests are arranged in a horizontal bar within the browser source
+       * * `VERTICAL_LAYOUT`: All live guests are arranged in a vertical bar within the browser source
+       */
+      group_layout?:
+        | "TILED_LAYOUT"
+        | "SCREENSHARE_LAYOUT"
+        | "HORIZONTAL_LAYOUT"
+        | "VERTICAL_LAYOUT";
+      /** Flag determining if Guest Star should regenerate the auth token associated with the channel’s browser sources. Providing a true value for this will immediately invalidate all browser sources previously configured in your streaming software. */
+      regenerate_browser_sources?: boolean;
+    };
+    GuestStarSession: {
+      /** ID uniquely representing the Guest Star session. */
+      id: string;
+      /** List of guests currently interacting with the Guest Star session. */
+      guests: { [key: string]: any };
+      /**
+       * ID representing this guest’s slot assignment.
+       *
+       * * Host is always in slot "0"
+       * * Guests are assigned the following consecutive IDs (e.g, "1", "2", "3", etc)
+       * * Screen Share is represented as a special guest with the ID "SCREENSHARE"
+       * * The identifier here matches the ID referenced in browser source links used in broadcasting software.
+       */
+      slot_id: string;
+      /** Flag determining whether or not the guest is visible in the browser source in the host’s streaming software. */
+      is_live: boolean;
+      /** User ID of the guest assigned to this slot. */
+      user_id: string;
+      /** Display name of the guest assigned to this slot. */
+      user_display_name: string;
+      /** Login of the guest assigned to this slot. */
+      user_login: string;
+      /** Value from 0 to 100 representing the host’s volume setting for this guest. */
+      volume: number;
+      /** Timestamp when this guest was assigned a slot in the session. */
+      assigned_at: string;
+      /** Information about the guest’s audio settings */
+      audio_settings: {
+        /** Flag determining whether the host is allowing the guest’s audio to be seen or heard within the session. */
+        is_host_enabled: boolean;
+        /** Flag determining whether the guest is allowing their audio to be transmitted to the session. */
+        is_guest_enabled: boolean;
+        /** Flag determining whether the guest has an appropriate audio device available to be transmitted to the session. */
+        is_available: boolean;
+      };
+      /** Information about the guest’s video settings */
+      video_settings: {
+        /** Flag determining whether the host is allowing the guest’s video to be seen or heard within the session. */
+        is_host_enabled: boolean;
+        /** Flag determining whether the guest is allowing their video to be transmitted to the session. */
+        is_guest_enabled: boolean;
+        /** Flag determining whether the guest has an appropriate video device available to be transmitted to the session. */
+        is_available: boolean;
+      };
+    };
+    GetGuestStarSessionResponse: {
+      /** Summary of the session details */
+      data: components["schemas"]["GuestStarSession"][];
+    };
+    CreateGuestStarSessionResponse: {
+      /** Summary of the session details. */
+      data: components["schemas"]["GuestStarSession"][];
+    };
+    EndGuestStarSessionResponse: {
+      /** Summary of the session details when the session was ended. */
+      data: components["schemas"]["GuestStarSession"][];
+    };
+    GuestStarInvite: {
+      /** Twitch User ID corresponding to the invited guest */
+      user_id: string;
+      /** Timestamp when this user was invited to the session. */
+      invited_at: string;
+      /**
+       * Status representing the invited user’s join state. Can be one of the following:
+       *
+       * * `INVITED`: The user has been invited to the session but has not acknowledged it.
+       * * `ACCEPTED`: The invited user has acknowledged the invite and joined the waiting room, but may still be setting up their media devices or otherwise preparing to join the call.
+       * * `READY`: The invited user has signaled they are ready to join the call from the waiting room.
+       */
+      status: string;
+      /** Flag signaling that the invited user has chosen to disable their local video device. The user has hidden themselves, but they may choose to reveal their video feed upon joining the session. */
+      is_video_enabled: boolean;
+      /** Flag signaling that the invited user has chosen to disable their local audio device. The user has muted themselves, but they may choose to unmute their audio feed upon joining the session. */
+      is_audio_enabled: boolean;
+      /** Flag signaling that the invited user has a video device available for sharing. */
+      is_video_available: boolean;
+      /** Flag signaling that the invited user has an audio device available for sharing. */
+      is_audio_available: boolean;
+    };
+    GetGuestStarInvitesResponse: {
+      /** A list of invite objects describing the invited user as well as their ready status. */
+      data: components["schemas"]["GuestStarInvite"][];
     };
     HypeTrainEvent: {
       /** An ID that identifies this event. */
@@ -3850,7 +4126,7 @@ export interface components {
       /** A Boolean value that determines whether the broadcaster is streaming live. Is **true** if the broadcaster is streaming live; otherwise, **false**. */
       is_live: boolean;
       /**
-       * **IMPORTANT** Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023). If you use this field, consider updating your code at your earliest convenience to use the `tags` field.
+       * **IMPORTANT** As of February 28, 2023, this field is deprecated and returns only an empty array. If you use this field, please update your code to use the `tags` field.
        *
        * The list of tags that apply to the stream. The list contains IDs only when the channel is steaming live. For a list of possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). The list doesn’t include Category Tags.
        */
@@ -3990,7 +4266,7 @@ export interface components {
       /** A URL to an image of a frame from the last 5 minutes of the stream. Replace the width and height placeholders in the URL (`{width}x{height}`) with the size of the image you want, in pixels. */
       thumbnail_url: string;
       /**
-       * **IMPORTANT** Twitch is deprecating this field and will stop providing IDs in 2023 (Twitch will communicate the specific date in early 2023). If you use this field, consider updating your code at your earliest convenience to use the `tags` field.
+       * **IMPORTANT** As of February 28, 2023, this field is deprecated and returns only an empty array. If you use this field, please update your code to use the `tags` field.
        *
        * The list of tags that apply to the stream. The list contains IDs only when the channel is steaming live. For a list of possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). The list doesn’t include Category Tags.
        */
@@ -4167,14 +4443,6 @@ export interface components {
     GetStreamTagsResponse: {
       /** The list of stream tags. The list is empty if the broadcaster or Twitch hasn’t added tags to the broadcaster’s channel. */
       data: components["schemas"]["StreamTag"][];
-    };
-    ReplaceStreamTagsBody: {
-      /**
-       * A list of IDs that identify the tags to apply to the channel. You may specify a maximum of five tags.
-       *
-       * To remove all tags from the channel, set `tag_ids` to an empty array.
-       */
-      tag_ids?: string[];
     };
     ChannelTeam: {
       /** An ID that identifies the broadcaster. */
@@ -4966,6 +5234,24 @@ export interface operations {
        * -H 'Content-Type: application/json' \
        * --data-raw '{"game_id":"33214", "title":"there are helicopters in the game? REASON TO PLAY FORTNITE found", "broadcaster_language":"en", "tags":["LevelingUp"]}'
        * ```
+       *
+       * Set CCLs for a Channel
+       *
+       * ```bash
+       * curl -X PATCH
+       * 'https://api.twitch.tv/helix/channels?broadcaster_id=41245072' \
+       * -H 'Authorization: Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx' \
+       * -H 'Client-Id: wbmytr93xzw8zbg0p1izqyzzc5mbiz' \
+       * -H 'Content-Type: application/json' \
+       * --data-raw '{
+       *     "game_id": "SomeGameID",
+       *     "content_classification_labels": [
+       *        {"id": "Gambling", "is_enabled": true},
+       *        {"id": "DrugsIntoxication", "is_enabled": false}
+       *      ],
+       *     "is_branded_content": true
+       * }'
+       * ```
        */
       204: never;
       /**
@@ -4979,9 +5265,11 @@ export interface operations {
        * * A tag in the `tags` field is empty.
        * * A tag in the `tags` field contains special characters or spaces.
        * * One or more tags in the `tags` field failed AutoMod review.
+       * * Game restricted for user's age and region
        */
       400: unknown;
       /**
+       * * User requests CCL for a channel they don’t own
        * * The ID in _broadcaster\_id_ must match the user ID found in the OAuth token.
        * * The Authorization header is required and must specify a user access token.
        * * The OAuth token must include the **channel:manage:broadcast** scope.
@@ -4989,6 +5277,13 @@ export interface operations {
        * * The ID in the Client-Id header must match the Client ID in the OAuth token.
        */
       401: unknown;
+      /**
+       * * User requested gaming CCLs to be added to their channel
+       * * Unallowed CCLs declared for underaged authorized user in a restricted country
+       */
+      403: unknown;
+      /** User set the Branded Content flag too frequently */
+      409: unknown;
       500: unknown;
     };
     requestBody: {
@@ -5026,6 +5321,100 @@ export interface operations {
        * * The OAuth token must include the **channel:read:editors** scope.
        * * The OAuth token is not valid.
        * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+       */
+      401: unknown;
+    };
+  };
+  /**
+   * Gets a list of broadcasters that the specified user follows. You can also use this endpoint to see whether a user follows a specific broadcaster.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
+   */
+  "get-followed-channels": {
+    parameters: {
+      query: {
+        /** A user’s ID. Returns the list of broadcasters that this user follows. This ID must match the user ID in the user OAuth token. */
+        user_id: string;
+        /** A broadcaster’s ID. Use this parameter to see whether the user follows this broadcaster. If specified, the response contains this broadcaster if the user follows them. If not specified, the response contains all broadcasters that the user follows. */
+        broadcaster_id?: string;
+        /** The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100\. The default is 20. */
+        first?: number;
+        /** The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read more](https://dev.twitch.tv/docs/api/guide#pagination). */
+        after?: string;
+      };
+    };
+    responses: {
+      /** Successfully retrieved the broadcaster’s list of followers. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetFollowedChannelsResponse"];
+        };
+      };
+      /**
+       * Possible reasons:
+       *
+       * * The _user\_id_ query parameter is required.
+       * * The _broadcaster\_id_ query parameter is not valid.
+       * * The _user\_id_ query parameter is required.
+       */
+      400: unknown;
+      /**
+       * Possible reasons:
+       *
+       * * The ID in the _user\_id_ query parameter must match the user ID in the access token.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token is missing the **user:read:follows** scope.
+       * * The OAuth token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
+       */
+      401: unknown;
+    };
+  };
+  /**
+   * Gets a list of users that follow the specified broadcaster. You can also use this endpoint to see whether a specific user follows the broadcaster.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:followers** scope. The ID in the broadcaster\_id query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster. If a scope is not provided, only the total follower count will be included in the response.
+   */
+  "get-channel-followers": {
+    parameters: {
+      query: {
+        /** A user’s ID. Use this parameter to see whether the user follows this broadcaster. If specified, the response contains this user if they follow the broadcaster. If not specified, the response contains all users that follow the broadcaster. */
+        user_id?: string;
+        /** The broadcaster’s ID. Returns the list of users that follow this broadcaster. */
+        broadcaster_id: string;
+        /** The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100\. The default is 20. */
+        first?: number;
+        /** The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read more](https://dev.twitch.tv/docs/api/guide#pagination). */
+        after?: string;
+      };
+    };
+    responses: {
+      /** Successfully retrieved the broadcaster’s list of followers. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetChannelFollowersResponse"];
+        };
+      };
+      /**
+       * Possible reasons:
+       *
+       * * The _broadcaster\_id_ query parameter is required.
+       * * The _broadcaster\_id_ query parameter is not valid.
+       * * The _user\_id_ query parameter is required.
+       */
+      400: unknown;
+      /**
+       * Possible reasons:
+       *
+       * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token is missing the **moderator:read:followers** scope.
+       * * The OAuth token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
        */
       401: unknown;
     };
@@ -5841,7 +6230,7 @@ export interface operations {
     };
   };
   /**
-   * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
+   * Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
    *
    * Twitch’s Shoutout feature is a great way for you to show support for other broadcasters and help them grow. Viewers who do not follow the other broadcaster will see a pop-up Follow button in your chat that they can click to follow the other broadcaster. [Learn More](https://help.twitch.tv/s/article/shoutouts)
    *
@@ -6141,93 +6530,31 @@ export interface operations {
     };
   };
   /**
-   * Gets the status of one or more redemption codes for a Bits reward. Only client IDs approved by Twitch may request a redemption code’s status.
-   *
-   * Rate limit: You may send at most one request per second per user.
+   * Gets information about Twitch content classification labels.
    *
    * __Authorization:__
    *
-   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the access token must match a client ID that Twitch has approved to provide entitlements.
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
    */
-  "get-code-status": {
+  "get-content-classification-labels": {
     parameters: {
       query: {
-        /** The redemption code to check. Include this parameter for each redemption code whose status you want to check. For example, `code=1234&code=5678`. You may specify a maximum of 20 codes. */
-        code: string[];
-        /** The ID of the user that owns the redemption code. */
-        user_id: number;
+        /**
+         * Locale for the Content Classification Labels. You may specify a maximum of 1 locale. Default: `“en-US”`
+         * Supported locales: `"bg-BG", "cs-CZ", "da-DK", "da-DK", "de-DE", "el-GR", "en-GB", "en-US", "es-ES", "es-MX", "fi-FI", "fr-FR", "hu-HU", "it-IT", "ja-JP", "ko-KR", "nl-NL", "no-NO", "pl-PL", "pt-BT", "pt-PT", "ro-RO", "ru-RU", "sk-SK", "sv-SE", "th-TH", "tr-TR", "vi-VN", "zh-CN", "zh-TW"`
+         */
+        locale?: string;
       };
     };
     responses: {
-      /** Successfully retrieved the statuses of the specified codes. */
+      /** Successfully retrieved The list of CCLs available. */
       200: {
         content: {
-          "application/json": components["schemas"]["GetCodeStatusResponse"];
+          "application/json": components["schemas"]["GetContentClassificationLabelsResponse"];
         };
       };
-      /**
-       * * The _user\_id_ query parameter is required.
-       * * The _code_ query parameter is required.
-       * * The _code_ query parameter may not contain a comma-delimited list of codes. Instead, repeat the parameter for each code. For example, `code=1234&code=5678`.
-       * * The _code_ query parameter may not contain an empty string.
-       */
       400: unknown;
-      /**
-       * * The Authorization header is required and must specify an app access token.
-       * * The access token is not valid.
-       * * The ID in the Client-Id header must match the Client ID in the access token.
-       */
       401: unknown;
-      /**
-       * * The API accepts only app access tokens.
-       * * The client ID specified in the access token is not approved for getting the statuses of the redemption codes.
-       */
-      403: unknown;
-    };
-  };
-  /**
-   * Redeems one or more redemption codes. Redeeming a code credits the user’s account with the entitlement; for example, a Bits reward earned by playing a game.
-   *
-   * Rate limit: You may send at most one request per second per user.
-   *
-   * __Authorization:__
-   *
-   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). Only client IDs approved by Twitch may redeem codes on behalf of any Twitch user account.
-   */
-  "redeem-code": {
-    parameters: {
-      query: {
-        /** The redemption code to redeem. To redeem multiple codes, include this parameter for each redemption code. For example, `code=1234&code=5678`. You may specify a maximum of 20 codes. */
-        code: string[];
-        /** An ID of the user that owns the redemption code to redeem. */
-        user_id: string;
-      };
-    };
-    responses: {
-      /** Successfully redeemed the code. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["RedeemCodeResponse"];
-        };
-      };
-      /**
-       * * The _user\_id_ query parameter is required.
-       * * The _code_ query parameter is required.
-       * * The _code_ query parameter may not contain a comma-delimited list of codes. Instead, repeat the parameter for each code. For example, `code=1234&code=5678`.
-       * * The _code_ query parameter may not contain an empty string.
-       */
-      400: unknown;
-      /**
-       * * The Authorization header is required and must specify an app access token.
-       * * The access token is not valid.
-       * * The ID in the Client-Id header must match the Client ID in the access token.
-       */
-      401: unknown;
-      /**
-       * * The API accepts only app access tokens.
-       * * The client specified in the access token is not approved to redeem codes.
-       */
-      403: unknown;
       500: unknown;
     };
   };
@@ -6948,6 +7275,11 @@ export interface operations {
           | "channel.unban"
           | "channel.moderator.add"
           | "channel.moderator.remove"
+          | "channel.guest_star_session.begin"
+          | "channel.guest_star_session.end"
+          | "channel.guest_star_guest.update"
+          | "channel.guest_star_slot.update"
+          | "channel.guest_star_settings.update"
           | "channel.channel_points_custom_reward.add"
           | "channel.channel_points_custom_reward.update"
           | "channel.channel_points_custom_reward.remove"
@@ -7225,6 +7557,594 @@ export interface operations {
     };
   };
   /**
+   * BETA Gets the channel settings for configuration of the Guest Star feature for a particular host.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+   */
+  "get-channel-guest-star-settings": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster you want to get guest star settings for. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token. */
+        moderator_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetChannelGuestStarSettingsResponse"];
+        };
+      };
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       */
+      400: unknown;
+      /** Insufficient authorization for viewing channel’s Guest Star settings */
+      403: unknown;
+    };
+  };
+  /**
+   * BETA Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star`
+   */
+  "update-channel-guest-star-settings": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster you want to update Guest Star settings for. */
+        broadcaster_id: string;
+      };
+    };
+    responses: {
+      /**
+       * Successfully updated channel settings
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Update browser source layout settings
+       *
+       * ```bash
+       * curl -x PUT `https://api.twitch.tv/helix/guest_star/channel_settings?broadcaster_id=9321049&group_layout=TILED_LAYOUT` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       *
+       * _Request:_
+       *
+       * Disable moderator control of slot live setting
+       *
+       * ```bash
+       * curl -x PUT `https://api.twitch.tv/helix/guest_star/channel_settings?broadcaster_id=9321049&is_moderator_send_live_enabled=false` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       *
+       * _Request:_
+       *
+       * Update max slot count
+       *
+       * ```bash
+       * curl -x PUT `https://api.twitch.tv/helix/guest_star/channel_settings?broadcaster_id=9321049&slot_count=6` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       *
+       * _Request:_
+       *
+       * Regenerate browser sources
+       *
+       * ```bash
+       * curl -x PUT `https://api.twitch.tv/helix/guest_star/channel_settings?broadcaster_id=9321049&regenerate_browser_sources=true` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Invalid _slot\_count_
+       * * Invalid _group\_layout_
+       */
+      400: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateChannelGuestStarSettingsBody"];
+      };
+    };
+  };
+  /**
+   * BETA Gets information about an ongoing Guest Star session for a particular channel.
+   *
+   * __Authorization:__
+   *
+   * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+   * * Guests must be either invited or assigned a slot within the session
+   */
+  "get-guest-star-session": {
+    parameters: {
+      query: {
+        /** ID for the user hosting the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token. */
+        moderator_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetGuestStarSessionResponse"];
+        };
+      };
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       */
+      400: unknown;
+      /** _moderator\_id_ and user token do not match */
+      401: unknown;
+    };
+  };
+  /**
+   * BETA Programmatically creates a Guest Star session on behalf of the broadcaster. Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star`
+   */
+  "create-guest-star-session": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster you want to create a Guest Star session for. Provided `broadcaster_id` must match the `user_id` in the auth token. */
+        broadcaster_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["CreateGuestStarSessionResponse"];
+        };
+      };
+      /**
+       * * Missing _broadcaster\_id_
+       * * Session limit reached (1 active call)
+       */
+      400: unknown;
+      /** Phone verification missing */
+      401: unknown;
+      /** Insufficient authorization for creating session */
+      403: unknown;
+    };
+  };
+  /**
+   * BETA Programmatically ends a Guest Star session on behalf of the broadcaster. Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star`
+   */
+  "end-guest-star-session": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster you want to end a Guest Star session for. Provided `broadcaster_id` must match the `user_id` in the auth token. */
+        broadcaster_id: string;
+        /** ID for the session to end on behalf of the broadcaster. */
+        session_id: string;
+      };
+    };
+    responses: {
+      /**
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * End Guest Star session
+       *
+       * ```bash
+       * curl -x DELETE `https://api.twitch.tv/helix/guest_star/session?broadcaster_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing or invalid _broadcaster\_id_
+       * * Missing or invalid _session\_id_
+       * * Session has already been ended
+       */
+      400: unknown;
+      /** Insufficient authorization for ending session */
+      403: unknown;
+    };
+  };
+  /**
+   * BETA Provides the caller with a list of pending invites to a Guest Star session, including the invitee’s ready status while joining the waiting room.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+   */
+  "get-guest-star-invites": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
+        moderator_id: string;
+        /** The session ID to query for invite status. */
+        session_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetGuestStarInvitesResponse"];
+        };
+      };
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _session\_id_
+       */
+      400: unknown;
+    };
+  };
+  /**
+   * BETA Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "send-guest-star-invite": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
+        moderator_id: string;
+        /** The session ID for the invite to be sent on behalf of the broadcaster. */
+        session_id: string;
+        /** Twitch User ID for the guest to invite to the Guest Star session. */
+        guest_id: string;
+      };
+    };
+    responses: {
+      /**
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Invite user to Guest Star session
+       *
+       * ```bash
+       * curl -x POST `https://api.twitch.tv/helix/guest_star/invites?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&guest_id=144601104` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       * * Missing _session\_id_
+       * * Missing _guest\_id_
+       * * Invalid _session\_id_
+       */
+      400: unknown;
+      /**
+       * * Unauthorized guest invited
+       * * Guest already invited
+       */
+      403: unknown;
+    };
+  };
+  /**
+   * BETA Revokes a previously sent invite for a Guest Star session.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "delete-guest-star-invite": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
+        moderator_id: string;
+        /** The ID of the session for the invite to be revoked on behalf of the broadcaster. */
+        session_id: string;
+        /** Twitch User ID for the guest to revoke the Guest Star session invite from. */
+        guest_id: string;
+      };
+    };
+    responses: {
+      /**
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Remove invite to session
+       *
+       * ```bash
+       * curl -x DELETE `https://api.twitch.tv/helix/guest_star/invites?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&guest_id=144601104` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _session\_id_
+       * * Missing _guest\_id_
+       * * Invalid _session\_id_
+       */
+      400: unknown;
+      /** No invite exists for specified _guest\_id_ */
+      404: unknown;
+    };
+  };
+  /**
+   * BETA Allows a previously invited user to be assigned a slot within the active Guest Star session, once that guest has indicated they are ready to join.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "assign-guest-star-slot": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
+        moderator_id: string;
+        /** The ID of the Guest Star session in which to assign the slot. */
+        session_id: string;
+        /** The Twitch User ID corresponding to the guest to assign a slot in the session. This user must already have an invite to this session, and have indicated that they are ready to join. */
+        guest_id: string;
+        /** The slot assignment to give to the user. Must be a numeric identifier between “1” and “N” where N is the max number of slots for the session. Max number of slots allowed for the session is reported by [Get Channel Guest Star Settings](https://dev.twitch.tv/docs/api/reference#get-channel-guest-star-settings). */
+        slot_id: string;
+      };
+    };
+    responses: {
+      /**
+       * Successfuly assigned guest to slot
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Assign invited user to slot
+       *
+       * ```bash
+       * curl -x POST `https://api.twitch.tv/helix/guest_star/slot?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&guest_id=144601104&slot_id=1` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       * * Missing _guest\_id_
+       * * Missing or invalid _session\_id_
+       * * Missing or invalid _slot\_id_
+       */
+      400: unknown;
+      /** _moderator\_id_ is not a guest star moderator */
+      401: unknown;
+      /**
+       * * Cannot assign host slot
+       * * Guest not invited to session
+       * * Guest already assigned to slot
+       * * Guest is not ready to join
+       */
+      403: unknown;
+    };
+  };
+  /**
+   * BETA Allows a caller to remove a slot assignment from a user participating in an active Guest Star session. This revokes their access to the session immediately and disables their access to publish or subscribe to media within the session.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "delete-guest-star-slot": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token. */
+        moderator_id: string;
+        /** The ID of the Guest Star session in which to remove the slot assignment. */
+        session_id: string;
+        /** The Twitch User ID corresponding to the guest to remove from the session. */
+        guest_id: string;
+        /** The slot ID representing the slot assignment to remove from the session. */
+        slot_id: string;
+        /** Flag signaling that the guest should be reinvited to the session, sending them back to the invite queue. */
+        should_reinvite_guest?: string;
+      };
+    };
+    responses: {
+      /**
+       * Successfuly removed user from slot
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Remove user from slot
+       *
+       * ```bash
+       * curl -x DELETE `https://api.twitch.tv/helix/guest_star/slot?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&guest_id=144601104&slot_id=1` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       * * Missing or invalid _session\_id_
+       * * Missing or invalid _slot\_id_
+       */
+      400: unknown;
+      /**
+       * * _moderator\_id_ is not a Guest Star moderator
+       * * The request is attempting to modify a restricted slot
+       */
+      403: unknown;
+      /** _guest\_id_ or _slot\_id_ not found */
+      404: unknown;
+    };
+  };
+  /**
+   * BETA Allows a user to update the assigned slot for a particular user within the active Guest Star session.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "update-guest-star-slot": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
+        moderator_id: string;
+        /** The ID of the Guest Star session in which to update slot settings. */
+        session_id: string;
+        /** The slot assignment previously assigned to a user. */
+        source_slot_id: string;
+        /** The slot to move this user assignment to. If the destination slot is occupied, the user assigned will be swapped into `source_slot_id`. */
+        destination_slot_id?: string;
+      };
+    };
+    responses: {
+      /**
+       * Successfuly updated slot(s)
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Move slot assignment to a new slot ID
+       *
+       * ```bash
+       * curl -x PATCH `https://api.twitch.tv/helix/guest_star/slot?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&source_slot_id=1&destination_slot_id=2` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing or invalid _session\_id_
+       * * Missing or invalid _slot\_id_
+       */
+      400: unknown;
+    };
+  };
+  /**
+   * BETA Allows a user to update slot settings for a particular guest within a Guest Star session, such as allowing the user to share audio or video within the call as a host. These settings will be broadcasted to all subscribers which control their view of the guest in that slot. One or more of the optional parameters to this API can be specified at any time.
+   *
+   * __Authorization:__
+   *
+   * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+   * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+   */
+  "update-guest-star-slot-settings": {
+    parameters: {
+      query: {
+        /** The ID of the broadcaster running the Guest Star session. */
+        broadcaster_id: string;
+        /** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token. */
+        moderator_id: string;
+        /** The ID of the Guest Star session in which to update a slot’s settings. */
+        session_id: string;
+        /** The slot assignment that has previously been assigned to a user. */
+        slot_id: string;
+        /** Flag indicating whether the slot is allowed to share their audio with the rest of the session. If false, the slot will be muted in any views containing the slot. */
+        is_audio_enabled?: boolean;
+        /** Flag indicating whether the slot is allowed to share their video with the rest of the session. If false, the slot will have no video shared in any views containing the slot. */
+        is_video_enabled?: boolean;
+        /** Flag indicating whether the user assigned to this slot is visible/can be heard from any public subscriptions. Generally, this determines whether or not the slot is enabled in any broadcasting software integrations. */
+        is_live?: boolean;
+        /** Value from 0-100 that controls the audio volume for shared views containing the slot. */
+        volume?: number;
+      };
+    };
+    responses: {
+      /**
+       * Successfuly updated slot settings
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * Update slot settings to enable slot in broadcasting software
+       *
+       * ```bash
+       * curl -x PATCH `https://api.twitch.tv/helix/guest_star/slot_settings?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&slot_id=1&is_audio_enabled=false` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       *
+       * _Request:_
+       *
+       * Mute a slot’s audio for a guest
+       *
+       * ```bash
+       * curl -x PATCH `https://api.twitch.tv/helix/guest_star/slot_settings?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&slot_id=1&is_live=true` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       *
+       * _Request:_
+       *
+       * Allow slot audio to be unmuted by a guest. **NOTE**: This operation does not immediately unmute the guest. The guest will be notified they can unmute themselves when ready.
+       *
+       * ```bash
+       * curl -x PATCH `https://api.twitch.tv/helix/guest_star/slot_settings?broadcaster_id=9321049&moderator_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI&slot_id=1&is_audio_enabled=true` \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
+       * ```
+       */
+      204: never;
+      /**
+       * * Missing _broadcaster\_id_
+       * * Missing _moderator\_id_
+       * * Missing or invalid _session\_id_
+       * * Missing or invalid _slot\_id_
+       */
+      400: unknown;
+      /**
+       * * _moderator\_id_ is not a Guest Star moderator
+       * * The request is attempting to modify a restricted slot
+       */
+      403: unknown;
+    };
+  };
+  /**
    * Gets information about the broadcaster’s current or most recent Hype Train event.
    *
    * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
@@ -7252,7 +8172,7 @@ export interface operations {
         };
       };
       /**
-       * * The ID in _broadcaster\_id_ must match the user ID in the user access token.
+       * * The ID in _broadcaster\_id_ must match the _user\_id_ in the user access token.
        * * The Authorization header is required and must contain a user access token.
        * * The user access token must include the **channel:read:hype\_train** scope.
        * * The access token is not valid.
@@ -8563,9 +9483,9 @@ export interface operations {
     parameters: {
       query: {
         /** The ID of the broadcaster that’s sending the raiding party. This ID must match the user ID in the user access token. */
-        from_broadcaster_id: string;
+        from_broadcaster_id?: string;
         /** The ID of the broadcaster to raid. */
-        to_broadcaster_id: string;
+        to_broadcaster_id?: string;
       };
     };
     responses: {
@@ -9452,7 +10372,7 @@ export interface operations {
     };
   };
   /**
-   * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023).
+   * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response.
    *
    * Gets a list of all stream tags that Twitch defines. The broadcaster may apply any of these to their channel except automatic tags. For an online list of the possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags).
    *
@@ -9492,7 +10412,7 @@ export interface operations {
     };
   };
   /**
-   * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
+   * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response. If you use this endpoint, please update your code to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
    *
    * Gets the list of stream tags that the broadcaster or Twitch added to their channel.
    *
@@ -9525,73 +10445,6 @@ export interface operations {
        * * The ID in the Client-Id header must match the Client ID in the access token.
        */
       401: unknown;
-    };
-  };
-  /**
-   * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Modify Channel Information](https://dev.twitch.tv/docs/api/reference#modify-channel-information).
-   *
-   * Applies one or more tags to the specified channel, overwriting existing tags.
-   *
-   * **NOTE**: You may not specify automatic tags; the call fails if you specify automatic tags. Automatic tags are tags that Twitch applies to the channel. For a list of automatic tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). To get the list of possible tags programmatically, see [Get All Stream Tags](https://dev.twitch.tv/docs/api/reference#get-all-stream-tags).
-   *
-   * __Authorization:__
-   *
-   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
-   */
-  "replace-stream-tags": {
-    parameters: {
-      query: {
-        /** The ID of the broadcaster that owns the channel to apply the tags to. This ID must match the user ID in the access token. */
-        broadcaster_id: string;
-      };
-    };
-    responses: {
-      /**
-       * Successfully replaced the stream’s tags.
-       *
-       * __Examples__
-       *
-       * _Request:_
-       *
-       * Applies two stream tags to channel 257788195.
-       *
-       * ```bash
-       * curl -X PUT 'https://api.twitch.tv/helix/streams/tags?broadcaster_id=257788195' \
-       * -H 'Authorization: Bearer 2gbdx6oar67tqtcmt49t3wpcgycthx' \
-       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2' \
-       * -H 'Content-Type: application/json' \
-       * -d '{"tag_ids":["621fb5bf-5498-4d8f-b4ac-db4d40d401bf","52d7e4cc-633d-46f5-818c-bb59102d9549"]}'
-       * ```
-       *
-       * ```bash
-       * # Twitch CLI example that adds two stream tags to the channel.
-       * twitch api put /streams/tags -q broadcaster_id=1234567 -b '{"tag_ids":["621fb5bf-5498-4d8f-b4ac-db4d40d401bf", "52d7e4cc-633d-46f5-818c-bb59102d9549"]}'
-       *
-       * # Twitch CLI example that removes all stream tags from the channel.
-       * twitch api put /streams/tags -q broadcaster_id=1234567 -b '{"tag_ids":[]}'
-       * ```
-       */
-      204: never;
-      /**
-       * * The tag ID <value> is not valid.
-       * * The list of tag IDs is too long.
-       */
-      400: unknown;
-      /**
-       * * The ID in _broadcaster\_id_ must match the user ID in the access token.
-       * * The Authorization header is required and must contain a user access token.
-       * * The user access token must include the **channel:manage:broadcast** scope.
-       * * The access token is not valid.
-       * * The client ID specified in the Client-Id header must match the client ID specified in the access token.
-       */
-      401: unknown;
-      /** * You may not add automatic tags. */
-      403: unknown;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ReplaceStreamTagsBody"];
-      };
     };
   };
   /**
@@ -9751,6 +10604,8 @@ export interface operations {
   };
   /**
    * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
+   *
+   * **_Deprecation Notice:_** This endpoint is deprecated and will be decommissioned on [August 3, 2023](https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322). Access to this endpoint is limited to client IDs that have called the endpoint on or before February 17, 2023.
    *
    * __Authorization:__
    *

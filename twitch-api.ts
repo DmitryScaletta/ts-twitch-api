@@ -10,6 +10,8 @@ export type GetExtensionTransactionsParams = operations['get-extension-transacti
 export type GetChannelInformationParams = operations['get-channel-information']['parameters']['query'];
 export type ModifyChannelInformationParams = operations['modify-channel-information']['parameters']['query'];
 export type GetChannelEditorsParams = operations['get-channel-editors']['parameters']['query'];
+export type GetFollowedChannelsParams = operations['get-followed-channels']['parameters']['query'];
+export type GetChannelFollowersParams = operations['get-channel-followers']['parameters']['query'];
 export type CreateCustomRewardsParams = operations['create-custom-rewards']['parameters']['query'];
 export type DeleteCustomRewardParams = operations['delete-custom-reward']['parameters']['query'];
 export type GetCustomRewardParams = operations['get-custom-reward']['parameters']['query'];
@@ -30,8 +32,7 @@ export type GetUserChatColorParams = operations['get-user-chat-color']['paramete
 export type UpdateUserChatColorParams = operations['update-user-chat-color']['parameters']['query'];
 export type CreateClipParams = operations['create-clip']['parameters']['query'];
 export type GetClipsParams = operations['get-clips']['parameters']['query'];
-export type GetCodeStatusParams = operations['get-code-status']['parameters']['query'];
-export type RedeemCodeParams = operations['redeem-code']['parameters']['query'];
+export type GetContentClassificationLabelsParams = operations['get-content-classification-labels']['parameters']['query'];
 export type GetDropsEntitlementsParams = operations['get-drops-entitlements']['parameters']['query'];
 export type GetExtensionConfigurationSegmentParams = operations['get-extension-configuration-segment']['parameters']['query'];
 export type SetExtensionRequiredConfigurationParams = operations['set-extension-required-configuration']['parameters']['query'];
@@ -46,6 +47,18 @@ export type GetEventSubSubscriptionsParams = operations['get-eventsub-subscripti
 export type GetTopGamesParams = operations['get-top-games']['parameters']['query'];
 export type GetGamesParams = operations['get-games']['parameters']['query'];
 export type GetCreatorGoalsParams = operations['get-creator-goals']['parameters']['query'];
+export type GetChannelGuestStarSettingsParams = operations['get-channel-guest-star-settings']['parameters']['query'];
+export type UpdateChannelGuestStarSettingsParams = operations['update-channel-guest-star-settings']['parameters']['query'];
+export type GetGuestStarSessionParams = operations['get-guest-star-session']['parameters']['query'];
+export type CreateGuestStarSessionParams = operations['create-guest-star-session']['parameters']['query'];
+export type EndGuestStarSessionParams = operations['end-guest-star-session']['parameters']['query'];
+export type GetGuestStarInvitesParams = operations['get-guest-star-invites']['parameters']['query'];
+export type SendGuestStarInviteParams = operations['send-guest-star-invite']['parameters']['query'];
+export type DeleteGuestStarInviteParams = operations['delete-guest-star-invite']['parameters']['query'];
+export type AssignGuestStarSlotParams = operations['assign-guest-star-slot']['parameters']['query'];
+export type UpdateGuestStarSlotParams = operations['update-guest-star-slot']['parameters']['query'];
+export type DeleteGuestStarSlotParams = operations['delete-guest-star-slot']['parameters']['query'];
+export type UpdateGuestStarSlotSettingsParams = operations['update-guest-star-slot-settings']['parameters']['query'];
 export type GetHypeTrainEventsParams = operations['get-hype-train-events']['parameters']['query'];
 export type CheckAutoModStatusParams = operations['check-automod-status']['parameters']['query'];
 export type GetAutoModSettingsParams = operations['get-automod-settings']['parameters']['query'];
@@ -88,7 +101,6 @@ export type GetBroadcasterSubscriptionsParams = operations['get-broadcaster-subs
 export type CheckUserSubscriptionParams = operations['check-user-subscription']['parameters']['query'];
 export type GetAllStreamTagsParams = operations['get-all-stream-tags']['parameters']['query'];
 export type GetStreamTagsParams = operations['get-stream-tags']['parameters']['query'];
-export type ReplaceStreamTagsParams = operations['replace-stream-tags']['parameters']['query'];
 export type GetChannelTeamsParams = operations['get-channel-teams']['parameters']['query'];
 export type GetTeamsParams = operations['get-teams']['parameters']['query'];
 export type GetUsersParams = operations['get-users']['parameters']['query'];
@@ -121,6 +133,8 @@ export type GetChannelInformationResponse = Schema<'GetChannelInformationRespons
 export type ModifyChannelInformationBody = Schema<'ModifyChannelInformationBody'>;
 export type ChannelEditor = Schema<'ChannelEditor'>;
 export type GetChannelEditorsResponse = Schema<'GetChannelEditorsResponse'>;
+export type GetFollowedChannelsResponse = Schema<'GetFollowedChannelsResponse'>;
+export type GetChannelFollowersResponse = Schema<'GetChannelFollowersResponse'>;
 export type CreateCustomRewardsBody = Schema<'CreateCustomRewardsBody'>;
 export type CustomReward = Schema<'CustomReward'>;
 export type CreateCustomRewardsResponse = Schema<'CreateCustomRewardsResponse'>;
@@ -157,14 +171,13 @@ export type GetUserChatColorResponse = Schema<'GetUserChatColorResponse'>;
 export type CreateClipResponse = Schema<'CreateClipResponse'>;
 export type Clip = Schema<'Clip'>;
 export type GetClipsResponse = Schema<'GetClipsResponse'>;
-export type CodeStatus = Schema<'CodeStatus'>;
-export type GetCodeStatusResponse = Schema<'GetCodeStatusResponse'>;
+export type ContentClassificationLabel = Schema<'ContentClassificationLabel'>;
+export type GetContentClassificationLabelsResponse = Schema<'GetContentClassificationLabelsResponse'>;
 export type DropsEntitlement = Schema<'DropsEntitlement'>;
 export type GetDropsEntitlementsResponse = Schema<'GetDropsEntitlementsResponse'>;
 export type UpdateDropsEntitlementsBody = Schema<'UpdateDropsEntitlementsBody'>;
 export type DropsEntitlementUpdated = Schema<'DropsEntitlementUpdated'>;
 export type UpdateDropsEntitlementsResponse = Schema<'UpdateDropsEntitlementsResponse'>;
-export type RedeemCodeResponse = Schema<'RedeemCodeResponse'>;
 export type ExtensionConfigurationSegment = Schema<'ExtensionConfigurationSegment'>;
 export type GetExtensionConfigurationSegmentResponse = Schema<'GetExtensionConfigurationSegmentResponse'>;
 export type SetExtensionConfigurationSegmentBody = Schema<'SetExtensionConfigurationSegmentBody'>;
@@ -193,6 +206,14 @@ export type GetTopGamesResponse = Schema<'GetTopGamesResponse'>;
 export type GetGamesResponse = Schema<'GetGamesResponse'>;
 export type CreatorGoal = Schema<'CreatorGoal'>;
 export type GetCreatorGoalsResponse = Schema<'GetCreatorGoalsResponse'>;
+export type GetChannelGuestStarSettingsResponse = Schema<'GetChannelGuestStarSettingsResponse'>;
+export type UpdateChannelGuestStarSettingsBody = Schema<'UpdateChannelGuestStarSettingsBody'>;
+export type GuestStarSession = Schema<'GuestStarSession'>;
+export type GetGuestStarSessionResponse = Schema<'GetGuestStarSessionResponse'>;
+export type CreateGuestStarSessionResponse = Schema<'CreateGuestStarSessionResponse'>;
+export type EndGuestStarSessionResponse = Schema<'EndGuestStarSessionResponse'>;
+export type GuestStarInvite = Schema<'GuestStarInvite'>;
+export type GetGuestStarInvitesResponse = Schema<'GetGuestStarInvitesResponse'>;
 export type HypeTrainEvent = Schema<'HypeTrainEvent'>;
 export type GetHypeTrainEventsResponse = Schema<'GetHypeTrainEventsResponse'>;
 export type CheckAutoModStatusBody = Schema<'CheckAutoModStatusBody'>;
@@ -264,7 +285,6 @@ export type CheckUserSubscriptionResponse = Schema<'CheckUserSubscriptionRespons
 export type StreamTag = Schema<'StreamTag'>;
 export type GetAllStreamTagsResponse = Schema<'GetAllStreamTagsResponse'>;
 export type GetStreamTagsResponse = Schema<'GetStreamTagsResponse'>;
-export type ReplaceStreamTagsBody = Schema<'ReplaceStreamTagsBody'>;
 export type ChannelTeam = Schema<'ChannelTeam'>;
 export type GetChannelTeamsResponse = Schema<'GetChannelTeamsResponse'>;
 export type Team = Schema<'Team'>;
@@ -751,14 +771,25 @@ export class TwitchApi {
      * * A tag in the `tags` field is empty.
      * * A tag in the `tags` field contains special characters or spaces.
      * * One or more tags in the `tags` field failed AutoMod review.
+     * * Game restricted for user's age and region
      *
      * _401 Unauthorized_
      *
+     * * User requests CCL for a channel they don’t own
      * * The ID in _broadcaster\_id_ must match the user ID found in the OAuth token.
      * * The Authorization header is required and must specify a user access token.
      * * The OAuth token must include the **channel:manage:broadcast** scope.
      * * The OAuth token is not valid.
      * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+     *
+     * _403 Forbidden_
+     *
+     * * User requested gaming CCLs to be added to their channel
+     * * Unallowed CCLs declared for underaged authorized user in a restricted country
+     *
+     * _409 Conflict_
+     *
+     * User set the Branded Content flag too frequently
      *
      * _500 Internal Server Error_
      *
@@ -769,7 +800,7 @@ export class TwitchApi {
       body: ModifyChannelInformationBody,
       accessToken = '',
       clientId = '',
-    ): ApiResponse<void, 204, 400 | 401 | 500> => 
+    ): ApiResponse<void, 204, 400 | 401 | 403 | 409 | 500> => 
       this.callApi({
         path: '/channels',
         method: 'PATCH',
@@ -816,6 +847,102 @@ export class TwitchApi {
     ): ApiResponse<GetChannelEditorsResponse, 200, 400 | 401> => 
       this.callApi({
         path: '/channels/editors',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * Gets a list of broadcasters that the specified user follows. You can also use this endpoint to see whether a user follows a specific broadcaster.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/channels/followed`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the broadcaster’s list of followers.
+     *
+     * _400 Bad Request_
+     *
+     * Possible reasons:
+     *
+     * * The _user\_id_ query parameter is required.
+     * * The _broadcaster\_id_ query parameter is not valid.
+     * * The _user\_id_ query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Possible reasons:
+     *
+     * * The ID in the _user\_id_ query parameter must match the user ID in the access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token is missing the **user:read:follows** scope.
+     * * The OAuth token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-followed-channels
+     */
+    getFollowedChannels: async (
+      params: GetFollowedChannelsParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetFollowedChannelsResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/channels/followed',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * Gets a list of users that follow the specified broadcaster. You can also use this endpoint to see whether a specific user follows the broadcaster.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:followers** scope. The ID in the broadcaster\_id query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster. If a scope is not provided, only the total follower count will be included in the response.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/channels/followers`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the broadcaster’s list of followers.
+     *
+     * _400 Bad Request_
+     *
+     * Possible reasons:
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The _broadcaster\_id_ query parameter is not valid.
+     * * The _user\_id_ query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Possible reasons:
+     *
+     * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token is missing the **moderator:read:followers** scope.
+     * * The OAuth token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-channel-followers
+     */
+    getChannelFollowers: async (
+      params: GetChannelFollowersParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetChannelFollowersResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/channels/followers',
         params,
         clientId,
         accessToken,
@@ -1684,7 +1811,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * [BETA](https://dev.twitch.tv/docs/product-lifecycle) Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
+     * Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
      *
      * Twitch’s Shoutout feature is a great way for you to show support for other broadcasters and help them grow. Viewers who do not follow the other broadcaster will see a pop-up Follow button in your chat that they can click to follow the other broadcaster. [Learn More](https://help.twitch.tv/s/article/shoutouts)
      *
@@ -1943,110 +2070,45 @@ export class TwitchApi {
         accessToken,
       }),
   };
-  entitlements = {
+  cCLs = {
     /**
-     * Gets the status of one or more redemption codes for a Bits reward. Only client IDs approved by Twitch may request a redemption code’s status.
-     *
-     * Rate limit: You may send at most one request per second per user.
+     * Gets information about Twitch content classification labels.
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the access token must match a client ID that Twitch has approved to provide entitlements.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
      * __URL:__
      *
-     * `GET https://api.twitch.tv/helix/entitlements/codes`
+     * `GET https://api.twitch.tv/helix/content_classification_labels`
      *
      * __Response Codes:__
      *
      * _200 OK_
      *
-     * Successfully retrieved the statuses of the specified codes.
+     * Successfully retrieved The list of CCLs available.
      *
      * _400 Bad Request_
      *
-     * * The _user\_id_ query parameter is required.
-     * * The _code_ query parameter is required.
-     * * The _code_ query parameter may not contain a comma-delimited list of codes. Instead, repeat the parameter for each code. For example, `code=1234&code=5678`.
-     * * The _code_ query parameter may not contain an empty string.
-     *
      * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must specify an app access token.
-     * * The access token is not valid.
-     * * The ID in the Client-Id header must match the Client ID in the access token.
-     *
-     * _403 Forbidden_
-     *
-     * * The API accepts only app access tokens.
-     * * The client ID specified in the access token is not approved for getting the statuses of the redemption codes.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-code-status
-     */
-    getCodeStatus: async (
-      params: GetCodeStatusParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetCodeStatusResponse, 200, 400 | 401 | 403> => 
-      this.callApi({
-        path: '/entitlements/codes',
-        params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * Redeems one or more redemption codes. Redeeming a code credits the user’s account with the entitlement; for example, a Bits reward earned by playing a game.
-     *
-     * Rate limit: You may send at most one request per second per user.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). Only client IDs approved by Twitch may redeem codes on behalf of any Twitch user account.
-     *
-     * __URL:__
-     *
-     * `POST https://api.twitch.tv/helix/entitlements/codes`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully redeemed the code.
-     *
-     * _400 Bad Request_
-     *
-     * * The _user\_id_ query parameter is required.
-     * * The _code_ query parameter is required.
-     * * The _code_ query parameter may not contain a comma-delimited list of codes. Instead, repeat the parameter for each code. For example, `code=1234&code=5678`.
-     * * The _code_ query parameter may not contain an empty string.
-     *
-     * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must specify an app access token.
-     * * The access token is not valid.
-     * * The ID in the Client-Id header must match the Client ID in the access token.
-     *
-     * _403 Forbidden_
-     *
-     * * The API accepts only app access tokens.
-     * * The client specified in the access token is not approved to redeem codes.
      *
      * _500 Internal Server Error_
      *
-     * @see https://dev.twitch.tv/docs/api/reference#redeem-code
+     * @see https://dev.twitch.tv/docs/api/reference#get-content-classification-labels
      */
-    redeemCode: async (
-      params: RedeemCodeParams,
+    getContentClassificationLabels: async (
+      params: GetContentClassificationLabelsParams,
       accessToken = '',
       clientId = '',
-    ): ApiResponse<RedeemCodeResponse, 200, 400 | 401 | 403 | 500> => 
+    ): ApiResponse<GetContentClassificationLabelsResponse, 200, 400 | 401 | 500> => 
       this.callApi({
-        path: '/entitlements/codes',
-        method: 'POST',
+        path: '/content_classification_labels',
         params,
         clientId,
         accessToken,
       }),
+  };
+  entitlements = {
     /**
      * Gets an organization’s list of entitlements that have been granted to a game, a user, or both.
      *
@@ -3031,6 +3093,506 @@ export class TwitchApi {
         accessToken,
       }),
   };
+  guestStar = {
+    /**
+     * BETA Gets the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/guest_star/channel_settings`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     *
+     * _403 Forbidden_
+     *
+     * Insufficient authorization for viewing channel’s Guest Star settings
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-channel-guest-star-settings
+     */
+    getChannelGuestStarSettings: async (
+      params: GetChannelGuestStarSettingsParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetChannelGuestStarSettingsResponse, 200, 400 | 403> => 
+      this.callApi({
+        path: '/guest_star/channel_settings',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `PUT https://api.twitch.tv/helix/guest_star/channel_settings`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully updated channel settings
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Invalid _slot\_count_
+     * * Invalid _group\_layout_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-channel-guest-star-settings
+     */
+    updateChannelGuestStarSettings: async (
+      params: UpdateChannelGuestStarSettingsParams,
+      body: UpdateChannelGuestStarSettingsBody,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400> => 
+      this.callApi({
+        path: '/guest_star/channel_settings',
+        method: 'PUT',
+        params,
+        body,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Gets information about an ongoing Guest Star session for a particular channel.
+     *
+     * __Authorization:__
+     *
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     * * Guests must be either invited or assigned a slot within the session
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/guest_star/session`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     *
+     * _401 Unauthorized_
+     *
+     * _moderator\_id_ and user token do not match
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-guest-star-session
+     */
+    getGuestStarSession: async (
+      params: GetGuestStarSessionParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetGuestStarSessionResponse, 200, 400 | 401> => 
+      this.callApi({
+        path: '/guest_star/session',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Programmatically creates a Guest Star session on behalf of the broadcaster. Requires the broadcaster to be present in the call interface, or the call will be ended automatically.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/guest_star/session`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Session limit reached (1 active call)
+     *
+     * _401 Unauthorized_
+     *
+     * Phone verification missing
+     *
+     * _403 Forbidden_
+     *
+     * Insufficient authorization for creating session
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#create-guest-star-session
+     */
+    createGuestStarSession: async (
+      params: CreateGuestStarSessionParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<CreateGuestStarSessionResponse, 200, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/guest_star/session',
+        method: 'POST',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Programmatically ends a Guest Star session on behalf of the broadcaster. Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/guest_star/session`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing or invalid _broadcaster\_id_
+     * * Missing or invalid _session\_id_
+     * * Session has already been ended
+     *
+     * _403 Forbidden_
+     *
+     * Insufficient authorization for ending session
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#end-guest-star-session
+     */
+    endGuestStarSession: async (
+      params: EndGuestStarSessionParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 403> => 
+      this.callApi({
+        path: '/guest_star/session',
+        method: 'DELETE',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Provides the caller with a list of pending invites to a Guest Star session, including the invitee’s ready status while joining the waiting room.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/guest_star/invites`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _session\_id_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-guest-star-invites
+     */
+    getGuestStarInvites: async (
+      params: GetGuestStarInvitesParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetGuestStarInvitesResponse, 200, 400> => 
+      this.callApi({
+        path: '/guest_star/invites',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/guest_star/invites`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     * * Missing _session\_id_
+     * * Missing _guest\_id_
+     * * Invalid _session\_id_
+     *
+     * _403 Forbidden_
+     *
+     * * Unauthorized guest invited
+     * * Guest already invited
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#send-guest-star-invite
+     */
+    sendGuestStarInvite: async (
+      params: SendGuestStarInviteParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 403> => 
+      this.callApi({
+        path: '/guest_star/invites',
+        method: 'POST',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Revokes a previously sent invite for a Guest Star session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/guest_star/invites`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _session\_id_
+     * * Missing _guest\_id_
+     * * Invalid _session\_id_
+     *
+     * _404 Not Found_
+     *
+     * No invite exists for specified _guest\_id_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#delete-guest-star-invite
+     */
+    deleteGuestStarInvite: async (
+      params: DeleteGuestStarInviteParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 404> => 
+      this.callApi({
+        path: '/guest_star/invites',
+        method: 'DELETE',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Allows a previously invited user to be assigned a slot within the active Guest Star session, once that guest has indicated they are ready to join.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/guest_star/slot`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfuly assigned guest to slot
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     * * Missing _guest\_id_
+     * * Missing or invalid _session\_id_
+     * * Missing or invalid _slot\_id_
+     *
+     * _401 Unauthorized_
+     *
+     * _moderator\_id_ is not a guest star moderator
+     *
+     * _403 Forbidden_
+     *
+     * * Cannot assign host slot
+     * * Guest not invited to session
+     * * Guest already assigned to slot
+     * * Guest is not ready to join
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#assign-guest-star-slot
+     */
+    assignGuestStarSlot: async (
+      params: AssignGuestStarSlotParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 401 | 403> => 
+      this.callApi({
+        path: '/guest_star/slot',
+        method: 'POST',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Allows a user to update the assigned slot for a particular user within the active Guest Star session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/guest_star/slot`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfuly updated slot(s)
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing or invalid _session\_id_
+     * * Missing or invalid _slot\_id_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-guest-star-slot
+     */
+    updateGuestStarSlot: async (
+      params: UpdateGuestStarSlotParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400> => 
+      this.callApi({
+        path: '/guest_star/slot',
+        method: 'PATCH',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Allows a caller to remove a slot assignment from a user participating in an active Guest Star session. This revokes their access to the session immediately and disables their access to publish or subscribe to media within the session.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/guest_star/slot`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfuly removed user from slot
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     * * Missing or invalid _session\_id_
+     * * Missing or invalid _slot\_id_
+     *
+     * _403 Forbidden_
+     *
+     * * _moderator\_id_ is not a Guest Star moderator
+     * * The request is attempting to modify a restricted slot
+     *
+     * _404 Not Found_
+     *
+     * _guest\_id_ or _slot\_id_ not found
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#delete-guest-star-slot
+     */
+    deleteGuestStarSlot: async (
+      params: DeleteGuestStarSlotParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 403 | 404> => 
+      this.callApi({
+        path: '/guest_star/slot',
+        method: 'DELETE',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Allows a user to update slot settings for a particular guest within a Guest Star session, such as allowing the user to share audio or video within the call as a host. These settings will be broadcasted to all subscribers which control their view of the guest in that slot. One or more of the optional parameters to this API can be specified at any time.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/guest_star/slot_settings`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfuly updated slot settings
+     *
+     * _400 Bad Request_
+     *
+     * * Missing _broadcaster\_id_
+     * * Missing _moderator\_id_
+     * * Missing or invalid _session\_id_
+     * * Missing or invalid _slot\_id_
+     *
+     * _403 Forbidden_
+     *
+     * * _moderator\_id_ is not a Guest Star moderator
+     * * The request is attempting to modify a restricted slot
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-guest-star-slot-settings
+     */
+    updateGuestStarSlotSettings: async (
+      params: UpdateGuestStarSlotSettingsParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<void, 204, 400 | 403> => 
+      this.callApi({
+        path: '/guest_star/slot_settings',
+        method: 'PATCH',
+        params,
+        clientId,
+        accessToken,
+      }),
+  };
   hypeTrain = {
     /**
      * Gets information about the broadcaster’s current or most recent Hype Train event.
@@ -3053,7 +3615,7 @@ export class TwitchApi {
      *
      * _401 Unauthorized_
      *
-     * * The ID in _broadcaster\_id_ must match the user ID in the user access token.
+     * * The ID in _broadcaster\_id_ must match the _user\_id_ in the user access token.
      * * The Authorization header is required and must contain a user access token.
      * * The user access token must include the **channel:read:hype\_train** scope.
      * * The access token is not valid.
@@ -5413,7 +5975,7 @@ export class TwitchApi {
   };
   tags = {
     /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023).
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response.
      *
      * Gets a list of all stream tags that Twitch defines. The broadcaster may apply any of these to their channel except automatic tags. For an online list of the possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags).
      *
@@ -5456,7 +6018,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
+     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. **IMPORTANT** As of February 28, 2023, this endpoint returns an empty array. On July 13, 2023, it will return a 410 response. If you use this endpoint, please update your code to use [Get Channel Information](https://dev.twitch.tv/docs/api/reference#get-channel-information).
      *
      * Gets the list of stream tags that the broadcaster or Twitch added to their channel.
      *
@@ -5495,60 +6057,6 @@ export class TwitchApi {
       this.callApi({
         path: '/streams/tags',
         params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * **IMPORTANT** Twitch is moving from Twitch-defined tags to channel-defined tags. As part of this move, Twitch is deprecating this endpoint and will remove it in 2023 (Twitch will communicate the specific removal date in early 2023). If you use this endpoint, consider updating your code at your earliest convenience to use [Modify Channel Information](https://dev.twitch.tv/docs/api/reference#modify-channel-information).
-     *
-     * Applies one or more tags to the specified channel, overwriting existing tags.
-     *
-     * **NOTE**: You may not specify automatic tags; the call fails if you specify automatic tags. Automatic tags are tags that Twitch applies to the channel. For a list of automatic tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). To get the list of possible tags programmatically, see [Get All Stream Tags](https://dev.twitch.tv/docs/api/reference#get-all-stream-tags).
-     *
-     * __Authorization:__
-     *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
-     *
-     * __URL:__
-     *
-     * `PUT https://api.twitch.tv/helix/streams/tags`
-     *
-     * __Response Codes:__
-     *
-     * _204 No Content_
-     *
-     * Successfully replaced the stream’s tags.
-     *
-     * _400 Bad Request_
-     *
-     * * The tag ID <value> is not valid.
-     * * The list of tag IDs is too long.
-     *
-     * _401 Unauthorized_
-     *
-     * * The ID in _broadcaster\_id_ must match the user ID in the access token.
-     * * The Authorization header is required and must contain a user access token.
-     * * The user access token must include the **channel:manage:broadcast** scope.
-     * * The access token is not valid.
-     * * The client ID specified in the Client-Id header must match the client ID specified in the access token.
-     *
-     * _403 Forbidden_
-     *
-     * * You may not add automatic tags.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#replace-stream-tags
-     */
-    replaceStreamTags: async (
-      params: ReplaceStreamTagsParams,
-      body: ReplaceStreamTagsBody,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<void, 204, 400 | 401 | 403> => 
-      this.callApi({
-        path: '/streams/tags',
-        method: 'PUT',
-        params,
-        body,
         clientId,
         accessToken,
       }),
@@ -5740,6 +6248,8 @@ export class TwitchApi {
       }),
     /**
      * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
+     *
+     * **_Deprecation Notice:_** This endpoint is deprecated and will be decommissioned on [August 3, 2023](https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322). Access to this endpoint is limited to client IDs that have called the endpoint on or before February 17, 2023.
      *
      * __Authorization:__
      *
