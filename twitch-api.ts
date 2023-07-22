@@ -90,9 +90,6 @@ export type UpdateChannelStreamScheduleSegmentParams = operations['update-channe
 export type DeleteChannelStreamScheduleSegmentParams = operations['delete-channel-stream-schedule-segment']['parameters']['query'];
 export type SearchCategoriesParams = operations['search-categories']['parameters']['query'];
 export type SearchChannelsParams = operations['search-channels']['parameters']['query'];
-export type GetSoundtrackCurrentTrackParams = operations['get-soundtrack-current-track']['parameters']['query'];
-export type GetSoundtrackPlaylistParams = operations['get-soundtrack-playlist']['parameters']['query'];
-export type GetSoundtrackPlaylistsParams = operations['get-soundtrack-playlists']['parameters']['query'];
 export type GetStreamKeyParams = operations['get-stream-key']['parameters']['query'];
 export type GetStreamsParams = operations['get-streams']['parameters']['query'];
 export type GetFollowedStreamsParams = operations['get-followed-streams']['parameters']['query'];
@@ -263,12 +260,6 @@ export type Category = Schema<'Category'>;
 export type SearchCategoriesResponse = Schema<'SearchCategoriesResponse'>;
 export type Channel = Schema<'Channel'>;
 export type SearchChannelsResponse = Schema<'SearchChannelsResponse'>;
-export type SoundtrackCurrentTrack = Schema<'SoundtrackCurrentTrack'>;
-export type GetSoundtrackCurrentTrackResponse = Schema<'GetSoundtrackCurrentTrackResponse'>;
-export type SoundtrackTrack = Schema<'SoundtrackTrack'>;
-export type GetSoundtrackPlaylistResponse = Schema<'GetSoundtrackPlaylistResponse'>;
-export type SoundtrackPlaylist = Schema<'SoundtrackPlaylist'>;
-export type GetSoundtrackPlaylistsResponse = Schema<'GetSoundtrackPlaylistsResponse'>;
 export type GetStreamKeyResponse = Schema<'GetStreamKeyResponse'>;
 export type Stream = Schema<'Stream'>;
 export type GetStreamsResponse = Schema<'GetStreamsResponse'>;
@@ -5504,139 +5495,6 @@ export class TwitchApi {
     ): ApiResponse<SearchChannelsResponse, 200, 400 | 401> => 
       this.callApi({
         path: '/search/channels',
-        params,
-        clientId,
-        accessToken,
-      }),
-  };
-  music = {
-    /**
-     * Gets the Soundtrack track that the broadcaster is playing.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/soundtrack/current_track`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the track that the broadcaster is playing.
-     *
-     * _400 Bad Request_
-     *
-     * * The _broadcaster\_id_ query parameter is required.
-     *
-     * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must specify an app access token or user access token.
-     * * The access token is not valid.
-     * * The ID in the Client-Id header must match the client ID in the access token.
-     *
-     * _404 Not Found_
-     *
-     * * The broadcaster is not playing a track.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-soundtrack-current-track
-     */
-    getSoundtrackCurrentTrack: async (
-      params: GetSoundtrackCurrentTrackParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetSoundtrackCurrentTrackResponse, 200, 400 | 401 | 404> => 
-      this.callApi({
-        path: '/soundtrack/current_track',
-        params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * Gets the Soundtrack playlist’s tracks.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/soundtrack/playlist`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the playlist.
-     *
-     * _400 Bad Request_
-     *
-     * * The _id_ query parameter is required.
-     * * The ID in the _id_ query parameter is not a valid playlist ASIN.
-     *
-     * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must specify an app access token or user access token.
-     * * The access token is not valid.
-     * * The ID in the Client-Id header must match the client ID in the access token.
-     *
-     * _404 Not Found_
-     *
-     * * The specified playlist was not found.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-soundtrack-playlist
-     */
-    getSoundtrackPlaylist: async (
-      params: GetSoundtrackPlaylistParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetSoundtrackPlaylistResponse, 200, 400 | 401 | 404> => 
-      this.callApi({
-        path: '/soundtrack/playlist',
-        params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * Gets a list of Soundtrack playlists.
-     *
-     * The response contains information about the playlists, such as their titles and descriptions. To get a playlist’s tracks, use [Get Soundtrack Playlist](https://dev.twitch.tv/docs/api/reference#get-soundtrack-playlist) endpoint.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/soundtrack/playlists`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the list of playlists.
-     *
-     * _400 Bad Request_
-     *
-     * * The ID in the _id_ query parameter is not a valid playlist ASIN.
-     *
-     * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must specify an app access token or user access token.
-     * * The access token is not valid.
-     * * The ID in the Client-Id header must match the client ID in the access token.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-soundtrack-playlists
-     */
-    getSoundtrackPlaylists: async (
-      params: GetSoundtrackPlaylistsParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetSoundtrackPlaylistsResponse, 200, 400 | 401> => 
-      this.callApi({
-        path: '/soundtrack/playlists',
         params,
         clientId,
         accessToken,
