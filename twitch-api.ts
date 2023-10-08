@@ -102,7 +102,6 @@ export type GetChannelTeamsParams = operations['get-channel-teams']['parameters'
 export type GetTeamsParams = operations['get-teams']['parameters']['query'];
 export type GetUsersParams = operations['get-users']['parameters']['query'];
 export type UpdateUserParams = operations['update-user']['parameters']['query'];
-export type GetUsersFollowsParams = operations['get-users-follows']['parameters']['query'];
 export type GetUserBlockListParams = operations['get-user-block-list']['parameters']['query'];
 export type BlockUserParams = operations['block-user']['parameters']['query'];
 export type UnblockUserParams = operations['unblock-user']['parameters']['query'];
@@ -283,8 +282,6 @@ export type GetTeamsResponse = Schema<'GetTeamsResponse'>;
 export type User = Schema<'User'>;
 export type GetUsersResponse = Schema<'GetUsersResponse'>;
 export type UpdateUserResponse = Schema<'UpdateUserResponse'>;
-export type UsersFollow = Schema<'UsersFollow'>;
-export type GetUsersFollowsResponse = Schema<'GetUsersFollowsResponse'>;
 export type UserBlockList = Schema<'UserBlockList'>;
 export type GetUserBlockListResponse = Schema<'GetUserBlockListResponse'>;
 export type UserExtension = Schema<'UserExtension'>;
@@ -895,7 +892,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:followers** scope. The ID in the broadcaster\_id query parameter must match the user ID in the access token or the user must be a moderator for the specified broadcaster. If a scope is not provided, only the total follower count will be included in the response.
+     * * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:followers** scope.
+     * * The ID in the broadcaster\_id query parameter must match the user ID in the access token or the user ID in the access token must be a moderator for the specified broadcaster.
+     *
+     * This endpoint will return specific follower information only if both of the above are true. If a scope is not provided or the user isn’t the broadcaster or a moderator for the specified channel, only the total follower count will be included in the response.
      *
      * __URL:__
      *
@@ -913,7 +913,6 @@ export class TwitchApi {
      *
      * * The _broadcaster\_id_ query parameter is required.
      * * The _broadcaster\_id_ query parameter is not valid.
-     * * The _user\_id_ query parameter is required.
      *
      * _401 Unauthorized_
      *
@@ -924,6 +923,7 @@ export class TwitchApi {
      * * The user access token is missing the **moderator:read:followers** scope.
      * * The OAuth token is not valid.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
+     * * The _user\_id_ parameter was specified but either the user access token is missing the **moderator:read:followers** scope or the user is not the broadcaster or moderator for the specified channel
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-followers
      */
@@ -6100,50 +6100,6 @@ export class TwitchApi {
       this.callApi({
         path: '/users',
         method: 'PUT',
-        params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * Gets information about users that are following other users. For example, you can use this endpoint to answer questions like “who is qotrok following,” “who is following qotrok,” or “is user X following user Y.”
-     *
-     * **_Deprecation Notice:_** This endpoint is deprecated and will be decommissioned on [August 3, 2023](https://discuss.dev.twitch.tv/t/follows-endpoints-and-eventsub-subscription-type-are-now-available-in-open-beta/43322). Access to this endpoint is limited to client IDs that have called the endpoint on or before February 17, 2023.
-     *
-     * __Authorization:__
-     *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/users/follows`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the follows information.
-     *
-     * _400 Bad Request_
-     *
-     * * The _from\_id_ query parameter, _to\_id_ query parameter, or both parameters are required.
-     * * The ID in the _from\_id_ query parameter is not valid
-     * * The ID in the _to\_id_ query parameter is not valid.
-     *
-     * _401 Unauthorized_
-     *
-     * * The Authorization header is required and must contain an app access token or user access token.
-     * * The access token is not valid.
-     * * The ID specified in the Client-Id header does not match the client ID specified in the access token.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-users-follows
-     */
-    getUsersFollows: async (
-      params: GetUsersFollowsParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetUsersFollowsResponse, 200, 400 | 401> => 
-      this.callApi({
-        path: '/users/follows',
         params,
         clientId,
         accessToken,
