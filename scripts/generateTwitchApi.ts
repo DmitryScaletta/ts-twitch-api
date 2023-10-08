@@ -18,6 +18,7 @@ export const lowerFirstLetter = (text: string): string =>
   text.charAt(0).toLowerCase() + text.slice(1);
 
 const endpointNamesMap: Record<string, string> = {
+  'Send a Shoutout': 'SendShoutout',
   'Start a raid': 'StartRaid',
   'Cancel a raid': 'CancelRaid',
   'Get Channel iCalendar': 'GetChannelICalendar',
@@ -176,9 +177,7 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
 
       if (hasParams) {
         methodSignature = methodSignature.replace('%PARAMS_TYPE%', paramsType);
-        typeExports.push(
-          `export type ${paramsType} = operations['${id}']['parameters']['query'];`,
-        );
+        typeExports.push(`export type ${paramsType} = ParamsSchema<'${id}'>;`);
       }
 
       if (hasBody) {
