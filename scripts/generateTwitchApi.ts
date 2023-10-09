@@ -1,6 +1,7 @@
 import type {
   OpenApi,
   OperationObject,
+  ParameterObject,
   ResponseObject,
   ResponsesObject,
   Templates,
@@ -176,12 +177,25 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
         .replace('%RESPONSE_CODE_ERROR%', responseCodeError);
 
       if (hasParams) {
-        methodSignature = methodSignature.replace('%PARAMS_TYPE%', paramsType);
+        let paramsTypeFinal = paramsType;
+        const hasRequired = (parameters as ParameterObject[]).some(
+          (p) => p.required,
+        );
+        if (!hasRequired) paramsTypeFinal += ' | null | undefined = null';
+        methodSignature = methodSignature.replace(
+          '%PARAMS_TYPE%',
+          paramsTypeFinal,
+        );
         typeExports.push(`export type ${paramsType} = ParamsSchema<'${id}'>;`);
       }
 
       if (hasBody) {
-        methodSignature = methodSignature.replace('%BODY_TYPE%', bodyType);
+        let bodyTypeFinal = bodyType;
+        const requiredFields = openApi.components.schemas[bodyType]?.required;
+        const hasRequired =
+          Array.isArray(requiredFields) && requiredFields.length > 0;
+        if (!hasRequired) bodyTypeFinal += ' | null | undefined = null';
+        methodSignature = methodSignature.replace('%BODY_TYPE%', bodyTypeFinal);
       }
 
       methodSignature.split('\n').map((line) => api.push([2, line]));

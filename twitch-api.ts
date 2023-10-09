@@ -3,7 +3,7 @@ import type { components, operations } from './twitch-api.generated';
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
   operations[T] extends { parameters: { query?: infer Q } }
-    ? Q | undefined
+    ? Q
     : never;
 
 export type GetExtensionAnalyticsParams = ParamsSchema<'get-extension-analytics'>;
@@ -491,7 +491,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-analytics
      */
     getExtensionAnalytics: async (
-      params: GetExtensionAnalyticsParams,
+      params: GetExtensionAnalyticsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetExtensionAnalyticsResponse, 200, 400 | 401 | 404> => 
@@ -541,7 +541,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-game-analytics
      */
     getGameAnalytics: async (
-      params: GetGameAnalyticsParams,
+      params: GetGameAnalyticsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetGameAnalyticsResponse, 200, 400 | 401 | 404> => 
@@ -588,7 +588,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-bits-leaderboard
      */
     getBitsLeaderboard: async (
-      params: GetBitsLeaderboardParams,
+      params: GetBitsLeaderboardParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetBitsLeaderboardResponse, 200, 400 | 401 | 403> => 
@@ -623,7 +623,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-cheermotes
      */
     getCheermotes: async (
-      params: GetCheermotesParams,
+      params: GetCheermotesParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetCheermotesResponse, 200, 401> => 
@@ -789,7 +789,7 @@ export class TwitchApi {
      */
     modifyChannelInformation: async (
       params: ModifyChannelInformationParams,
-      body: ModifyChannelInformationBody,
+      body: ModifyChannelInformationBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<void, 204, 400 | 401 | 403 | 409 | 500> => 
@@ -1169,7 +1169,7 @@ export class TwitchApi {
      */
     updateCustomReward: async (
       params: UpdateCustomRewardParams,
-      body: UpdateCustomRewardBody,
+      body: UpdateCustomRewardBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500> => 
@@ -1745,7 +1745,7 @@ export class TwitchApi {
      */
     updateChatSettings: async (
       params: UpdateChatSettingsParams,
-      body: UpdateChatSettingsBody,
+      body: UpdateChatSettingsBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateChatSettingsResponse, 200, 400 | 401 | 403> => 
@@ -2054,7 +2054,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-clips
      */
     getClips: async (
-      params: GetClipsParams,
+      params: GetClipsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetClipsResponse, 200, 400 | 401 | 404> => 
@@ -2092,7 +2092,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-content-classification-labels
      */
     getContentClassificationLabels: async (
-      params: GetContentClassificationLabelsParams,
+      params: GetContentClassificationLabelsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetContentClassificationLabelsResponse, 200, 400 | 401 | 500> => 
@@ -2158,7 +2158,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-drops-entitlements
      */
     getDropsEntitlements: async (
-      params: GetDropsEntitlementsParams,
+      params: GetDropsEntitlementsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetDropsEntitlementsResponse, 200, 400 | 401 | 403 | 500> => 
@@ -2210,7 +2210,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#update-drops-entitlements
      */
     updateDropsEntitlements: async (
-      body: UpdateDropsEntitlementsBody,
+      body: UpdateDropsEntitlementsBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateDropsEntitlementsResponse, 200, 400 | 401 | 500> => 
@@ -2734,7 +2734,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-bits-products
      */
     getExtensionBitsProducts: async (
-      params: GetExtensionBitsProductsParams,
+      params: GetExtensionBitsProductsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetExtensionBitsProductsResponse, 200, 400 | 401> => 
@@ -2945,7 +2945,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
      */
     getEventSubSubscriptions: async (
-      params: GetEventSubSubscriptionsParams,
+      params: GetEventSubSubscriptionsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetEventSubSubscriptionsResponse, 200, 400 | 401> => 
@@ -2988,7 +2988,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-top-games
      */
     getTopGames: async (
-      params: GetTopGamesParams,
+      params: GetTopGamesParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetTopGamesResponse, 200, 400 | 401> => 
@@ -3031,7 +3031,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-games
      */
     getGames: async (
-      params: GetGamesParams,
+      params: GetGamesParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetGamesResponse, 200, 400 | 401> => 
@@ -3155,7 +3155,7 @@ export class TwitchApi {
      */
     updateChannelGuestStarSettings: async (
       params: UpdateChannelGuestStarSettingsParams,
-      body: UpdateChannelGuestStarSettingsBody,
+      body: UpdateChannelGuestStarSettingsBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<void, 204, 400> => 
@@ -3856,7 +3856,7 @@ export class TwitchApi {
      */
     updateAutoModSettings: async (
       params: UpdateAutoModSettingsParams,
-      body: UpdateAutoModSettingsBody,
+      body: UpdateAutoModSettingsBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateAutoModSettingsResponse, 200, 400 | 401 | 403> => 
@@ -5040,7 +5040,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#start-a-raid
      */
     startRaid: async (
-      params: StartRaidParams,
+      params: StartRaidParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<StartRaidResponse, 200, 400 | 401 | 404 | 409 | 429> => 
@@ -5353,7 +5353,7 @@ export class TwitchApi {
      */
     updateChannelStreamScheduleSegment: async (
       params: UpdateChannelStreamScheduleSegmentParams,
-      body: UpdateChannelStreamScheduleSegmentBody,
+      body: UpdateChannelStreamScheduleSegmentBody | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 404> => 
@@ -5578,7 +5578,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-streams
      */
     getStreams: async (
-      params: GetStreamsParams,
+      params: GetStreamsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetStreamsResponse, 200, 400 | 401> => 
@@ -5729,7 +5729,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-markers
      */
     getStreamMarkers: async (
-      params: GetStreamMarkersParams,
+      params: GetStreamMarkersParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetStreamMarkersResponse, 200, 400 | 401 | 403 | 404> => 
@@ -5869,7 +5869,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-all-stream-tags
      */
     getAllStreamTags: async (
-      params: GetAllStreamTagsParams,
+      params: GetAllStreamTagsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetAllStreamTagsResponse, 200, 400 | 401> => 
@@ -6005,7 +6005,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-teams
      */
     getTeams: async (
-      params: GetTeamsParams,
+      params: GetTeamsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetTeamsResponse, 200, 400 | 401 | 404> => 
@@ -6054,7 +6054,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-users
      */
     getUsers: async (
-      params: GetUsersParams,
+      params: GetUsersParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetUsersResponse, 200, 400 | 401> => 
@@ -6097,7 +6097,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#update-user
      */
     updateUser: async (
-      params: UpdateUserParams,
+      params: UpdateUserParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<UpdateUserResponse, 200, 400 | 401> => 
@@ -6303,7 +6303,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-user-active-extensions
      */
     getUserActiveExtensions: async (
-      params: GetUserActiveExtensionsParams,
+      params: GetUserActiveExtensionsParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetUserActiveExtensionsResponse, 200, 400 | 401> => 
@@ -6406,7 +6406,7 @@ export class TwitchApi {
      * @see https://dev.twitch.tv/docs/api/reference#get-videos
      */
     getVideos: async (
-      params: GetVideosParams,
+      params: GetVideosParams | null | undefined = null,
       accessToken = '',
       clientId = '',
     ): ApiResponse<GetVideosResponse, 200, 400 | 401 | 404> => 

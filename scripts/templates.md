@@ -8,7 +8,7 @@ import type { components, operations } from './twitch-api.generated';
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
   operations[T] extends { parameters: { query?: infer Q } }
-    ? Q | undefined
+    ? Q
     : never;
 
 %TYPE_EXPORTS%
