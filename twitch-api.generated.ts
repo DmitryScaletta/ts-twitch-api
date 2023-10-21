@@ -20,6 +20,28 @@ export interface paths {
      */
     post: operations["start-commercial"];
   };
+  "/channels/ads/schedule/snooze": {
+    /**
+     * Returns ad schedule related information.
+     * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     */
+    post: operations["get-ad-schedule"];
+  };
+  "/channels/ads": {
+    /**
+     * Pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes.
+     * @description If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     */
+    get: operations["snooze-next-ad"];
+  };
   "/analytics/extensions": {
     /**
      * Gets an analytics report for one or more extensions.
@@ -1576,36 +1598,6 @@ export interface paths {
      */
     post: operations["send-whisper"];
   };
-  "/badges/global/display": {
-    /**
-     * Gets a list of all global badges.
-     * @description Gets a list of all global badges.
-     *
-     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-     *
-     * **NOTE:** This endpoint is not documented.
-     *
-     * __Authorization:__
-     *
-     * The Client-Id and Authorization headers are not required.
-     */
-    get: operations["get-global-badges"];
-  };
-  "/badges/channels/{channel_id}/display": {
-    /**
-     * Gets a list of badges that belongs to the channel.
-     * @description Gets a list of badges that belongs to the channel.
-     *
-     * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-     *
-     * **NOTE:** This endpoint is not documented.
-     *
-     * __Authorization:__
-     *
-     * The Client-Id and Authorization headers are not required.
-     */
-    get: operations["get-channel-badges"];
-  };
 }
 
 export type webhooks = Record<string, never>;
@@ -1636,6 +1628,61 @@ export interface components {
            * @description The number of seconds you must wait before running another commercial.
            */
           retry_after: number;
+        }[];
+    };
+    GetAdScheduleResponse: {
+      /** @description A list that contains information about the channel’s snoozes and next upcoming ad after successfully snoozing. */
+      data: {
+          /**
+           * Format: int32
+           * @description The number of snoozes available for the broadcaster.
+           */
+          snooze_count: number;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp when the broadcaster will gain an additional snooze, in RFC3339 format.
+           */
+          snooze_refresh_at: string;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp of the broadcaster’s next scheduled ad, in RFC3339 format.
+           */
+          next_ad_at: string;
+        }[];
+    };
+    SnoozeNextAdResponse: {
+      /** @description A list that contains information related to the channel’s ad schedule. */
+      data: {
+          /**
+           * Format: int32
+           * @description The number of snoozes available for the broadcaster.
+           */
+          snooze_count: number;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp when the broadcaster will gain an additional snooze, in RFC3339 format.
+           */
+          snooze_refresh_at: string;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp of the broadcaster’s next scheduled ad, in RFC3339 format. Empty if the channel has no ad scheduled or is not live.
+           */
+          next_ad_at: string;
+          /**
+           * Format: int32
+           * @description The length in seconds of the scheduled upcoming ad break.
+           */
+          length_seconds: number;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp of the broadcaster’s last ad-break, in RFC3339 format. Empty if the channel has not run an ad or is not live.
+           */
+          last_ad_at: string;
+          /**
+           * Format: int32
+           * @description The amount of pre-roll free time remaining for the channel in seconds. Returns 0 if they are currently not pre-roll free.
+           */
+          preroll_free_time_seconds: number;
         }[];
     };
     ExtensionAnalytics: {
@@ -3294,7 +3341,7 @@ export interface components {
        * @description The type of subscription to create. For a list of subscriptions that you can create, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). Set this field to the value in the **Name** column of the Subscription Types table.
        * @enum {string}
        */
-      type: "channel.update" | "channel.follow" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
       /** @description The version number that identifies the definition of the subscription type that you want the response to use. */
       version: string;
       /** @description A JSON object that contains the parameter values that are specific to the specified subscription type. For the object’s required and optional fields, see the subscription type’s documentation. */
@@ -3359,7 +3406,7 @@ export interface components {
        * @description The subscription’s type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types).
        * @enum {string}
        */
-      type: "channel.update" | "channel.follow" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
       /** @description The version number that identifies this definition of the subscription’s data. */
       version: string;
       /** @description The subscription’s parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
@@ -5211,32 +5258,6 @@ export interface components {
        */
       message: string;
     };
-    BadgeVersion: {
-      image_url_1x: string;
-      image_url_2x: string;
-      image_url_4x: string;
-      description: string;
-      title: string;
-      click_action: string;
-      /** @enum {string} */
-      click_url: "none" | "visit_url" | "subscribe_to_channel" | "turbo";
-      last_updated: string | null;
-    };
-    Badge: {
-      versions: {
-        [key: string]: components["schemas"]["BadgeVersion"];
-      };
-    };
-    GetGlobalBadgesResponse: {
-      badge_sets: {
-        [key: string]: components["schemas"]["Badge"];
-      };
-    };
-    GetChannelBadgesResponse: {
-      badge_sets: {
-        [key: string]: components["schemas"]["Badge"];
-      };
-    };
   };
   responses: never;
   parameters: never;
@@ -5302,6 +5323,76 @@ export interface operations {
       };
       /** @description * The broadcaster may not run another commercial until the cooldown period expires. The `retry_after` field in the previous start commercial response specifies the amount of time the broadcaster must wait between running commercials. */
       429: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * Returns ad schedule related information.
+   * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+   */
+  "get-ad-schedule": {
+    parameters: {
+      query: {
+        /** @description Provided `broadcaster_id` must match the `user_id` in the auth token. */
+        broadcaster_id: string;
+      };
+    };
+    responses: {
+      /** @description User’s next ad is successfully snoozed. Their _snooze\_count_ is decremented and _snooze\_refresh\_time_ and _next\_ad\_at_ are both updated. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetAdScheduleResponse"];
+        };
+      };
+      /**
+       * @description * The channel is not currently live.
+       * * The broadcaster ID is not valid.
+       * * Channel does not have an upcoming scheduled ad break.
+       */
+      400: {
+        content: never;
+      };
+      /** @description Channel has no snoozes left. */
+      429: {
+        content: never;
+      };
+      500: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * Pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes.
+   * @description If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+   *
+   * __Authorization:__
+   *
+   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+   */
+  "snooze-next-ad": {
+    parameters: {
+      query: {
+        /** @description Provided `broadcaster_id` must match the `user_id` in the auth token. */
+        broadcaster_id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the ad schedule information for the channel. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SnoozeNextAdResponse"];
+        };
+      };
+      /** @description The broadcaster ID is not valid. */
+      400: {
+        content: never;
+      };
+      500: {
         content: never;
       };
     };
@@ -7999,7 +8090,7 @@ export interface operations {
          */
         status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
         /** @description Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
-        type?: "channel.update" | "channel.follow" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+        type?: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
         /** @description Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
         user_id?: string;
         /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor’s value. */
@@ -12201,69 +12292,6 @@ export interface operations {
       /** @description * The sending user exceeded the number of whisper requests that they may make. See Rate Limits for this endpoint above. */
       429: {
         content: never;
-      };
-    };
-  };
-  /**
-   * Gets a list of all global badges.
-   * @description Gets a list of all global badges.
-   *
-   * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-   *
-   * **NOTE:** This endpoint is not documented.
-   *
-   * __Authorization:__
-   *
-   * The Client-Id and Authorization headers are not required.
-   */
-  "get-global-badges": {
-    parameters: {
-      query?: {
-        /** @description The ISO 639-1 two-letter language code */
-        language?: string;
-      };
-    };
-    responses: {
-      /** @description Successfully retrieved the global badges. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetGlobalBadgesResponse"];
-        };
-      };
-    };
-  };
-  /**
-   * Gets a list of badges that belongs to the channel.
-   * @description Gets a list of badges that belongs to the channel.
-   *
-   * **NOTE:** Base URL is `https://badges.twitch.tv/v1`
-   *
-   * **NOTE:** This endpoint is not documented.
-   *
-   * __Authorization:__
-   *
-   * The Client-Id and Authorization headers are not required.
-   */
-  "get-channel-badges": {
-    parameters: {
-      query?: {
-        /** @description The ISO 639-1 two-letter language code */
-        language?: string;
-      };
-      path: {
-        /**
-         * @description The ID of the channel whose chat badges you want to get.
-         * @example 23161357
-         */
-        channel_id: string;
-      };
-    };
-    responses: {
-      /** @description Successfully retrieved the channel's badges. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetChannelBadgesResponse"];
-        };
       };
     };
   };

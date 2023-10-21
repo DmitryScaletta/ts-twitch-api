@@ -6,6 +6,8 @@ type ParamsSchema<T extends keyof operations> =
     ? Q
     : never;
 
+export type GetAdScheduleParams = ParamsSchema<'get-ad-schedule'>;
+export type SnoozeNextAdParams = ParamsSchema<'snooze-next-ad'>;
 export type GetExtensionAnalyticsParams = ParamsSchema<'get-extension-analytics'>;
 export type GetGameAnalyticsParams = ParamsSchema<'get-game-analytics'>;
 export type GetBitsLeaderboardParams = ParamsSchema<'get-bits-leaderboard'>;
@@ -115,6 +117,8 @@ export type DeleteVideosParams = ParamsSchema<'delete-videos'>;
 export type SendWhisperParams = ParamsSchema<'send-whisper'>;
 export type StartCommercialBody = Schema<'StartCommercialBody'>;
 export type StartCommercialResponse = Schema<'StartCommercialResponse'>;
+export type GetAdScheduleResponse = Schema<'GetAdScheduleResponse'>;
+export type SnoozeNextAdResponse = Schema<'SnoozeNextAdResponse'>;
 export type ExtensionAnalytics = Schema<'ExtensionAnalytics'>;
 export type GetExtensionAnalyticsResponse = Schema<'GetExtensionAnalyticsResponse'>;
 export type GameAnalytics = Schema<'GameAnalytics'>;
@@ -303,10 +307,6 @@ export type Video = Schema<'Video'>;
 export type GetVideosResponse = Schema<'GetVideosResponse'>;
 export type DeleteVideosResponse = Schema<'DeleteVideosResponse'>;
 export type SendWhisperBody = Schema<'SendWhisperBody'>;
-export type BadgeVersion = Schema<'BadgeVersion'>;
-export type Badge = Schema<'Badge'>;
-export type GetGlobalBadgesResponse = Schema<'GetGlobalBadgesResponse'>;
-export type GetChannelBadgesResponse = Schema<'GetChannelBadgesResponse'>;
 
 type SuccessCode = 200 | 202 | 204;
 type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
@@ -318,6 +318,8 @@ export type ApiResponse<
   | { ok: true; status: TSuccessCode; data: TData }
   | { ok: false; status: TErrorCode; data: unknown }
 >;
+
+const BASE_URL = 'https://api.twitch.tv/helix';
 
 const getSearchParams = <T extends Record<string, any>>(params: T) => {
   const kvPairs: string[] = [];
@@ -333,7 +335,6 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
 };
 
 type CallApiOptions = {
-  baseUrl?: string;
   path: string;
   method?: string;
   params?: any;
@@ -358,7 +359,6 @@ export class TwitchApi {
   }
 
   private async callApi({
-    baseUrl = 'https://api.twitch.tv/helix',
     path,
     method = 'GET',
     params,
@@ -368,8 +368,8 @@ export class TwitchApi {
     requiresAuth = true,
   }: CallApiOptions): Promise<any> {
     const url = params
-      ? `${baseUrl}${path}?${getSearchParams(params)}`
-      : `${baseUrl}${path}`;
+      ? `${BASE_URL}${path}?${getSearchParams(params)}`
+      : `${BASE_URL}${path}`;
     const options: RequestInit = { method };
     const headers = new Headers();
     options.headers = headers;
@@ -446,6 +446,85 @@ export class TwitchApi {
         path: '/channels/commercial',
         method: 'POST',
         body,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/channels/ads/schedule/snooze`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * User’s next ad is successfully snoozed. Their _snooze\_count_ is decremented and _snooze\_refresh\_time_ and _next\_ad\_at_ are both updated.
+     *
+     * _400 Bad Request_
+     *
+     * * The channel is not currently live.
+     * * The broadcaster ID is not valid.
+     * * Channel does not have an upcoming scheduled ad break.
+     *
+     * _429 Too Many Requests_
+     *
+     * Channel has no snoozes left.
+     *
+     * _500 Internal Server Error_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-ad-schedule
+     */
+    getAdSchedule: async (
+      params: GetAdScheduleParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetAdScheduleResponse, 200, 400 | 429 | 500> => 
+      this.callApi({
+        path: '/channels/ads/schedule/snooze',
+        method: 'POST',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/channels/ads`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Returns the ad schedule information for the channel.
+     *
+     * _400 Bad Request_
+     *
+     * The broadcaster ID is not valid.
+     *
+     * _500 Internal Server Error_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#snooze-next-ad
+     */
+    snoozeNextAd: async (
+      params: SnoozeNextAdParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<SnoozeNextAdResponse, 200, 400 | 500> => 
+      this.callApi({
+        path: '/channels/ads',
+        params,
         clientId,
         accessToken,
       }),
