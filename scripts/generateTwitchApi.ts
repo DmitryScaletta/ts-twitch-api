@@ -67,7 +67,7 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   const typeExports: string[] = [];
   let api: Line[] = [];
 
-  const globalBaseUrl = openApi.servers[0]!.url;
+  const baseUrl = openApi.servers[0]!.url;
   const mainTemplate = templates['main']!;
   const methodCommentTemplate = templates['method-comment']!;
 
@@ -88,9 +88,6 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   }
 
   for (const [tag, endpoints] of Object.entries(endpointsByTags)) {
-    // skip get badges for now
-    if (tag === 'badges') continue;
-
     api.push([1, `${tag} = {`]);
 
     for (const { path, method, endpoint } of endpoints) {
@@ -100,18 +97,14 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
         parameters,
         requestBody,
         responses,
-        servers,
         operationId,
       } = endpoint;
       const id = operationId;
 
-      const baseUrl = servers?.[0]?.url || globalBaseUrl;
       const url = `${baseUrl}${path}`;
 
       let docsUrl = externalDocs?.url;
       let name = externalDocs?.description;
-      if (id === 'get-global-badges') name = 'Get Global Badges';
-      if (id === 'get-channel-badges') name = 'Get Channel Badges';
 
       const { responseCodesText, responseCodeSuccess, responseCodeError } =
         parseResponseCodes(responses!);
@@ -152,9 +145,6 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
       if (hasParams && hasBody) {
         methodTemplate = templates['method-signature-params-body']!;
       }
-      if (id === 'get-global-badges' || id === 'get-channel-badges') {
-        methodTemplate = templates['method-signature-badges']!;
-      }
 
       const methodName = getMethodName(name!);
       const paramsType = getParamsSchemaName(name!);
@@ -166,7 +156,6 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
 
       let methodSignature = methodTemplate
         .replace('%METHOD_NAME%', methodName)
-        .replace('%BASE_URL%', baseUrl)
         .replace('%PATH%', path)
         .replace('%METHOD%', method.toUpperCase())
         .replace("    method: 'GET',\n", '');

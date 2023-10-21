@@ -24,6 +24,8 @@ export type ApiResponse<
   | { ok: false; status: TErrorCode; data: unknown }
 >;
 
+const BASE_URL = 'https://api.twitch.tv/helix';
+
 const getSearchParams = <T extends Record<string, any>>(params: T) => {
   const kvPairs: string[] = [];
   for (const key of Object.keys(params)) {
@@ -38,7 +40,6 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
 };
 
 type CallApiOptions = {
-  baseUrl?: string;
   path: string;
   method?: string;
   params?: any;
@@ -63,7 +64,6 @@ export class TwitchApi {
   }
 
   private async callApi({
-    baseUrl = 'https://api.twitch.tv/helix',
     path,
     method = 'GET',
     params,
@@ -73,8 +73,8 @@ export class TwitchApi {
     requiresAuth = true,
   }: CallApiOptions): Promise<any> {
     const url = params
-      ? `${baseUrl}${path}?${getSearchParams(params)}`
-      : `${baseUrl}${path}`;
+      ? `${BASE_URL}${path}?${getSearchParams(params)}`
+      : `${BASE_URL}${path}`;
     const options: RequestInit = { method };
     const headers = new Headers();
     options.headers = headers;
