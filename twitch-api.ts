@@ -450,11 +450,47 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     * BETA This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
      *
      * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/channels/ads`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Returns the ad schedule information for the channel.
+     *
+     * _400 Bad Request_
+     *
+     * The broadcaster ID is not valid.
+     *
+     * _500 Internal Server Error_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-ad-schedule
+     */
+    getAdSchedule: async (
+      params: GetAdScheduleParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetAdScheduleResponse, 200, 400 | 500> => 
+      this.callApi({
+        path: '/channels/ads',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
      *
      * __URL:__
      *
@@ -478,52 +514,16 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
-     * @see https://dev.twitch.tv/docs/api/reference#get-ad-schedule
-     */
-    getAdSchedule: async (
-      params: GetAdScheduleParams,
-      accessToken = '',
-      clientId = '',
-    ): ApiResponse<GetAdScheduleResponse, 200, 400 | 429 | 500> => 
-      this.callApi({
-        path: '/channels/ads/schedule/snooze',
-        method: 'POST',
-        params,
-        clientId,
-        accessToken,
-      }),
-    /**
-     * If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
-     *
-     * __Authorization:__
-     *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/channels/ads`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Returns the ad schedule information for the channel.
-     *
-     * _400 Bad Request_
-     *
-     * The broadcaster ID is not valid.
-     *
-     * _500 Internal Server Error_
-     *
      * @see https://dev.twitch.tv/docs/api/reference#snooze-next-ad
      */
     snoozeNextAd: async (
       params: SnoozeNextAdParams,
       accessToken = '',
       clientId = '',
-    ): ApiResponse<SnoozeNextAdResponse, 200, 400 | 500> => 
+    ): ApiResponse<SnoozeNextAdResponse, 200, 400 | 429 | 500> => 
       this.callApi({
-        path: '/channels/ads',
+        path: '/channels/ads/schedule/snooze',
+        method: 'POST',
         params,
         clientId,
         accessToken,
