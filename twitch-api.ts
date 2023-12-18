@@ -450,7 +450,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * BETA This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     * This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time. Note that a new ad cannot be run until 8 minutes after running a previous ad.
      *
      * __Authorization:__
      *
@@ -486,7 +486,7 @@ export class TwitchApi {
         accessToken,
       }),
     /**
-     * BETA If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
+     * If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
      *
      * __Authorization:__
      *
@@ -6022,7 +6022,7 @@ export class TwitchApi {
      *
      * _400 Bad Request_
      *
-     * * The _broadcaster\_id_ query parameter is required.
+     * * The _broadcaster\_id_ query parameter is missing or invalid.
      *
      * _401 Unauthorized_
      *
@@ -6033,7 +6033,6 @@ export class TwitchApi {
      * _404 Not Found_
      *
      * * The broadcaster was not found.
-     * * The broadcaster is not a member of a team.
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-teams
      */

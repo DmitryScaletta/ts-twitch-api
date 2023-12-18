@@ -20,18 +20,18 @@ export interface paths {
      */
     post: operations["start-commercial"];
   };
-  "/channels/ads/schedule/snooze": {
+  "/channels/ads": {
     /**
      * Returns ad schedule related information.
-     * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+     * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time. Note that a new ad cannot be run until 8 minutes after running a previous ad.
      *
      * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
      */
-    post: operations["get-ad-schedule"];
+    get: operations["get-ad-schedule"];
   };
-  "/channels/ads": {
+  "/channels/ads/schedule/snooze": {
     /**
      * Pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes.
      * @description If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager.
@@ -40,7 +40,7 @@ export interface paths {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
      */
-    get: operations["snooze-next-ad"];
+    post: operations["snooze-next-ad"];
   };
   "/analytics/extensions": {
     /**
@@ -1631,26 +1631,6 @@ export interface components {
         }[];
     };
     GetAdScheduleResponse: {
-      /** @description A list that contains information about the channel’s snoozes and next upcoming ad after successfully snoozing. */
-      data: {
-          /**
-           * Format: int32
-           * @description The number of snoozes available for the broadcaster.
-           */
-          snooze_count: number;
-          /**
-           * Format: date-time
-           * @description The UTC timestamp when the broadcaster will gain an additional snooze, in RFC3339 format.
-           */
-          snooze_refresh_at: string;
-          /**
-           * Format: date-time
-           * @description The UTC timestamp of the broadcaster’s next scheduled ad, in RFC3339 format.
-           */
-          next_ad_at: string;
-        }[];
-    };
-    SnoozeNextAdResponse: {
       /** @description A list that contains information related to the channel’s ad schedule. */
       data: {
           /**
@@ -1672,7 +1652,7 @@ export interface components {
            * Format: int32
            * @description The length in seconds of the scheduled upcoming ad break.
            */
-          length_seconds: number;
+          duration: number;
           /**
            * Format: date-time
            * @description The UTC timestamp of the broadcaster’s last ad-break, in RFC3339 format. Empty if the channel has not run an ad or is not live.
@@ -1682,7 +1662,27 @@ export interface components {
            * Format: int32
            * @description The amount of pre-roll free time remaining for the channel in seconds. Returns 0 if they are currently not pre-roll free.
            */
-          preroll_free_time_seconds: number;
+          preroll_free_time: number;
+        }[];
+    };
+    SnoozeNextAdResponse: {
+      /** @description A list that contains information about the channel’s snoozes and next upcoming ad after successfully snoozing. */
+      data: {
+          /**
+           * Format: int32
+           * @description The number of snoozes available for the broadcaster.
+           */
+          snooze_count: number;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp when the broadcaster will gain an additional snooze, in RFC3339 format.
+           */
+          snooze_refresh_at: string;
+          /**
+           * Format: date-time
+           * @description The UTC timestamp of the broadcaster’s next scheduled ad, in RFC3339 format.
+           */
+          next_ad_at: string;
         }[];
     };
     ExtensionAnalytics: {
@@ -4905,7 +4905,7 @@ export interface components {
       id: string;
     };
     GetChannelTeamsResponse: {
-      /** @description The list of teams that the broadcaster is a member of. */
+      /** @description The list of teams that the broadcaster is a member of. Returns an empty array if the broadcaster is not a member of a team. */
       data: components["schemas"]["ChannelTeam"][];
     };
     Team: {
@@ -5329,7 +5329,7 @@ export interface operations {
   };
   /**
    * Returns ad schedule related information.
-   * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time.
+   * @description This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time. Note that a new ad cannot be run until 8 minutes after running a previous ad.
    *
    * __Authorization:__
    *
@@ -5343,22 +5343,14 @@ export interface operations {
       };
     };
     responses: {
-      /** @description User’s next ad is successfully snoozed. Their _snooze\_count_ is decremented and _snooze\_refresh\_time_ and _next\_ad\_at_ are both updated. */
+      /** @description Returns the ad schedule information for the channel. */
       200: {
         content: {
           "application/json": components["schemas"]["GetAdScheduleResponse"];
         };
       };
-      /**
-       * @description * The channel is not currently live.
-       * * The broadcaster ID is not valid.
-       * * Channel does not have an upcoming scheduled ad break.
-       */
+      /** @description The broadcaster ID is not valid. */
       400: {
-        content: never;
-      };
-      /** @description Channel has no snoozes left. */
-      429: {
         content: never;
       };
       500: {
@@ -5382,14 +5374,22 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Returns the ad schedule information for the channel. */
+      /** @description User’s next ad is successfully snoozed. Their _snooze\_count_ is decremented and _snooze\_refresh\_time_ and _next\_ad\_at_ are both updated. */
       200: {
         content: {
           "application/json": components["schemas"]["SnoozeNextAdResponse"];
         };
       };
-      /** @description The broadcaster ID is not valid. */
+      /**
+       * @description * The channel is not currently live.
+       * * The broadcaster ID is not valid.
+       * * Channel does not have an upcoming scheduled ad break.
+       */
       400: {
+        content: never;
+      };
+      /** @description Channel has no snoozes left. */
+      429: {
         content: never;
       };
       500: {
@@ -11599,7 +11599,7 @@ export interface operations {
           "application/json": components["schemas"]["GetChannelTeamsResponse"];
         };
       };
-      /** @description * The _broadcaster\_id_ query parameter is required. */
+      /** @description * The _broadcaster\_id_ query parameter is missing or invalid. */
       400: {
         content: never;
       };
@@ -11611,10 +11611,7 @@ export interface operations {
       401: {
         content: never;
       };
-      /**
-       * @description * The broadcaster was not found.
-       * * The broadcaster is not a member of a team.
-       */
+      /** @description * The broadcaster was not found. */
       404: {
         content: never;
       };
