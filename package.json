@@ -1,5 +1,5 @@
 {
-  "name": "twitch-api-ts",
+  "name": "twitch-api-typescript",
   "version": "0.1.0",
   "description": "Very simple TwitchApi class and TypeScript interfaces for all Twitch API endpoints",
   "author": "DmitryScaletta",

@@ -1,4 +1,4 @@
-# twitch-api-ts
+# twitch-api-typescript
 
 Very simple `TwitchApi` class and TypeScript interfaces for all Twitch API endpoints
 
@@ -12,12 +12,12 @@ Very simple `TwitchApi` class and TypeScript interfaces for all Twitch API endpo
 
 ## Installation
 
-```
-npm i twitch-api-ts
-```
+```bash
+npm i twitch-api-typescript
 
-```
-yarn add twitch-api-ts
+pnpm i twitch-api-typescript
+
+yarn add twitch-api-typescript
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ import type {
   UpdateAutoModSettingsParams,
   UpdateAutoModSettingsBody,
   UpdateAutoModSettingsResponse,
-} from 'twitch-api-ts';
+} from 'twitch-api-typescript';
 
 const updateAutoModSettings = async (
   params: UpdateAutoModSettingsParams,
@@ -53,7 +53,7 @@ const updateAutoModSettings = async (
 ### `TwitchApi` class
 
 ```ts
-import { TwitchApi } from 'twitch-api-ts';
+import { TwitchApi } from 'twitch-api-typescript';
 
 const twitchApi = new TwitchApi({
   accessToken: process.env.ACCESS_TOKEN,
@@ -74,7 +74,7 @@ if (response.ok) {
 }
 
 const streams = await twitchApi.streams.getStreams(
-  // some endpoints accepts multiple ids like this: `id=1234&id=5678`
+  // some endpoints accept multiple ids like this: `id=1234&id=5678`
   { user_id: ['1', '2'] },
   // override accessToken and/or clientId for different requests
   '<accessToken>',
