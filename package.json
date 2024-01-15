@@ -5,6 +5,13 @@
   "author": "DmitryScaletta",
   "license": "MIT",
   "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DmitryScaletta/twitch-api-typescript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DmitryScaletta/twitch-api-typescript/issues"
+  },
   "main": "index.ts",
   "files": [
     "index.ts",
