@@ -1,4 +1,4 @@
-# twitch-api-typescript
+# ts-twitch-api
 
 Very simple `TwitchApi` class and TypeScript interfaces for all Twitch API endpoints
 
@@ -13,11 +13,11 @@ Very simple `TwitchApi` class and TypeScript interfaces for all Twitch API endpo
 ## Installation
 
 ```bash
-npm i twitch-api-typescript
+npm i ts-twitch-api
 
-pnpm i twitch-api-typescript
+pnpm i ts-twitch-api
 
-yarn add twitch-api-typescript
+yarn add ts-twitch-api
 ```
 
 ## Usage
@@ -29,7 +29,7 @@ import type {
   UpdateAutoModSettingsParams,
   UpdateAutoModSettingsBody,
   UpdateAutoModSettingsResponse,
-} from 'twitch-api-typescript';
+} from 'ts-twitch-api';
 
 const updateAutoModSettings = async (
   params: UpdateAutoModSettingsParams,
@@ -53,7 +53,7 @@ const updateAutoModSettings = async (
 ### `TwitchApi` class
 
 ```ts
-import { TwitchApi } from 'twitch-api-typescript';
+import { TwitchApi } from 'ts-twitch-api';
 
 const twitchApi = new TwitchApi({
   accessToken: process.env.ACCESS_TOKEN,

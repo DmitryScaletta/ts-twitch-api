@@ -1,5 +1,5 @@
 {
-  "name": "twitch-api-typescript",
+  "name": "ts-twitch-api",
   "version": "0.1.0",
   "description": "Very simple TwitchApi class and TypeScript interfaces for all Twitch API endpoints",
   "author": "DmitryScaletta",
@@ -7,10 +7,10 @@
   "keywords": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DmitryScaletta/twitch-api-typescript.git"
+    "url": "git+https://github.com/DmitryScaletta/ts-twitch-api.git"
   },
   "bugs": {
-    "url": "https://github.com/DmitryScaletta/twitch-api-typescript/issues"
+    "url": "https://github.com/DmitryScaletta/ts-twitch-api/issues"
   },
   "main": "index.ts",
   "files": [
