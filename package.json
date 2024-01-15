@@ -13,12 +13,12 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "node --loader ts-node/esm ./scripts/build.ts",
+    "build": "node --import tsx ./scripts/build.ts",
     "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.8.7",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.11.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }
