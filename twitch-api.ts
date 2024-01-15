@@ -76,6 +76,7 @@ export type GetBlockedTermsParams = ParamsSchema<'get-blocked-terms'>;
 export type AddBlockedTermParams = ParamsSchema<'add-blocked-term'>;
 export type RemoveBlockedTermParams = ParamsSchema<'remove-blocked-term'>;
 export type DeleteChatMessagesParams = ParamsSchema<'delete-chat-messages'>;
+export type GetModeratedChannelsParams = ParamsSchema<'get-moderated-channels'>;
 export type GetModeratorsParams = ParamsSchema<'get-moderators'>;
 export type AddChannelModeratorParams = ParamsSchema<'add-channel-moderator'>;
 export type RemoveChannelModeratorParams = ParamsSchema<'remove-channel-moderator'>;
@@ -236,6 +237,7 @@ export type BlockedTerm = Schema<'BlockedTerm'>;
 export type GetBlockedTermsResponse = Schema<'GetBlockedTermsResponse'>;
 export type AddBlockedTermBody = Schema<'AddBlockedTermBody'>;
 export type AddBlockedTermResponse = Schema<'AddBlockedTermResponse'>;
+export type GetModeratedChannelsResponse = Schema<'GetModeratedChannelsResponse'>;
 export type UserModerator = Schema<'UserModerator'>;
 export type GetModeratorsResponse = Schema<'GetModeratorsResponse'>;
 export type UserVip = Schema<'UserVip'>;
@@ -2160,7 +2162,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved The list of CCLs available.
+     * Successfully retrieved the list of CCLs available.
      *
      * _400 Bad Request_
      *
@@ -4315,6 +4317,43 @@ export class TwitchApi {
       this.callApi({
         path: '/moderation/chat',
         method: 'DELETE',
+        params,
+        clientId,
+        accessToken,
+      }),
+    /**
+     * BETA Gets a list of channels that the specified user has moderator privileges in.
+     *
+     * __Authorization:__
+     *
+     * * Query parameter `user_id` must match the user ID in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+     * * Requires OAuth Scope: `user:read:moderated_channels`
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/moderation/channels`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the list of moderated channels.
+     *
+     * _400 Bad Request_
+     *
+     * _401 Unauthorized_
+     *
+     * _500 Internal Server Error_
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-moderated-channels
+     */
+    getModeratedChannels: async (
+      params: GetModeratedChannelsParams,
+      accessToken = '',
+      clientId = '',
+    ): ApiResponse<GetModeratedChannelsResponse, 200, 400 | 401 | 500> => 
+      this.callApi({
+        path: '/moderation/channels',
         params,
         clientId,
         accessToken,
