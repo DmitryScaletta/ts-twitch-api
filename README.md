@@ -84,4 +84,15 @@ const streams = await twitchApi.streams.getStreams(
 if (streams.ok) {
   console.log(streams.data);
 }
+
+// pass fetch options via RequestInit object
+const ac = new AbortController();
+const users = twitchApi.users.getUsers(
+  { id: ['1', '2'] },
+  null,
+  null,
+  { signal: ac.signal },
+);
+
+ac.abort();
 ```
