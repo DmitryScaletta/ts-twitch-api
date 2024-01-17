@@ -42,12 +42,15 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
 type CallApiOptions = {
   path: string;
   method?: string;
-  params?: any;
-  body?: any;
-  clientId?: string;
-  accessToken?: string;
+  params?: Record<string, any> | null;
+  body?: Record<string, any> | null;
   requiresAuth?: boolean;
-}
+  request: [
+    clientId?: string | null,
+    accessToken?: string | null,
+    requestInit?: RequestInit,
+  ];
+};
 
 export type TwitchApiOptions = {
   accessToken?: string;
@@ -63,19 +66,22 @@ export class TwitchApi {
     this._clientId = clientId;
   }
 
-  private async callApi({
+  private async callApi<
+    TData,
+    TSuccessCode extends SuccessCode = SuccessCode,
+    TErrorCode extends ErrorCode = ErrorCode,
+  >({
     path,
     method = 'GET',
     params,
     body,
-    clientId,
-    accessToken,
     requiresAuth = true,
-  }: CallApiOptions): Promise<any> {
+    request: [clientId = null, accessToken = null, requestInit = {}],
+  }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
       : `${BASE_URL}${path}`;
-    const options: RequestInit = { method };
+    const options: RequestInit = { ...requestInit, method };
     const headers = new Headers();
     options.headers = headers;
     if (body) {
@@ -83,7 +89,10 @@ export class TwitchApi {
       options.body = JSON.stringify(body);
     }
     if (requiresAuth) {
-      options.headers.set('Authorization', `Bearer ${accessToken || this._accessToken}`);
+      options.headers.set(
+        'Authorization',
+        `Bearer ${accessToken || this._accessToken}`,
+      );
       options.headers.set('Client-Id', clientId || this._clientId);
     }
     const response = await fetch(url, options);
@@ -115,12 +124,11 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: async (accessToken = '', clientId = ''): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
-  this.callApi({
+%METHOD_NAME%: async (...request: CallApiOptions['request']) => 
+  this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
-    clientId,
-    accessToken,
+    request,
   }),
 ```
 
@@ -129,15 +137,13 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   body: %BODY_TYPE%,
-  accessToken = '',
-  clientId = '',
-): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
-  this.callApi({
+  ...request: CallApiOptions['request']
+) =>
+  this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     body,
-    clientId,
-    accessToken,
+    request,
   }),
 ```
 
@@ -146,15 +152,13 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
-  accessToken = '',
-  clientId = '',
-): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
-  this.callApi({
+  ...request: CallApiOptions['request']
+) =>
+  this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     params,
-    clientId,
-    accessToken,
+    request,
   }),
 ```
 
@@ -164,15 +168,13 @@ __URL:__
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
   body: %BODY_TYPE%,
-  accessToken = '',
-  clientId = '',
-): ApiResponse<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%> => 
-  this.callApi({
+  ...request: CallApiOptions['request']
+) =>
+  this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     params,
     body,
-    clientId,
-    accessToken,
+    request,
   }),
 ```

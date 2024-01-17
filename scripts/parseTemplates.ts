@@ -1,6 +1,6 @@
 import type { Templates } from './types';
 
-const TEMPLATE_REGEX = /## ([\w-]+)\s*```(?:ts|md)\s*/gs;
+const TEMPLATE_REGEX = /## ([^\s]+)\s*```(?:ts|md)\s*/gs;
 
 const parseTemplates = (text: string): Templates => {
   const templates: Templates = {};
