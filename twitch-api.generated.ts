@@ -397,6 +397,17 @@ export interface paths {
      */
     post: operations["send-a-shoutout"];
   };
+  "/chat/messages": {
+    /**
+     * NEW Sends a message to the broadcaster’s chat room.
+     * @description NEW Sends a message to the broadcaster’s chat room.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+     */
+    post: operations["send-chat-message"];
+  };
   "/chat/color": {
     /**
      * Gets the color used for the user’s name in chat.
@@ -446,6 +457,66 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **clips:edit** scope.
      */
     post: operations["create-clip"];
+  };
+  "/eventsub/conduits": {
+    /**
+     * NEW  Gets the conduits for a client ID.
+     * @description NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) for a client ID.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    get: operations["get-conduits"];
+    /**
+     * NEW Creates a new conduit.
+     * @description NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    post: operations["create-conduits"];
+    /**
+     * NEW Deletes a specified conduit.
+     * @description NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    delete: operations["delete-conduit"];
+    /**
+     * NEW Updates a conduit’s shard count.
+     * @description NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    patch: operations["update-conduits"];
+  };
+  "/eventsub/conduits/shards": {
+    /**
+     * NEW Gets a lists of all shards for a conduit.
+     * @description NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    get: operations["get-conduit-shards"];
+    /**
+     * NEW Updates shard(s) for a conduit.
+     * @description NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * **NOTE:** Shard IDs are indexed starting at 0, so a conduit with a `shard_count` of 5 will have shards with IDs 0 through 4.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    patch: operations["update-conduit-shards"];
   };
   "/content_classification_labels": {
     /**
@@ -695,6 +766,8 @@ export interface paths {
      * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token. If the subscription type requires user authorization, the user must have granted your app (client ID) permissions to receive those events before you subscribe to them. For example, to subscribe to [channel.subscribe](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) events, your app must get a user access token that includes the `channel:read:subscriptions` scope, which adds the required permission to your app access token’s client ID.
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. If the subscription type requires user authorization, the token must include the required scope. However, if the subscription type doesn’t include user authorization, the token may include any scopes or no scopes.
+     *
+     * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
      */
     post: operations["create-eventsub-subscription"];
     /**
@@ -2841,6 +2914,31 @@ export interface components {
        */
       color?: "blue" | "green" | "orange" | "purple" | "primary (default)";
     };
+    SendChatMessageBody: {
+      /** @description The ID of the broadcaster whose chat room the message will be sent to. */
+      broadcaster_id: string;
+      /** @description The ID of the user sending the message. This ID must match the user ID in the user access token. */
+      sender_id: string;
+      /** @description The message to send. The message is limited to a maximum of 500 characters. Chat messages can also include emoticons. To include emoticons, use the name of the emote. The names are case sensitive. Don’t include colons around the name (e.g., :bleedPurple:). If Twitch recognizes the name, Twitch converts the name to the emote before writing the chat message to the chat room */
+      message: string;
+      /** @description The ID of the chat message being replied to. */
+      reply_parent_message_id?: string;
+    };
+    SendChatMessageResponse: {
+      data: {
+          /** @description The message id for the message that was sent. */
+          message_id: string;
+          /** @description If the message passed all checks and was sent. */
+          is_sent: boolean;
+          /** @description The reason the message was dropped, if any. */
+          drop_reason?: {
+              /** @description Code for why the message was dropped. */
+              code: string;
+              /** @description Message for why the message was dropped. */
+              message: string;
+            }[];
+        }[];
+    };
     UserChatColor: {
       /** @description An ID that uniquely identifies the user. */
       user_id: string;
@@ -2925,6 +3023,204 @@ export interface components {
         /** @description The cursor used to get the next page of results. Set the request’s _after_ or _before_ query parameter to this value depending on whether you’re paging forwards or backwards. */
         cursor?: string;
       };
+    };
+    GetConduitsResponse: {
+      /** @description List of information about the client’s conduits. */
+      data: {
+          /** @description Conduit ID. */
+          id: string;
+          /**
+           * Format: int32
+           * @description Number of shards associated with this conduit.
+           */
+          shard_count: number;
+        }[];
+    };
+    CreateConduitsBody: {
+      /**
+       * Format: int32
+       * @description The number of shards to create for this conduit.
+       */
+      shard_count: number;
+    };
+    CreateConduitsResponse: {
+      /** @description List of information about the client’s conduits. */
+      data: {
+          /** @description Conduit ID. */
+          id: string;
+          /**
+           * Format: int32
+           * @description Number of shards created for this conduit.
+           */
+          shard_count: number;
+        }[];
+    };
+    UpdateConduitsBody: {
+      /** @description Conduit ID. */
+      id: string;
+      /**
+       * Format: int32
+       * @description The new number of shards for this conduit.
+       */
+      shard_count: number;
+    };
+    UpdateConduitsResponse: {
+      /** @description List of information about the client’s conduits. */
+      data: {
+          /** @description Conduit ID. */
+          id: string;
+          /**
+           * Format: int32
+           * @description Number of shards associated with this conduit after the update.
+           */
+          shard_count: number;
+        }[];
+    };
+    GetConduitShardsResponse: {
+      /** @description List of information about a conduit's shards. */
+      data: ({
+          /** @description Shard ID. */
+          id: string;
+          /**
+           * @description The shard status. The subscriber receives events only for enabled shards. Possible values are:
+           *
+           * * enabled — The shard is enabled.
+           * * webhook\_callback\_verification\_pending — The shard is pending verification of the specified callback URL.
+           * * webhook\_callback\_verification\_failed — The specified callback URL failed verification.
+           * * notification\_failures\_exceeded — The notification delivery failure rate was too high.
+           * * websocket\_disconnected — The client closed the connection.
+           * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
+           * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+           * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
+           * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
+           * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
+           * @enum {string}
+           */
+          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+          /** @description The transport details used to send the notifications. */
+          transport: {
+            /**
+             * @description The transport method. Possible values are:
+             *
+             * * webhook
+             * * websocket
+             * @enum {string}
+             */
+            method: "webhook" | "websocket";
+            /** @description The callback URL where the notifications are sent. Included only if method is set to webhook. */
+            callback?: string;
+            /** @description An ID that identifies the WebSocket that notifications are sent to. Included only if method is set to websocket. */
+            session_id?: string;
+            /**
+             * Format: date-time
+             * @description The UTC date and time that the WebSocket connection was established. Included only if method is set to websocket.
+             */
+            connected_at?: string;
+            /**
+             * Format: date-time
+             * @description The UTC date and time that the WebSocket connection was lost. Included only if method is set to websocket.
+             */
+            disconnected_at?: string;
+          };
+        })[];
+      /** @description Contains information used to page through a list of results. The object is empty if there are no more pages left to page through. */
+      pagination?: {
+        /** @description The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
+        cursor?: string;
+      };
+    };
+    UpdateConduitShardsBody: {
+      /** @description Conduit ID. */
+      conduit_id: string;
+      /** @description List of shards to update. */
+      shards: ({
+          /** @description Shard ID. */
+          id: string;
+          /** @description The transport details that you want Twitch to use when sending you notifications. */
+          transport: {
+            /**
+             * @description The transport method. Possible values are:
+             *
+             * * webhook
+             * * websocket
+             * @enum {string}
+             */
+            method?: "webhook" | "websocket";
+            /** @description The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443\. See Processing an event.Specify this field only if method is set to webhook.NOTE: Redirects are not followed. */
+            callback?: string;
+            /** @description The secret used to verify the signature. The secret must be an ASCII string that’s a minimum of 10 characters long and a maximum of 100 characters long. For information about how the secret is used, see Verifying the event message.Specify this field only if method is set to webhook. */
+            secret?: string;
+            /** @description An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the Welcome message.Specify this field only if method is set to websocket. */
+            session_id?: string;
+          };
+        })[];
+    };
+    UpdateConduitShardsResponse: {
+      /** @description List of successful shard updates. */
+      data: ({
+          /** @description Shard ID. */
+          id: string;
+          /**
+           * @description The shard status. The subscriber receives events only for enabled shards. Possible values are:
+           *
+           * * enabled — The shard is enabled.
+           * * webhook\_callback\_verification\_pending — The shard is pending verification of the specified callback URL.
+           * * webhook\_callback\_verification\_failed — The specified callback URL failed verification.
+           * * notification\_failures\_exceeded — The notification delivery failure rate was too high.
+           * * websocket\_disconnected — The client closed the connection.
+           * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
+           * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+           * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
+           * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
+           * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
+           * @enum {string}
+           */
+          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+          /** @description The transport details used to send the notifications. */
+          transport: {
+            /**
+             * @description The transport method. Possible values are:
+             *
+             * * webhook
+             * * websocket
+             * @enum {string}
+             */
+            method: "webhook" | "websocket";
+            /** @description The callback URL where the notifications are sent. Included only if method is set to webhook. */
+            callback?: string;
+            /** @description An ID that identifies the WebSocket that notifications are sent to. Included only if method is set to websocket. */
+            session_id?: string;
+            /**
+             * Format: date-time
+             * @description The UTC date and time that the WebSocket connection was established. Included only if method is set to websocket.
+             */
+            connected_at?: string;
+            /**
+             * Format: date-time
+             * @description The UTC date and time that the WebSocket connection was lost. Included only if method is set to websocket.
+             */
+            disconnected_at?: string;
+          };
+        })[];
+      /** @description List of unsuccessful updates. */
+      errors: {
+          /** @description Shard ID. */
+          id: string;
+          /**
+           * @description The error that occurred while updating the shard. Possible errors:
+           *
+           * * The length of the string in the secret field is not valid.
+           * * The URL in the transport's callback field is not valid. The URL must use the HTTPS protocol and the 443 port number.
+           * * The value specified in the method field is not valid.
+           * * The callback field is required if you specify the webhook transport method.
+           * * The session\_id field is required if you specify the WebSocket transport method.
+           * * The websocket session is not connected.
+           * * The shard id is outside of the conduit’s range.
+           */
+          message: string;
+          /** @description Error codes used to represent a specific error condition while attempting to update shards. */
+          code: string;
+        }[];
     };
     ContentClassificationLabel: {
       /** @description Unique identifier for the CCL. */
@@ -3281,13 +3577,13 @@ export interface components {
       data: components["schemas"]["Extension"][];
     };
     ExtensionBitsProduct: {
-      /** @description The product’s SKU. The SKU is unique across an extension’s products. */
+      /** @description The product's SKU. The SKU is unique across an extension's products. */
       sku: string;
-      /** @description An object that contains the product’s cost information. */
+      /** @description An object that contains the product's cost information. */
       cost: {
         /**
          * Format: int32
-         * @description The product’s price.
+         * @description The product's price.
          */
         amount: number;
         /**
@@ -3300,7 +3596,7 @@ export interface components {
       };
       /** @description A Boolean value that indicates whether the product is in development. If **true**, the product is not available for public use. */
       in_development: boolean;
-      /** @description The product’s name as displayed in the extension. */
+      /** @description The product's name as displayed in the extension. */
       display_name: string;
       /**
        * Format: date-time
@@ -3315,13 +3611,13 @@ export interface components {
       data: components["schemas"]["ExtensionBitsProduct"][];
     };
     UpdateExtensionBitsProductBody: {
-      /** @description The product’s SKU. The SKU must be unique within an extension. The product’s SKU cannot be changed. The SKU may contain only alphanumeric characters, dashes (-), underscores (\_), and periods (.) and is limited to a maximum of 255 characters. No spaces. */
+      /** @description The product's SKU. The SKU must be unique within an extension. The product's SKU cannot be changed. The SKU may contain only alphanumeric characters, dashes (-), underscores (\_), and periods (.) and is limited to a maximum of 255 characters. No spaces. */
       sku: string;
-      /** @description An object that contains the product’s cost information. */
+      /** @description An object that contains the product's cost information. */
       cost: {
         /**
          * Format: int32
-         * @description The product’s price.
+         * @description The product's price.
          */
         amount: number;
         /**
@@ -3332,7 +3628,7 @@ export interface components {
          */
         type: "bits";
       };
-      /** @description The product’s name as displayed in the extension. The maximum length is 255 characters. */
+      /** @description The product's name as displayed in the extension. The maximum length is 255 characters. */
       display_name: string;
       /** @description A Boolean value that indicates whether the product is in development. Set to **true** if the product is in development and not available for public use. The default is **false**. */
       in_development?: boolean;
@@ -3345,7 +3641,7 @@ export interface components {
       is_broadcast?: boolean;
     };
     UpdateExtensionBitsProductResponse: {
-      /** @description A list of Bits products that the extension created. The list is in ascending SKU order. The list is empty if the extension hasn’t created any products or they’re all expired or disabled. */
+      /** @description A list of Bits products that the extension created. The list is in ascending SKU order. The list is empty if the extension hasn't created any products or they're all expired or disabled. */
       data: components["schemas"]["ExtensionBitsProduct"][];
     };
     CreateEventSubSubscriptionBody: {
@@ -3353,7 +3649,7 @@ export interface components {
        * @description The type of subscription to create. For a list of subscriptions that you can create, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). Set this field to the value in the **Name** column of the Subscription Types table.
        * @enum {string}
        */
-      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
       /** @description The version number that identifies the definition of the subscription type that you want the response to use. */
       version: string;
       /** @description A JSON object that contains the parameter values that are specific to the specified subscription type. For the object’s required and optional fields, see the subscription type’s documentation. */
@@ -3365,36 +3661,29 @@ export interface components {
          *
          * * webhook
          * * websocket
+         * * conduit
          * @enum {string}
          */
-        method: "webhook" | "websocket";
+        method: "webhook" | "websocket" | "conduit";
         /**
-         * @description The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443\. See [Processing an event](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#processing-an-event).
-         *
-         * Specify this field only if `method` is set to **webhook**.
+         * @description The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443\. See [Processing an event](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#processing-an-event). Specify this field only if `method` is set to **webhook**.
          *
          * **NOTE**: Redirects are not followed.
          */
         callback?: string;
-        /**
-         * @description The secret used to verify the signature. The secret must be an ASCII string that’s a minimum of 10 characters long and a maximum of 100 characters long. For information about how the secret is used, see [Verifying the event message](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#verifying-the-event-message).
-         *
-         * Specify this field only if `method` is set to **webhook**.
-         */
+        /** @description The secret used to verify the signature. The secret must be an ASCII string that’s a minimum of 10 characters long and a maximum of 100 characters long. For information about how the secret is used, see [Verifying the event message](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#verifying-the-event-message). Specify this field only if `method` is set to **webhook**. */
         secret?: string;
-        /**
-         * @description An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message).
-         *
-         * Specify this field only if `method` is set to **websocket**.
-         */
+        /** @description An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the Welcome message. Specify this field only if `method` is set to **websocket**. */
         session_id?: string;
+        /** @description An ID that identifies the conduit to send notifications to. When you create a conduit, the server returns the conduit ID. Specify this field only if `method` is set to **conduit**. */
+        conduit_id?: string;
       };
     };
     EventSubSubscription: {
       /** @description An ID that identifies the subscription. */
       id: string;
       /**
-       * @description The subscription’s status. The subscriber receives events only for **enabled** subscriptions. Possible values are:
+       * @description The subscription's status. The subscriber receives events only for **enabled** subscriptions. Possible values are:
        *
        * * enabled — The subscription is enabled.
        * * webhook\_callback\_verification\_pending — The subscription is pending verification of the specified callback URL.
@@ -3403,7 +3692,8 @@ export interface components {
        * * authorization\_revoked — The authorization was revoked for one or more users specified in the **Condition** object.
        * * moderator\_removed — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
        * * user\_removed — One of the users specified in the **Condition** object was removed.
-       * * version\_removed — The subscribed to subscription type and version is no longer supported.
+       * * version\_removed — The subscription to subscription type and version is no longer supported.
+       * * beta\_maintenance — The subscription to the beta subscription type was removed due to maintenance.
        * * websocket\_disconnected — The client closed the connection.
        * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
        * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
@@ -3413,15 +3703,15 @@ export interface components {
        * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
        * @enum {string}
        */
-      status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+      status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "beta_maintenance" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
       /**
-       * @description The subscription’s type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types).
+       * @description The subscription's type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types).
        * @enum {string}
        */
-      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
-      /** @description The version number that identifies this definition of the subscription’s data. */
+      type: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      /** @description The version number that identifies this definition of the subscription's data. */
       version: string;
-      /** @description The subscription’s parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
+      /** @description The subscription's parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
       condition: Record<string, never>;
       /**
        * Format: date-time
@@ -3479,11 +3769,11 @@ export interface components {
       max_total_cost: number;
     };
     GetEventSubSubscriptionsResponse: {
-      /** @description The list of subscriptions. The list is ordered by the oldest subscription first. The list is empty if the client hasn’t created subscriptions or there are no subscriptions that match the specified filter criteria. */
+      /** @description The list of subscriptions. The list is ordered by the oldest subscription first. The list is empty if the client hasn't created subscriptions or there are no subscriptions that match the specified filter criteria. */
       data: components["schemas"]["EventSubSubscription"][];
       /**
        * Format: int32
-       * @description The total number of subscriptions that you’ve created.
+       * @description The total number of subscriptions that you've created.
        */
       total: number;
       /**
@@ -3493,7 +3783,7 @@ export interface components {
       total_cost: number;
       /**
        * Format: int32
-       * @description The maximum total cost that you’re allowed to incur for all subscriptions that you create.
+       * @description The maximum total cost that you're allowed to incur for all subscriptions that you create.
        */
       max_total_cost: number;
       /** @description An object that contains the cursor used to get the next page of subscriptions. The object is empty if there are no more pages to get. The number of subscriptions returned per page is undertermined. */
@@ -5224,7 +5514,7 @@ export interface components {
       published_at: string;
       /** @description The video’s URL. */
       url: string;
-      /** @description A URL to a thumbnail image of the video. Before using the URL, you must replace the `%{width}` and `%{height}` placeholders with the width and height of the thumbnail you want returned. Specify the width and height in pixels. Because the CDN preserves the thumbnail’s ratio, the thumbnail may not be the exact size you requested. */
+      /** @description A URL to a thumbnail image of the video. Before using the URL, you must replace the `%{width}` and `%{height}` placeholders with the width and height of the thumbnail you want returned. Due to current limitations, `${width}` must be 320 and `${height}` must be 180. */
       thumbnail_url: string;
       /** @description The video’s viewable state. Always set to **public**. */
       viewable: string;
@@ -5436,7 +5726,7 @@ export interface operations {
   "get-extension-analytics": {
     parameters: {
       query?: {
-        /** @description The extension’s client ID. If specified, the response contains a report for the specified extension. If not specified, the response includes a report for each extension that the authenticated user owns. */
+        /** @description The extension's client ID. If specified, the response contains a report for the specified extension. If not specified, the response includes a report for each extension that the authenticated user owns. */
         extension_id?: string;
         /**
          * @description The type of analytics report to get. Possible values are:
@@ -5445,17 +5735,17 @@ export interface operations {
          */
         type?: "overview_v2";
         /**
-         * @description The reporting window’s start date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-22T00:00:00Z).
+         * @description The reporting window's start date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-22T00:00:00Z).
          *
-         * The start date must be on or after January 31, 2018\. If you specify an earlier date, the API ignores it and uses January 31, 2018\. If you specify a start date, you must specify an end date. If you don’t specify a start and end date, the report includes all available data since January 31, 2018.
+         * The start date must be on or after January 31, 2018\. If you specify an earlier date, the API ignores it and uses January 31, 2018\. If you specify a start date, you must specify an end date. If you don't specify a start and end date, the report includes all available data since January 31, 2018.
          *
          * The report contains one row of data for each day in the reporting window.
          */
         started_at?: string;
         /**
-         * @description The reporting window’s end date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-27T00:00:00Z). The report is inclusive of the end date.
+         * @description The reporting window's end date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-27T00:00:00Z). The report is inclusive of the end date.
          *
-         * Specify an end date only if you provide a start date. Because it can take up to two days for the data to be available, you must specify an end date that’s earlier than today minus one to two days. If not, the API ignores your end date and uses an end date that is today minus one to two days.
+         * Specify an end date only if you provide a start date. Because it can take up to two days for the data to be available, you must specify an end date that's earlier than today minus one to two days. If not, the API ignores your end date and uses an end date that is today minus one to two days.
          */
         ended_at?: string;
         /**
@@ -5473,7 +5763,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the broadcaster’s analytics reports. */
+      /** @description Successfully retrieved the broadcaster's analytics reports. */
       200: {
         content: {
           "application/json": components["schemas"]["GetExtensionAnalyticsResponse"];
@@ -6954,7 +7244,6 @@ export interface operations {
       /**
        * @description * The `message` field in the request's body is required.
        * * The `message` field may not contain an empty string.
-       * * The `message` field may not contain an empty string.
        * * The string in the `message` field failed review.
        * * The specified color is not valid.
        */
@@ -7052,6 +7341,58 @@ export interface operations {
     };
   };
   /**
+   * NEW Sends a message to the broadcaster’s chat room.
+   * @description NEW Sends a message to the broadcaster’s chat room.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+   */
+  "send-chat-message": {
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["SendChatMessageBody"];
+      };
+    };
+    responses: {
+      /** @description Successfully sent the specified broadcaster a message. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["SendChatMessageResponse"];
+        };
+      };
+      /**
+       * @description * The _broadcaster\_id_ query parameter is required.
+       * * The ID in the _broadcaster\_id_ query parameter is not valid.
+       * * The _sender\_id_ query parameter is required.
+       * * The ID in the _sender\_id_ query parameter is not valid.
+       * * The _text_ query parameter is required.
+       * * The ID in the _reply\_parent\_message\_id_ query parameter is not valid.
+       */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The ID in the user\_id query parameter must match the user ID in the access token.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token must include the user:write:chat scope.
+       * * The access token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description The sender is not permitted to send chat messages to the broadcaster’s chat room. */
+      403: {
+        content: never;
+      };
+      /** @description The message is too large. */
+      422: {
+        content: never;
+      };
+    };
+  };
+  /**
    * Gets the color used for the user’s name in chat.
    * @description Gets the color used for the user’s name in chat.
    *
@@ -7105,7 +7446,7 @@ export interface operations {
         /** @description The ID of the user whose chat color you want to update. This ID must match the user ID in the access token. */
         user_id: string;
         /**
-         * @description The color to use for the user’s name in chat. All users may specify one of the following named color values.
+         * @description The color to use for the user's name in chat. All users may specify one of the following named color values.
          *
          * * blue
          * * blue\_violet
@@ -7130,7 +7471,7 @@ export interface operations {
     };
     responses: {
       /**
-       * @description Successfully updated the user’s chat color.
+       * @description Successfully updated the user's chat color.
        *
        * __Examples__
        *
@@ -7293,6 +7634,237 @@ export interface operations {
         content: never;
       };
       /** @description * The broadcaster in the _broadcaster\_id_ query parameter must be broadcasting live. */
+      404: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW  Gets the conduits for a client ID.
+   * @description NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) for a client ID.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "get-conduits": {
+    responses: {
+      /** @description Successfully retrieved conduits. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetConduitsResponse"];
+        };
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Creates a new conduit.
+   * @description NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "create-conduits": {
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CreateConduitsBody"];
+      };
+    };
+    responses: {
+      /** @description Conduit created. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["CreateConduitsResponse"];
+        };
+      };
+      /** @description Invalid shard count. */
+      400: {
+        content: never;
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+      /** @description Conduit limit reached. */
+      429: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Deletes a specified conduit.
+   * @description NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "delete-conduit": {
+    parameters: {
+      query: {
+        /** @description Conduit ID. */
+        id: string;
+      };
+    };
+    responses: {
+      /**
+       * @description Successfully deleted the conduit.
+       *
+       * __Examples__
+       *
+       * _Request:_
+       *
+       * ```bash
+       * curl -X DELETE 'https://api.twitch.tv/helix/eventsub/conduits' \
+       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2' \
+       * -d '{"id":"bfcfc993-26b1-b876-44d9-afe75a379dac"}'
+       * ```
+       */
+      204: {
+        content: never;
+      };
+      /** @description The id query parameter is required. */
+      400: {
+        content: never;
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+      /**
+       * @description * Conduit not found.
+       * * Conduit’s owner must match the client ID in the access token.
+       */
+      404: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Updates a conduit’s shard count.
+   * @description NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "update-conduits": {
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateConduitsBody"];
+      };
+    };
+    responses: {
+      /** @description Conduit updated. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UpdateConduitsResponse"];
+        };
+      };
+      /**
+       * @description * Invalid shard count
+       * * The id query parameter is required.
+       */
+      400: {
+        content: never;
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+      /**
+       * @description * Conduit not found.
+       * * Conduit’s owner must match the client ID in the access token.
+       */
+      404: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Gets a lists of all shards for a conduit.
+   * @description NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "get-conduit-shards": {
+    parameters: {
+      query: {
+        /** @description Conduit ID. */
+        conduit_id: string;
+        /** @description Status to filter by. */
+        status?: string;
+        /** @description The cursor used to get the next page of results. The pagination object in the response contains the cursor’s value. */
+        after?: string;
+      };
+    };
+    responses: {
+      /** @description Successfully retrieved shards. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetConduitShardsResponse"];
+        };
+      };
+      /** @description The id query parameter is required. */
+      400: {
+        content: never;
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+      /**
+       * @description * Conduit not found.
+       * * Conduit’s owner must match the client ID in the access token.
+       */
+      404: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Updates shard(s) for a conduit.
+   * @description NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+   *
+   * **NOTE:** Shard IDs are indexed starting at 0, so a conduit with a `shard_count` of 5 will have shards with IDs 0 through 4.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "update-conduit-shards": {
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UpdateConduitShardsBody"];
+      };
+    };
+    responses: {
+      /** @description Successfully retrieved shards. */
+      202: {
+        content: {
+          "application/json": components["schemas"]["UpdateConduitShardsResponse"];
+        };
+      };
+      /** @description The id query parameter is required. */
+      400: {
+        content: never;
+      };
+      /** @description Authorization header required with an app access token. */
+      401: {
+        content: never;
+      };
+      /**
+       * @description * Conduit not found.
+       * * Conduit’s owner must match the client ID in the access token.
+       */
       404: {
         content: never;
       };
@@ -8062,7 +8634,7 @@ export interface operations {
        * * The value in the `sku` field is not valid. The SKU may contain only alphanumeric characters, dashes (-), underscores (\_), and periods (.).
        * * The `cost` object's `amount` field is required.
        * * The value in the `cost` object's `amount` field is not valid.
-       * * The cost object's `type` field is required.
+       * * The `cost` object's `type` field is required.
        * * The value in the `cost` object's `type` field is not valid.
        * * The `display_name` field is required.
        * * The ID in the Client-Id header must belong to the extension.
@@ -8107,7 +8679,8 @@ export interface operations {
          * * authorization\_revoked — The authorization was revoked for one or more users specified in the **Condition** object.
          * * moderator\_removed — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
          * * user\_removed — One of the users specified in the **Condition** object was removed.
-         * * version\_removed — The subscribed to subscription type and version is no longer supported.
+         * * version\_removed — The subscription to subscription type and version is no longer supported.
+         * * beta\_maintenance — The subscription to the beta subscription type was removed due to maintenance.
          * * websocket\_disconnected — The client closed the connection.
          * * websocket\_failed\_ping\_pong — The client failed to respond to a ping message.
          * * websocket\_received\_inbound\_traffic — The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
@@ -8116,12 +8689,12 @@ export interface operations {
          * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
          * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
          */
-        status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+        status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "beta_maintenance" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
         /** @description Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
-        type?: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+        type?: "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
         /** @description Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
         user_id?: string;
-        /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor’s value. */
+        /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor's value. */
         after?: string;
       };
     };
@@ -8160,6 +8733,8 @@ export interface operations {
    * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token. If the subscription type requires user authorization, the user must have granted your app (client ID) permissions to receive those events before you subscribe to them. For example, to subscribe to [channel.subscribe](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) events, your app must get a user access token that includes the `channel:read:subscriptions` scope, which adds the required permission to your app access token’s client ID.
    *
    * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. If the subscription type requires user authorization, the token must include the required scope. However, if the subscription type doesn’t include user authorization, the token may include any scopes or no scopes.
+   *
+   * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
    */
   "create-eventsub-subscription": {
     requestBody?: {
@@ -8185,6 +8760,7 @@ export interface operations {
        * * The `callback` field is required if you specify the webhook transport method.
        * * The `session_id` field is required if you specify the WebSocket transport method.
        * * The combination of subscription type and version is not valid.
+       * * The `conduit_id` field is required if you specify the Conduit transport method.
        */
       400: {
         content: never;
@@ -8198,15 +8774,15 @@ export interface operations {
       401: {
         content: never;
       };
-      /** @description * The access token is missing the required scopes. */
+      /** @description The access token is missing the required scopes. */
       403: {
         content: never;
       };
-      /** @description * A subscription already exists for the specified event type and condition combination. */
+      /** @description A subscription already exists for the specified event type and `condition` combination. */
       409: {
         content: never;
       };
-      /** @description * The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values. */
+      /** @description The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values. */
       429: {
         content: never;
       };

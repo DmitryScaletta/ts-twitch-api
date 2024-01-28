@@ -38,6 +38,8 @@ export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
 export type UpdateUserChatColorParams = ParamsSchema<'update-user-chat-color'>;
 export type CreateClipParams = ParamsSchema<'create-clip'>;
 export type GetClipsParams = ParamsSchema<'get-clips'>;
+export type DeleteConduitParams = ParamsSchema<'delete-conduit'>;
+export type GetConduitShardsParams = ParamsSchema<'get-conduit-shards'>;
 export type GetContentClassificationLabelsParams = ParamsSchema<'get-content-classification-labels'>;
 export type GetDropsEntitlementsParams = ParamsSchema<'get-drops-entitlements'>;
 export type GetExtensionConfigurationSegmentParams = ParamsSchema<'get-extension-configuration-segment'>;
@@ -171,11 +173,21 @@ export type UpdateChatSettingsBody = Schema<'UpdateChatSettingsBody'>;
 export type ChatSettingsUpdated = Schema<'ChatSettingsUpdated'>;
 export type UpdateChatSettingsResponse = Schema<'UpdateChatSettingsResponse'>;
 export type SendChatAnnouncementBody = Schema<'SendChatAnnouncementBody'>;
+export type SendChatMessageBody = Schema<'SendChatMessageBody'>;
+export type SendChatMessageResponse = Schema<'SendChatMessageResponse'>;
 export type UserChatColor = Schema<'UserChatColor'>;
 export type GetUserChatColorResponse = Schema<'GetUserChatColorResponse'>;
 export type CreateClipResponse = Schema<'CreateClipResponse'>;
 export type Clip = Schema<'Clip'>;
 export type GetClipsResponse = Schema<'GetClipsResponse'>;
+export type GetConduitsResponse = Schema<'GetConduitsResponse'>;
+export type CreateConduitsBody = Schema<'CreateConduitsBody'>;
+export type CreateConduitsResponse = Schema<'CreateConduitsResponse'>;
+export type UpdateConduitsBody = Schema<'UpdateConduitsBody'>;
+export type UpdateConduitsResponse = Schema<'UpdateConduitsResponse'>;
+export type GetConduitShardsResponse = Schema<'GetConduitShardsResponse'>;
+export type UpdateConduitShardsBody = Schema<'UpdateConduitShardsBody'>;
+export type UpdateConduitShardsResponse = Schema<'UpdateConduitShardsResponse'>;
 export type ContentClassificationLabel = Schema<'ContentClassificationLabel'>;
 export type GetContentClassificationLabelsResponse = Schema<'GetContentClassificationLabelsResponse'>;
 export type DropsEntitlement = Schema<'DropsEntitlement'>;
@@ -550,7 +562,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s analytics reports.
+     * Successfully retrieved the broadcaster's analytics reports.
      *
      * _400 Bad Request_
      *
@@ -1812,7 +1824,6 @@ export class TwitchApi {
      *
      * * The `message` field in the request's body is required.
      * * The `message` field may not contain an empty string.
-     * * The `message` field may not contain an empty string.
      * * The string in the `message` field failed review.
      * * The specified color is not valid.
      *
@@ -1900,6 +1911,60 @@ export class TwitchApi {
         request,
       }),
     /**
+     * NEW Sends a message to the broadcaster’s chat room.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/chat/messages`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully sent the specified broadcaster a message.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The ID in the _broadcaster\_id_ query parameter is not valid.
+     * * The _sender\_id_ query parameter is required.
+     * * The ID in the _sender\_id_ query parameter is not valid.
+     * * The _text_ query parameter is required.
+     * * The ID in the _reply\_parent\_message\_id_ query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in the user\_id query parameter must match the user ID in the access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the user:write:chat scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * The sender is not permitted to send chat messages to the broadcaster’s chat room.
+     *
+     * _422 Unprocessable Entity_
+     *
+     * The message is too large.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#send-chat-message
+     */
+    sendChatMessage: async (
+      body: SendChatMessageBody,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<SendChatMessageResponse, 200, 400 | 401 | 403 | 422>({
+        path: '/chat/messages',
+        method: 'POST',
+        body,
+        request,
+      }),
+    /**
      * Gets the color used for the user’s name in chat.
      *
      * __Authorization:__
@@ -1952,7 +2017,7 @@ export class TwitchApi {
      *
      * _204 No Content_
      *
-     * Successfully updated the user’s chat color.
+     * Successfully updated the user's chat color.
      *
      * _400 Bad Request_
      *
@@ -2084,6 +2149,247 @@ export class TwitchApi {
       this.callApi<GetClipsResponse, 200, 400 | 401 | 404>({
         path: '/clips',
         params,
+        request,
+      }),
+  };
+  conduits = {
+    /**
+     * NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) for a client ID.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/eventsub/conduits`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved conduits.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-conduits
+     */
+    getConduits: async (...request: CallApiOptions['request']) => 
+      this.callApi<GetConduitsResponse, 200, 401>({
+        path: '/eventsub/conduits',
+        request,
+      }),
+    /**
+     * NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/eventsub/conduits`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Conduit created.
+     *
+     * _400 Bad Request_
+     *
+     * Invalid shard count.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * _429 Too Many Requests_
+     *
+     * Conduit limit reached.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#create-conduits
+     */
+    createConduits: async (
+      body: CreateConduitsBody,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<CreateConduitsResponse, 200, 400 | 401 | 429>({
+        path: '/eventsub/conduits',
+        method: 'POST',
+        body,
+        request,
+      }),
+    /**
+     * NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/eventsub/conduits`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Conduit updated.
+     *
+     * _400 Bad Request_
+     *
+     * * Invalid shard count
+     * * The id query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * _404 Not Found_
+     *
+     * * Conduit not found.
+     * * Conduit’s owner must match the client ID in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-conduits
+     */
+    updateConduits: async (
+      body: UpdateConduitsBody,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<UpdateConduitsResponse, 200, 400 | 401 | 404>({
+        path: '/eventsub/conduits',
+        method: 'PATCH',
+        body,
+        request,
+      }),
+    /**
+     * NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/eventsub/conduits`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully deleted the conduit.
+     *
+     * _400 Bad Request_
+     *
+     * The id query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * _404 Not Found_
+     *
+     * * Conduit not found.
+     * * Conduit’s owner must match the client ID in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#delete-conduit
+     */
+    deleteConduit: async (
+      params: DeleteConduitParams,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<void, 204, 400 | 401 | 404>({
+        path: '/eventsub/conduits',
+        method: 'DELETE',
+        params,
+        request,
+      }),
+    /**
+     * NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/eventsub/conduits/shards`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved shards.
+     *
+     * _400 Bad Request_
+     *
+     * The id query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * _404 Not Found_
+     *
+     * * Conduit not found.
+     * * Conduit’s owner must match the client ID in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-conduit-shards
+     */
+    getConduitShards: async (
+      params: GetConduitShardsParams,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<GetConduitShardsResponse, 200, 400 | 401 | 404>({
+        path: '/eventsub/conduits/shards',
+        params,
+        request,
+      }),
+    /**
+     * NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     *
+     * **NOTE:** Shard IDs are indexed starting at 0, so a conduit with a `shard_count` of 5 will have shards with IDs 0 through 4.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/eventsub/conduits/shards`
+     *
+     * __Response Codes:__
+     *
+     * _202 Accepted_
+     *
+     * Successfully retrieved shards.
+     *
+     * _400 Bad Request_
+     *
+     * The id query parameter is required.
+     *
+     * _401 Unauthorized_
+     *
+     * Authorization header required with an app access token.
+     *
+     * _404 Not Found_
+     *
+     * * Conduit not found.
+     * * Conduit’s owner must match the client ID in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-conduit-shards
+     */
+    updateConduitShards: async (
+      body: UpdateConduitShardsBody,
+      ...request: CallApiOptions['request']
+    ) =>
+      this.callApi<UpdateConduitShardsResponse, 202, 400 | 401 | 404>({
+        path: '/eventsub/conduits/shards',
+        method: 'PATCH',
+        body,
         request,
       }),
   };
@@ -2762,7 +3068,7 @@ export class TwitchApi {
      * * The value in the `sku` field is not valid. The SKU may contain only alphanumeric characters, dashes (-), underscores (\_), and periods (.).
      * * The `cost` object's `amount` field is required.
      * * The value in the `cost` object's `amount` field is not valid.
-     * * The cost object's `type` field is required.
+     * * The `cost` object's `type` field is required.
      * * The value in the `cost` object's `type` field is not valid.
      * * The `display_name` field is required.
      * * The ID in the Client-Id header must belong to the extension.
@@ -2796,6 +3102,8 @@ export class TwitchApi {
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. If the subscription type requires user authorization, the token must include the required scope. However, if the subscription type doesn’t include user authorization, the token may include any scopes or no scopes.
      *
+     * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
+     *
      * __URL:__
      *
      * `POST https://api.twitch.tv/helix/eventsub/subscriptions`
@@ -2818,6 +3126,7 @@ export class TwitchApi {
      * * The `callback` field is required if you specify the webhook transport method.
      * * The `session_id` field is required if you specify the WebSocket transport method.
      * * The combination of subscription type and version is not valid.
+     * * The `conduit_id` field is required if you specify the Conduit transport method.
      *
      * _401 Unauthorized_
      *
@@ -2828,15 +3137,15 @@ export class TwitchApi {
      *
      * _403 Forbidden_
      *
-     * * The access token is missing the required scopes.
+     * The access token is missing the required scopes.
      *
      * _409 Conflict_
      *
-     * * A subscription already exists for the specified event type and condition combination.
+     * A subscription already exists for the specified event type and `condition` combination.
      *
      * _429 Too Many Requests_
      *
-     * * The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values.
+     * The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values.
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription
      */
