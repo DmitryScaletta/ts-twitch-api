@@ -5,6 +5,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Node 18 + ESM + Strictest",
   "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
     "lib": [
       "ESNext",
       "DOM"
@@ -25,6 +27,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "declaration": true,
+  },
+  "exclude": ["./scripts", "./dist"],
 }
