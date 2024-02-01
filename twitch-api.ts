@@ -1,4 +1,4 @@
-import type { components, operations } from './twitch-api.generated.d.ts';
+import type { components, operations } from './twitch-api.generated';
 
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
