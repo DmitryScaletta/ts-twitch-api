@@ -7720,10 +7720,9 @@ export interface operations {
        * _Request:_
        *
        * ```bash
-       * curl -X DELETE 'https://api.twitch.tv/helix/eventsub/conduits' \
+       * curl -X DELETE 'https://api.twitch.tv/helix/eventsub/conduits?id=bfcfc993-26b1-b876-44d9-afe75a379dac' \
        * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
-       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2' \
-       * -d '{"id":"bfcfc993-26b1-b876-44d9-afe75a379dac"}'
+       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
        * ```
        */
       204: {
