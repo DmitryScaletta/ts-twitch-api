@@ -3,7 +3,7 @@
 ## main
 
 ```ts
-import type { components, operations } from './twitch-api.generated.d.ts';
+import type { components, operations } from './twitch-api.generated';
 
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
@@ -45,11 +45,11 @@ type CallApiOptions = {
   params?: Record<string, any> | null;
   body?: Record<string, any> | null;
   requiresAuth?: boolean;
-  request: [
+  options: {
     clientId?: string | null,
     accessToken?: string | null,
     requestInit?: RequestInit,
-  ];
+  };
 };
 
 export type TwitchApiOptions = {
@@ -76,7 +76,11 @@ export class TwitchApi {
     params,
     body,
     requiresAuth = true,
-    request: [clientId = null, accessToken = null, requestInit = {}],
+    options: {
+      clientId = null,
+      accessToken = null,
+      requestInit = {},
+    },
   }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
@@ -124,11 +128,11 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: async (...request: CallApiOptions['request']) => 
+%METHOD_NAME%: async (options: CallApiOptions['options']) => 
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
-    request,
+    options,
   }),
 ```
 
@@ -137,13 +141,13 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   body: %BODY_TYPE%,
-  ...request: CallApiOptions['request']
+  options: CallApiOptions['options']
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     body,
-    request,
+    options,
   }),
 ```
 
@@ -152,13 +156,13 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
-  ...request: CallApiOptions['request']
+  options: CallApiOptions['options']
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     params,
-    request,
+    options,
   }),
 ```
 
@@ -168,13 +172,13 @@ __URL:__
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
   body: %BODY_TYPE%,
-  ...request: CallApiOptions['request']
+  options: CallApiOptions['options']
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
     params,
     body,
-    request,
+    options,
   }),
 ```

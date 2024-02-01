@@ -77,8 +77,10 @@ const streams = await twitchApi.streams.getStreams(
   // some endpoints accept multiple ids like this: `id=1234&id=5678`
   { user_id: ['1', '2'] },
   // override accessToken and/or clientId for different requests
-  '<accessToken>',
-  '<clientId>',
+  {
+    accessToken: '<accessToken>',
+    clientId: '<clientId>'
+  },
 );
 
 if (streams.ok) {
@@ -89,9 +91,7 @@ if (streams.ok) {
 const ac = new AbortController();
 const users = twitchApi.users.getUsers(
   { id: ['1', '2'] },
-  null,
-  null,
-  { signal: ac.signal },
+  { requestInit: { signal: ac.signal } },
 );
 
 ac.abort();
