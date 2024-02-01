@@ -25,10 +25,10 @@
   "type": "module",
   "scripts": {
     "build": "rm -rf ./dist && pnpm build:src && pnpm type:extract && pnpm type:dts",
-    "type:dts": "tsc --emitDeclarationOnly",
+    "type:dts": "tsc --emitDeclarationOnly && cp twitch-api.generated.d.ts ./dist/twitch-api.generated.d.ts",
     "type:extract": "tsc --project tsconfig.build.json",
     "build:src": "node --import tsx ./scripts/build.ts",
-    "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
+    "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.d.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.2",

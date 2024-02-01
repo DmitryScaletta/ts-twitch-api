@@ -1,2 +1,2 @@
-export * from './twitch-api';
-export * from './twitch-api.generated';
+export { TwitchApi } from './twitch-api';
+export type * from './twitch-api.d.ts';

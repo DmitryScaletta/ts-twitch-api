@@ -3,7 +3,7 @@
 ## main
 
 ```ts
-import type { components, operations } from './twitch-api.generated';
+import type { components, operations } from './twitch-api.generated.d.ts';
 
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
