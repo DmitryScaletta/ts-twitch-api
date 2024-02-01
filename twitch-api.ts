@@ -1,4 +1,4 @@
-import type { components, operations } from './twitch-api.generated.d.ts';
+import type { components, operations } from './twitch-api.generated';
 
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
@@ -1582,7 +1582,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: async (...request: CallApiOptions['request']) => 
+    getGlobalEmotes: async (...request: CallApiOptions['request']) =>
       this.callApi<GetGlobalEmotesResponse, 200, 401>({
         path: '/chat/emotes/global',
         request,
@@ -1697,7 +1697,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: async (...request: CallApiOptions['request']) => 
+    getGlobalChatBadges: async (...request: CallApiOptions['request']) =>
       this.callApi<GetGlobalChatBadgesResponse, 200, 401>({
         path: '/chat/badges/global',
         request,
@@ -2176,7 +2176,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduits
      */
-    getConduits: async (...request: CallApiOptions['request']) => 
+    getConduits: async (...request: CallApiOptions['request']) =>
       this.callApi<GetConduitsResponse, 200, 401>({
         path: '/eventsub/conduits',
         request,
@@ -2829,7 +2829,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: async (...request: CallApiOptions['request']) => 
+    getExtensionSecrets: async (...request: CallApiOptions['request']) =>
       this.callApi<GetExtensionSecretsResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
         request,
@@ -6461,7 +6461,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: async (...request: CallApiOptions['request']) => 
+    getUserExtensions: async (...request: CallApiOptions['request']) =>
       this.callApi<GetUserExtensionsResponse, 200, 401>({
         path: '/users/extensions/list',
         request,

@@ -17,21 +17,25 @@
   "bugs": {
     "url": "https://github.com/DmitryScaletta/ts-twitch-api/issues"
   },
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "main": "dist/index.cjs",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "files": [
     "dist"
   ],
   "type": "module",
   "scripts": {
-    "build": "rm -rf ./dist && pnpm build:src && pnpm type:extract && pnpm type:dts",
-    "type:dts": "tsc --emitDeclarationOnly && cp twitch-api.generated.d.ts ./dist/twitch-api.generated.d.ts",
-    "type:extract": "tsc --project tsconfig.build.json",
+    "build": "pnpm build:src && tsup",
     "build:src": "node --import tsx ./scripts/build.ts",
-    "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.d.ts"
+    "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.2",
+    "tsup": "^8.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
