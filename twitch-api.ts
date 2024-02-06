@@ -354,9 +354,9 @@ type CallApiOptions = {
   params?: Record<string, any> | null;
   body?: Record<string, any> | null;
   requiresAuth?: boolean;
-  options: {
-    clientId?: string | null,
-    accessToken?: string | null,
+  options?: {
+    clientId?: string,
+    accessToken?: string,
     requestInit?: RequestInit,
   };
 };
@@ -386,10 +386,10 @@ export class TwitchApi {
     body,
     requiresAuth = true,
     options: {
-      clientId = null,
-      accessToken = null,
+      clientId,
+      accessToken,
       requestInit = {},
-    },
+    } = {},
   }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
@@ -466,7 +466,7 @@ export class TwitchApi {
      */
     startCommercial: async (
       body: StartCommercialBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<StartCommercialResponse, 200, 400 | 401 | 404 | 429>({
         path: '/channels/commercial',
@@ -501,7 +501,7 @@ export class TwitchApi {
      */
     getAdSchedule: async (
       params: GetAdScheduleParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetAdScheduleResponse, 200, 400 | 500>({
         path: '/channels/ads',
@@ -541,7 +541,7 @@ export class TwitchApi {
      */
     snoozeNextAd: async (
       params: SnoozeNextAdParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<SnoozeNextAdResponse, 200, 400 | 429 | 500>({
         path: '/channels/ads/schedule/snooze',
@@ -592,7 +592,7 @@ export class TwitchApi {
      */
     getExtensionAnalytics: async (
       params: GetExtensionAnalyticsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionAnalyticsResponse, 200, 400 | 401 | 404>({
         path: '/analytics/extensions',
@@ -640,7 +640,7 @@ export class TwitchApi {
      */
     getGameAnalytics: async (
       params: GetGameAnalyticsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetGameAnalyticsResponse, 200, 400 | 401 | 404>({
         path: '/analytics/games',
@@ -685,7 +685,7 @@ export class TwitchApi {
      */
     getBitsLeaderboard: async (
       params: GetBitsLeaderboardParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetBitsLeaderboardResponse, 200, 400 | 401 | 403>({
         path: '/bits/leaderboard',
@@ -718,7 +718,7 @@ export class TwitchApi {
      */
     getCheermotes: async (
       params: GetCheermotesParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCheermotesResponse, 200, 401>({
         path: '/bits/cheermotes',
@@ -763,7 +763,7 @@ export class TwitchApi {
      */
     getExtensionTransactions: async (
       params: GetExtensionTransactionsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionTransactionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/transactions',
@@ -811,7 +811,7 @@ export class TwitchApi {
      */
     getChannelInformation: async (
       params: GetChannelInformationParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelInformationResponse, 200, 400 | 401 | 429 | 500>({
         path: '/channels',
@@ -878,7 +878,7 @@ export class TwitchApi {
     modifyChannelInformation: async (
       params: ModifyChannelInformationParams,
       body: ModifyChannelInformationBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 409 | 500>({
         path: '/channels',
@@ -902,7 +902,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s list of editors.
+     * Successfully retrieved the broadcaster's list of editors.
      *
      * _400 Bad Request_
      *
@@ -920,7 +920,7 @@ export class TwitchApi {
      */
     getChannelEditors: async (
       params: GetChannelEditorsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelEditorsResponse, 200, 400 | 401>({
         path: '/channels/editors',
@@ -942,7 +942,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s list of followers.
+     * Successfully retrieved the broadcaster's list of followers.
      *
      * _400 Bad Request_
      *
@@ -966,7 +966,7 @@ export class TwitchApi {
      */
     getFollowedChannels: async (
       params: GetFollowedChannelsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetFollowedChannelsResponse, 200, 400 | 401>({
         path: '/channels/followed',
@@ -1015,7 +1015,7 @@ export class TwitchApi {
      */
     getChannelFollowers: async (
       params: GetChannelFollowersParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelFollowersResponse, 200, 400 | 401>({
         path: '/channels/followers',
@@ -1073,7 +1073,7 @@ export class TwitchApi {
     createCustomRewards: async (
       params: CreateCustomRewardsParams,
       body: CreateCustomRewardsBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateCustomRewardsResponse, 200, 400 | 401 | 403 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1128,7 +1128,7 @@ export class TwitchApi {
      */
     deleteCustomReward: async (
       params: DeleteCustomRewardParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1181,7 +1181,7 @@ export class TwitchApi {
      */
     getCustomReward: async (
       params: GetCustomRewardParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1244,7 +1244,7 @@ export class TwitchApi {
     updateCustomReward: async (
       params: UpdateCustomRewardParams,
       body: UpdateCustomRewardBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1300,7 +1300,7 @@ export class TwitchApi {
      */
     getCustomRewardRedemption: async (
       params: GetCustomRewardRedemptionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCustomRewardRedemptionResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards/redemptions',
@@ -1355,7 +1355,7 @@ export class TwitchApi {
     updateRedemptionStatus: async (
       params: UpdateRedemptionStatusParams,
       body: UpdateRedemptionStatusBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateRedemptionStatusResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards/redemptions',
@@ -1406,7 +1406,7 @@ export class TwitchApi {
      */
     getCharityCampaign: async (
       params: GetCharityCampaignParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCharityCampaignResponse, 200, 400 | 401 | 403>({
         path: '/charity/campaigns',
@@ -1453,7 +1453,7 @@ export class TwitchApi {
      */
     getCharityCampaignDonations: async (
       params: GetCharityCampaignDonationsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCharityCampaignDonationsResponse, 200, 400 | 401 | 403>({
         path: '/charity/donations',
@@ -1506,7 +1506,7 @@ export class TwitchApi {
      */
     getChatters: async (
       params: GetChattersParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChattersResponse, 200, 400 | 401 | 403>({
         path: '/chat/chatters',
@@ -1532,7 +1532,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved broadcaster’s list of custom emotes.
+     * Successfully retrieved broadcaster's list of custom emotes.
      *
      * _400 Bad Request_
      *
@@ -1548,7 +1548,7 @@ export class TwitchApi {
      */
     getChannelEmotes: async (
       params: GetChannelEmotesParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelEmotesResponse, 200, 400 | 401>({
         path: '/chat/emotes',
@@ -1576,7 +1576,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved Twitch’s list of global emotes.
+     * Successfully retrieved Twitch's list of global emotes.
      *
      * _401 Unauthorized_
      *
@@ -1586,7 +1586,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: async (options: CallApiOptions['options']) => 
+    getGlobalEmotes: async (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetGlobalEmotesResponse, 200, 401>({
         path: '/chat/emotes/global',
         options,
@@ -1627,7 +1627,7 @@ export class TwitchApi {
      */
     getEmoteSets: async (
       params: GetEmoteSetsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetEmoteSetsResponse, 200, 400 | 401>({
         path: '/chat/emotes/set',
@@ -1665,7 +1665,7 @@ export class TwitchApi {
      */
     getChannelChatBadges: async (
       params: GetChannelChatBadgesParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelChatBadgesResponse, 200, 400 | 401>({
         path: '/chat/badges',
@@ -1701,7 +1701,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: async (options: CallApiOptions['options']) => 
+    getGlobalChatBadges: async (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetGlobalChatBadgesResponse, 200, 401>({
         path: '/chat/badges/global',
         options,
@@ -1739,7 +1739,7 @@ export class TwitchApi {
      */
     getChatSettings: async (
       params: GetChatSettingsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChatSettingsResponse, 200, 400 | 401>({
         path: '/chat/settings',
@@ -1798,7 +1798,7 @@ export class TwitchApi {
     updateChatSettings: async (
       params: UpdateChatSettingsParams,
       body: UpdateChatSettingsBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateChatSettingsResponse, 200, 400 | 401 | 403>({
         path: '/chat/settings',
@@ -1843,7 +1843,7 @@ export class TwitchApi {
     sendChatAnnouncement: async (
       params: SendChatAnnouncementParams,
       body: SendChatAnnouncementBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/chat/announcements',
@@ -1906,7 +1906,7 @@ export class TwitchApi {
      */
     sendShoutout: async (
       params: SendShoutoutParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 429>({
         path: '/chat/shoutouts',
@@ -1960,7 +1960,7 @@ export class TwitchApi {
      */
     sendChatMessage: async (
       body: SendChatMessageBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<SendChatMessageResponse, 200, 400 | 401 | 403 | 422>({
         path: '/chat/messages',
@@ -1999,7 +1999,7 @@ export class TwitchApi {
      */
     getUserChatColor: async (
       params: GetUserChatColorParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetUserChatColorResponse, 200, 400 | 401>({
         path: '/chat/color',
@@ -2042,7 +2042,7 @@ export class TwitchApi {
      */
     updateUserChatColor: async (
       params: UpdateUserChatColorParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/chat/color',
@@ -2100,7 +2100,7 @@ export class TwitchApi {
      */
     createClip: async (
       params: CreateClipParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateClipResponse, 202, 400 | 401 | 403 | 404>({
         path: '/clips',
@@ -2148,7 +2148,7 @@ export class TwitchApi {
      */
     getClips: async (
       params: GetClipsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetClipsResponse, 200, 400 | 401 | 404>({
         path: '/clips',
@@ -2180,7 +2180,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduits
      */
-    getConduits: async (options: CallApiOptions['options']) => 
+    getConduits: async (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetConduitsResponse, 200, 401>({
         path: '/eventsub/conduits',
         options,
@@ -2218,7 +2218,7 @@ export class TwitchApi {
      */
     createConduits: async (
       body: CreateConduitsBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateConduitsResponse, 200, 400 | 401 | 429>({
         path: '/eventsub/conduits',
@@ -2261,7 +2261,7 @@ export class TwitchApi {
      */
     updateConduits: async (
       body: UpdateConduitsBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateConduitsResponse, 200, 400 | 401 | 404>({
         path: '/eventsub/conduits',
@@ -2303,7 +2303,7 @@ export class TwitchApi {
      */
     deleteConduit: async (
       params: DeleteConduitParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/eventsub/conduits',
@@ -2345,7 +2345,7 @@ export class TwitchApi {
      */
     getConduitShards: async (
       params: GetConduitShardsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetConduitShardsResponse, 200, 400 | 401 | 404>({
         path: '/eventsub/conduits/shards',
@@ -2388,7 +2388,7 @@ export class TwitchApi {
      */
     updateConduitShards: async (
       body: UpdateConduitShardsBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateConduitShardsResponse, 202, 400 | 401 | 404>({
         path: '/eventsub/conduits/shards',
@@ -2425,7 +2425,7 @@ export class TwitchApi {
      */
     getContentClassificationLabels: async (
       params: GetContentClassificationLabelsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetContentClassificationLabelsResponse, 200, 400 | 401 | 500>({
         path: '/content_classification_labels',
@@ -2489,7 +2489,7 @@ export class TwitchApi {
      */
     getDropsEntitlements: async (
       params: GetDropsEntitlementsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetDropsEntitlementsResponse, 200, 400 | 401 | 403 | 500>({
         path: '/entitlements/drops',
@@ -2539,7 +2539,7 @@ export class TwitchApi {
      */
     updateDropsEntitlements: async (
       body: UpdateDropsEntitlementsBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateDropsEntitlementsResponse, 200, 400 | 401 | 500>({
         path: '/entitlements/drops',
@@ -2588,7 +2588,7 @@ export class TwitchApi {
      */
     getExtensionConfigurationSegment: async (
       params: GetExtensionConfigurationSegmentParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionConfigurationSegmentResponse, 200, 400 | 401 | 429>({
         path: '/extensions/configurations',
@@ -2628,7 +2628,7 @@ export class TwitchApi {
      */
     setExtensionConfigurationSegment: async (
       body: SetExtensionConfigurationSegmentBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/configurations',
@@ -2671,7 +2671,7 @@ export class TwitchApi {
     setExtensionRequiredConfiguration: async (
       params: SetExtensionRequiredConfigurationParams,
       body: SetExtensionRequiredConfigurationBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/required_configuration',
@@ -2751,7 +2751,7 @@ export class TwitchApi {
      */
     sendExtensionPubSubMessage: async (
       body: SendExtensionPubSubMessageBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 422>({
         path: '/extensions/pubsub',
@@ -2797,7 +2797,7 @@ export class TwitchApi {
      */
     getExtensionLiveChannels: async (
       params: GetExtensionLiveChannelsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionLiveChannelsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/live',
@@ -2833,7 +2833,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: async (options: CallApiOptions['options']) => 
+    getExtensionSecrets: async (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetExtensionSecretsResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
         options,
@@ -2870,7 +2870,7 @@ export class TwitchApi {
      */
     createExtensionSecret: async (
       params: CreateExtensionSecretParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateExtensionSecretResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
@@ -2917,7 +2917,7 @@ export class TwitchApi {
     sendExtensionChatMessage: async (
       params: SendExtensionChatMessageParams,
       body: SendExtensionChatMessageBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/chat',
@@ -2962,7 +2962,7 @@ export class TwitchApi {
      */
     getExtensions: async (
       params: GetExtensionsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions',
@@ -3004,7 +3004,7 @@ export class TwitchApi {
      */
     getReleasedExtensions: async (
       params: GetReleasedExtensionsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetReleasedExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/released',
@@ -3042,7 +3042,7 @@ export class TwitchApi {
      */
     getExtensionBitsProducts: async (
       params: GetExtensionBitsProductsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetExtensionBitsProductsResponse, 200, 400 | 401>({
         path: '/bits/extensions',
@@ -3087,7 +3087,7 @@ export class TwitchApi {
      */
     updateExtensionBitsProduct: async (
       body: UpdateExtensionBitsProductBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateExtensionBitsProductResponse, 200, 400 | 401>({
         path: '/bits/extensions',
@@ -3155,7 +3155,7 @@ export class TwitchApi {
      */
     createEventSubSubscription: async (
       body: CreateEventSubSubscriptionBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateEventSubSubscriptionResponse, 202, 400 | 401 | 403 | 409 | 429>({
         path: '/eventsub/subscriptions',
@@ -3200,7 +3200,7 @@ export class TwitchApi {
      */
     deleteEventSubSubscription: async (
       params: DeleteEventSubSubscriptionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/eventsub/subscriptions',
@@ -3248,7 +3248,7 @@ export class TwitchApi {
      */
     getEventSubSubscriptions: async (
       params: GetEventSubSubscriptionsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetEventSubSubscriptionsResponse, 200, 400 | 401>({
         path: '/eventsub/subscriptions',
@@ -3289,7 +3289,7 @@ export class TwitchApi {
      */
     getTopGames: async (
       params: GetTopGamesParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetTopGamesResponse, 200, 400 | 401>({
         path: '/games/top',
@@ -3330,7 +3330,7 @@ export class TwitchApi {
      */
     getGames: async (
       params: GetGamesParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetGamesResponse, 200, 400 | 401>({
         path: '/games',
@@ -3374,7 +3374,7 @@ export class TwitchApi {
      */
     getCreatorGoals: async (
       params: GetCreatorGoalsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetCreatorGoalsResponse, 200, 400 | 401>({
         path: '/goals',
@@ -3412,7 +3412,7 @@ export class TwitchApi {
      */
     getChannelGuestStarSettings: async (
       params: GetChannelGuestStarSettingsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelGuestStarSettingsResponse, 200, 400 | 403>({
         path: '/guest_star/channel_settings',
@@ -3448,7 +3448,7 @@ export class TwitchApi {
     updateChannelGuestStarSettings: async (
       params: UpdateChannelGuestStarSettingsParams,
       body: UpdateChannelGuestStarSettingsBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400>({
         path: '/guest_star/channel_settings',
@@ -3486,7 +3486,7 @@ export class TwitchApi {
      */
     getGuestStarSession: async (
       params: GetGuestStarSessionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetGuestStarSessionResponse, 200, 400 | 401>({
         path: '/guest_star/session',
@@ -3526,7 +3526,7 @@ export class TwitchApi {
      */
     createGuestStarSession: async (
       params: CreateGuestStarSessionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateGuestStarSessionResponse, 200, 400 | 401 | 403>({
         path: '/guest_star/session',
@@ -3564,7 +3564,7 @@ export class TwitchApi {
      */
     endGuestStarSession: async (
       params: EndGuestStarSessionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 403>({
         path: '/guest_star/session',
@@ -3597,7 +3597,7 @@ export class TwitchApi {
      */
     getGuestStarInvites: async (
       params: GetGuestStarInvitesParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetGuestStarInvitesResponse, 200, 400>({
         path: '/guest_star/invites',
@@ -3637,7 +3637,7 @@ export class TwitchApi {
      */
     sendGuestStarInvite: async (
       params: SendGuestStarInviteParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 403>({
         path: '/guest_star/invites',
@@ -3676,7 +3676,7 @@ export class TwitchApi {
      */
     deleteGuestStarInvite: async (
       params: DeleteGuestStarInviteParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 404>({
         path: '/guest_star/invites',
@@ -3725,7 +3725,7 @@ export class TwitchApi {
      */
     assignGuestStarSlot: async (
       params: AssignGuestStarSlotParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403>({
         path: '/guest_star/slot',
@@ -3761,7 +3761,7 @@ export class TwitchApi {
      */
     updateGuestStarSlot: async (
       params: UpdateGuestStarSlotParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400>({
         path: '/guest_star/slot',
@@ -3807,7 +3807,7 @@ export class TwitchApi {
      */
     deleteGuestStarSlot: async (
       params: DeleteGuestStarSlotParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 403 | 404>({
         path: '/guest_star/slot',
@@ -3849,7 +3849,7 @@ export class TwitchApi {
      */
     updateGuestStarSlotSettings: async (
       params: UpdateGuestStarSlotSettingsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 403>({
         path: '/guest_star/slot_settings',
@@ -3890,7 +3890,7 @@ export class TwitchApi {
      */
     getHypeTrainEvents: async (
       params: GetHypeTrainEventsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetHypeTrainEventsResponse, 200, 401>({
         path: '/hypetrain/events',
@@ -3956,7 +3956,7 @@ export class TwitchApi {
     checkAutoModStatus: async (
       params: CheckAutoModStatusParams,
       body: CheckAutoModStatusBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CheckAutoModStatusResponse, 200, 400 | 401 | 403 | 429>({
         path: '/moderation/enforcements/status',
@@ -4011,7 +4011,7 @@ export class TwitchApi {
      */
     manageHeldAutoModMessages: async (
       body: ManageHeldAutoModMessagesBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404>({
         path: '/moderation/automod/message',
@@ -4057,7 +4057,7 @@ export class TwitchApi {
      */
     getAutoModSettings: async (
       params: GetAutoModSettingsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetAutoModSettingsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/automod/settings',
@@ -4119,7 +4119,7 @@ export class TwitchApi {
     updateAutoModSettings: async (
       params: UpdateAutoModSettingsParams,
       body: UpdateAutoModSettingsBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateAutoModSettingsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/automod/settings',
@@ -4161,7 +4161,7 @@ export class TwitchApi {
      */
     getBannedUsers: async (
       params: GetBannedUsersParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetBannedUsersResponse, 200, 400 | 401>({
         path: '/moderation/banned',
@@ -4227,7 +4227,7 @@ export class TwitchApi {
     banUser: async (
       params: BanUserParams,
       body: BanUserBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<BanUserResponse, 200, 400 | 401 | 403 | 409 | 429>({
         path: '/moderation/bans',
@@ -4286,7 +4286,7 @@ export class TwitchApi {
      */
     unbanUser: async (
       params: UnbanUserParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 409 | 429>({
         path: '/moderation/bans',
@@ -4332,7 +4332,7 @@ export class TwitchApi {
      */
     getBlockedTerms: async (
       params: GetBlockedTermsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetBlockedTermsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4380,7 +4380,7 @@ export class TwitchApi {
     addBlockedTerm: async (
       params: AddBlockedTermParams,
       body: AddBlockedTermBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<AddBlockedTermResponse, 200, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4428,7 +4428,7 @@ export class TwitchApi {
      */
     removeBlockedTerm: async (
       params: RemoveBlockedTermParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4478,7 +4478,7 @@ export class TwitchApi {
      */
     deleteChatMessages: async (
       params: DeleteChatMessagesParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404>({
         path: '/moderation/chat',
@@ -4487,7 +4487,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Gets a list of channels that the specified user has moderator privileges in.
+     * Gets a list of channels that the specified user has moderator privileges in.
      *
      * __Authorization:__
      *
@@ -4514,7 +4514,7 @@ export class TwitchApi {
      */
     getModeratedChannels: async (
       params: GetModeratedChannelsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetModeratedChannelsResponse, 200, 400 | 401 | 500>({
         path: '/moderation/channels',
@@ -4554,7 +4554,7 @@ export class TwitchApi {
      */
     getModerators: async (
       params: GetModeratorsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetModeratorsResponse, 200, 400 | 401>({
         path: '/moderation/moderators',
@@ -4607,7 +4607,7 @@ export class TwitchApi {
      */
     addChannelModerator: async (
       params: AddChannelModeratorParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 422 | 429>({
         path: '/moderation/moderators',
@@ -4656,7 +4656,7 @@ export class TwitchApi {
      */
     removeChannelModerator: async (
       params: RemoveChannelModeratorParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 429>({
         path: '/moderation/moderators',
@@ -4699,7 +4699,7 @@ export class TwitchApi {
      */
     getVIPs: async (
       params: GetVIPsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetVIPsResponse, 200, 400 | 401>({
         path: '/channels/vips',
@@ -4769,7 +4769,7 @@ export class TwitchApi {
      */
     addChannelVIP: async (
       params: AddChannelVIPParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429>({
         path: '/channels/vips',
@@ -4832,7 +4832,7 @@ export class TwitchApi {
      */
     removeChannelVIP: async (
       params: RemoveChannelVIPParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 422 | 429>({
         path: '/channels/vips',
@@ -4883,7 +4883,7 @@ export class TwitchApi {
     updateShieldModeStatus: async (
       params: UpdateShieldModeStatusParams,
       body: UpdateShieldModeStatusBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateShieldModeStatusResponse, 200, 400 | 401 | 403>({
         path: '/moderation/shield_mode',
@@ -4932,7 +4932,7 @@ export class TwitchApi {
      */
     getShieldModeStatus: async (
       params: GetShieldModeStatusParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetShieldModeStatusResponse, 200, 400 | 401 | 403>({
         path: '/moderation/shield_mode',
@@ -4980,7 +4980,7 @@ export class TwitchApi {
      */
     getPolls: async (
       params: GetPollsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetPollsResponse, 200, 400 | 401 | 404>({
         path: '/polls',
@@ -5033,7 +5033,7 @@ export class TwitchApi {
      */
     createPoll: async (
       body: CreatePollBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreatePollResponse, 200, 400 | 401>({
         path: '/polls',
@@ -5078,7 +5078,7 @@ export class TwitchApi {
      */
     endPoll: async (
       body: EndPollBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<EndPollResponse, 200, 400 | 401>({
         path: '/polls',
@@ -5121,7 +5121,7 @@ export class TwitchApi {
      */
     getPredictions: async (
       params: GetPredictionsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetPredictionsResponse, 200, 400 | 401>({
         path: '/predictions',
@@ -5174,7 +5174,7 @@ export class TwitchApi {
      */
     createPrediction: async (
       body: CreatePredictionBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreatePredictionResponse, 200, 400 | 401 | 429>({
         path: '/predictions',
@@ -5226,7 +5226,7 @@ export class TwitchApi {
      */
     endPrediction: async (
       body: EndPredictionBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<EndPredictionResponse, 200, 400 | 401 | 404>({
         path: '/predictions',
@@ -5294,7 +5294,7 @@ export class TwitchApi {
      */
     startRaid: async (
       params: StartRaidParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<StartRaidResponse, 200, 400 | 401 | 404 | 409 | 429>({
         path: '/raids',
@@ -5347,7 +5347,7 @@ export class TwitchApi {
      */
     cancelRaid: async (
       params: CancelRaidParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404 | 429>({
         path: '/raids',
@@ -5399,7 +5399,7 @@ export class TwitchApi {
      */
     getChannelStreamSchedule: async (
       params: GetChannelStreamScheduleParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelStreamScheduleResponse, 200, 400 | 401 | 403 | 404>({
         path: '/schedule',
@@ -5438,7 +5438,7 @@ export class TwitchApi {
      */
     getChannelICalendar: async (
       params: GetChannelICalendarParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<string, 200, 400>({
         path: '/schedule/icalendar',
@@ -5486,7 +5486,7 @@ export class TwitchApi {
      */
     updateChannelStreamSchedule: async (
       params: UpdateChannelStreamScheduleParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/schedule/settings',
@@ -5538,7 +5538,7 @@ export class TwitchApi {
     createChannelStreamScheduleSegment: async (
       params: CreateChannelStreamScheduleSegmentParams,
       body: CreateChannelStreamScheduleSegmentBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 403>({
         path: '/schedule/segment',
@@ -5595,7 +5595,7 @@ export class TwitchApi {
     updateChannelStreamScheduleSegment: async (
       params: UpdateChannelStreamScheduleSegmentParams,
       body: UpdateChannelStreamScheduleSegmentBody | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 404>({
         path: '/schedule/segment',
@@ -5642,7 +5642,7 @@ export class TwitchApi {
      */
     deleteChannelStreamScheduleSegment: async (
       params: DeleteChannelStreamScheduleSegmentParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/schedule/segment',
@@ -5685,7 +5685,7 @@ export class TwitchApi {
      */
     searchCategories: async (
       params: SearchCategoriesParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<SearchCategoriesResponse, 200, 400 | 401>({
         path: '/search/categories',
@@ -5729,7 +5729,7 @@ export class TwitchApi {
      */
     searchChannels: async (
       params: SearchChannelsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<SearchChannelsResponse, 200, 400 | 401>({
         path: '/search/channels',
@@ -5772,7 +5772,7 @@ export class TwitchApi {
      */
     getStreamKey: async (
       params: GetStreamKeyParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetStreamKeyResponse, 200, 400 | 401>({
         path: '/streams/key',
@@ -5810,7 +5810,7 @@ export class TwitchApi {
      */
     getStreams: async (
       params: GetStreamsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetStreamsResponse, 200, 400 | 401>({
         path: '/streams',
@@ -5850,7 +5850,7 @@ export class TwitchApi {
      */
     getFollowedStreams: async (
       params: GetFollowedStreamsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetFollowedStreamsResponse, 200, 400 | 401>({
         path: '/streams/followed',
@@ -5907,7 +5907,7 @@ export class TwitchApi {
      */
     createStreamMarker: async (
       body: CreateStreamMarkerBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CreateStreamMarkerResponse, 200, 400 | 401 | 403 | 404>({
         path: '/streams/markers',
@@ -5955,7 +5955,7 @@ export class TwitchApi {
      */
     getStreamMarkers: async (
       params: GetStreamMarkersParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetStreamMarkersResponse, 200, 400 | 401 | 403 | 404>({
         path: '/streams/markers',
@@ -5999,7 +5999,7 @@ export class TwitchApi {
      */
     getBroadcasterSubscriptions: async (
       params: GetBroadcasterSubscriptionsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetBroadcasterSubscriptionsResponse, 200, 400 | 401>({
         path: '/subscriptions',
@@ -6046,7 +6046,7 @@ export class TwitchApi {
      */
     checkUserSubscription: async (
       params: CheckUserSubscriptionParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<CheckUserSubscriptionResponse, 200, 400 | 401 | 404>({
         path: '/subscriptions/user',
@@ -6089,7 +6089,7 @@ export class TwitchApi {
      */
     getAllStreamTags: async (
       params: GetAllStreamTagsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetAllStreamTagsResponse, 200, 400 | 401>({
         path: '/tags/streams',
@@ -6130,7 +6130,7 @@ export class TwitchApi {
      */
     getStreamTags: async (
       params: GetStreamTagsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetStreamTagsResponse, 200, 400 | 401>({
         path: '/streams/tags',
@@ -6174,7 +6174,7 @@ export class TwitchApi {
      */
     getChannelTeams: async (
       params: GetChannelTeamsParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetChannelTeamsResponse, 200, 400 | 401 | 404>({
         path: '/teams/channel',
@@ -6196,7 +6196,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the team’s information.
+     * Successfully retrieved the team's information.
      *
      * _400 Bad Request_
      *
@@ -6218,7 +6218,7 @@ export class TwitchApi {
      */
     getTeams: async (
       params: GetTeamsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetTeamsResponse, 200, 400 | 401 | 404>({
         path: '/teams',
@@ -6248,7 +6248,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the specified users’ information.
+     * Successfully retrieved the specified users' information.
      *
      * _400 Bad Request_
      *
@@ -6265,7 +6265,7 @@ export class TwitchApi {
      */
     getUsers: async (
       params: GetUsersParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetUsersResponse, 200, 400 | 401>({
         path: '/users',
@@ -6289,7 +6289,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully updated the specified user’s information.
+     * Successfully updated the specified user's information.
      *
      * _400 Bad Request_
      *
@@ -6306,7 +6306,7 @@ export class TwitchApi {
      */
     updateUser: async (
       params: UpdateUserParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateUserResponse, 200, 400 | 401>({
         path: '/users',
@@ -6329,7 +6329,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s list of blocked users.
+     * Successfully retrieved the broadcaster's list of blocked users.
      *
      * _400 Bad Request_
      *
@@ -6347,7 +6347,7 @@ export class TwitchApi {
      */
     getUserBlockList: async (
       params: GetUserBlockListParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetUserBlockListResponse, 200, 400 | 401>({
         path: '/users/blocks',
@@ -6391,7 +6391,7 @@ export class TwitchApi {
      */
     blockUser: async (
       params: BlockUserParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/users/blocks',
@@ -6431,7 +6431,7 @@ export class TwitchApi {
      */
     unblockUser: async (
       params: UnblockUserParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/users/blocks',
@@ -6454,7 +6454,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the user’s installed extensions.
+     * Successfully retrieved the user's installed extensions.
      *
      * _401 Unauthorized_
      *
@@ -6465,7 +6465,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: async (options: CallApiOptions['options']) => 
+    getUserExtensions: async (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetUserExtensionsResponse, 200, 401>({
         path: '/users/extensions/list',
         options,
@@ -6487,7 +6487,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the user’s active extensions.
+     * Successfully retrieved the user's active extensions.
      *
      * _400 Bad Request_
      *
@@ -6503,7 +6503,7 @@ export class TwitchApi {
      */
     getUserActiveExtensions: async (
       params: GetUserActiveExtensionsParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetUserActiveExtensionsResponse, 200, 400 | 401>({
         path: '/users/extensions',
@@ -6548,7 +6548,7 @@ export class TwitchApi {
      */
     updateUserExtensions: async (
       body: UpdateUserExtensionsBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<UpdateUserExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/users/extensions',
@@ -6602,7 +6602,7 @@ export class TwitchApi {
      */
     getVideos: async (
       params: GetVideosParams | null | undefined = null,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<GetVideosResponse, 200, 400 | 401 | 404>({
         path: '/videos',
@@ -6643,7 +6643,7 @@ export class TwitchApi {
      */
     deleteVideos: async (
       params: DeleteVideosParams,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<DeleteVideosResponse, 200, 400 | 401>({
         path: '/videos',
@@ -6712,7 +6712,7 @@ export class TwitchApi {
     sendWhisper: async (
       params: SendWhisperParams,
       body: SendWhisperBody,
-      options: CallApiOptions['options']
+      options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 429>({
         path: '/whispers',

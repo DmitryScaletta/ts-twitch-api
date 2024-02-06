@@ -1114,8 +1114,8 @@ export interface paths {
   };
   "/moderation/channels": {
     /**
-     * BETA Gets a list of channels that the specified user has moderator privileges in.
-     * @description BETA Gets a list of channels that the specified user has moderator privileges in.
+     * Gets a list of channels that the specified user has moderator privileges in.
+     * @description Gets a list of channels that the specified user has moderator privileges in.
      *
      * __Authorization:__
      *
@@ -2529,7 +2529,7 @@ export interface components {
         /** @description A URL to the large version (112px x 112px) of the emote. */
         url_4x: string;
       };
-      /** @description The subscriber tier at which the emote is unlocked. This field contains the tier information only if `emote_type` is set to `subscriptions`, otherwise, it’s an empty string. */
+      /** @description The subscriber tier at which the emote is unlocked. This field contains the tier information only if `emote_type` is set to `subscriptions`, otherwise, it's an empty string. */
       tier: string;
       /**
        * @description The type of emote. The possible values are:
@@ -2566,7 +2566,7 @@ export interface components {
       theme_mode: ("dark" | "light")[];
     };
     GetChannelEmotesResponse: {
-      /** @description The list of emotes that the specified broadcaster created. If the broadcaster hasn’t created custom emotes, the list is empty. */
+      /** @description The list of emotes that the specified broadcaster created. If the broadcaster hasn't created custom emotes, the list is empty. */
       data: components["schemas"]["ChannelEmote"][];
       /** @description A templated URL. Use the values from the `id`, `format`, `scale`, and `theme_mode` fields to replace the like-named placeholder strings in the templated URL to create a CDN (content delivery network) URL that you use to fetch the emote. For information about what the template looks like and how to use it to fetch emotes, see [Emote CDN URL format](https://dev.twitch.tv/docs/irc/emotes#cdn-template). You should use this template instead of using the URLs in the `images` object. */
       template: string;
@@ -5268,9 +5268,9 @@ export interface components {
     User: {
       /** @description An ID that identifies the user. */
       id: string;
-      /** @description The user’s login name. */
+      /** @description The user's login name. */
       login: string;
-      /** @description The user’s display name. */
+      /** @description The user's display name. */
       display_name: string;
       /**
        * @description The type of user. Possible values are:
@@ -5291,28 +5291,28 @@ export interface components {
        * @enum {string}
        */
       broadcaster_type: "affiliate" | "partner" | "";
-      /** @description The user’s description of their channel. */
+      /** @description The user's description of their channel. */
       description: string;
-      /** @description A URL to the user’s profile image. */
+      /** @description A URL to the user's profile image. */
       profile_image_url: string;
-      /** @description A URL to the user’s offline image. */
+      /** @description A URL to the user's offline image. */
       offline_image_url: string;
       /**
        * Format: int32
-       * @description The number of times the user’s channel has been viewed.
+       * @description The number of times the user's channel has been viewed.
        *
-       * **NOTE**: This field has been deprecated (see [Get Users API endpoint – “view\_count” deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
+       * **NOTE**: This field has been deprecated (see [Get Users API endpoint – "view\_count" deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
        */
       view_count: number;
       /**
-       * @description The user’s verified email address. The object includes this field only if the user access token includes the **user:read:email** scope.
+       * @description The user's verified email address. The object includes this field only if the user access token includes the **user:read:email** scope.
        *
        * If the request contains more than one user, only the user associated with the access token that provided consent will include an email address — the email address for all other users will be empty.
        */
       email?: string;
       /**
        * Format: date-time
-       * @description The UTC date and time that the user’s account was created. The timestamp is in RFC3339 format.
+       * @description The UTC date and time that the user's account was created. The timestamp is in RFC3339 format.
        */
       created_at: string;
     };
@@ -5339,9 +5339,9 @@ export interface components {
     UserExtension: {
       /** @description An ID that identifies the extension. */
       id: string;
-      /** @description The extension’s version. */
+      /** @description The extension's version. */
       version: string;
-      /** @description The extension’s name. */
+      /** @description The extension's name. */
       name: string;
       /** @description A Boolean value that determines whether the extension is configured and can be activated. Is **true** if the extension is configured and can be activated. */
       can_activate: boolean;
@@ -5490,17 +5490,17 @@ export interface components {
     Video: {
       /** @description An ID that identifies the video. */
       id: string;
-      /** @description The ID of the stream that the video originated from if the video’s type is “archive;” otherwise, **null**. */
+      /** @description The ID of the stream that the video originated from if the video's type is "archive;" otherwise, **null**. */
       stream_id: string | null;
       /** @description The ID of the broadcaster that owns the video. */
       user_id: string;
-      /** @description The broadcaster’s login name. */
+      /** @description The broadcaster's login name. */
       user_login: string;
-      /** @description The broadcaster’s display name. */
+      /** @description The broadcaster's display name. */
       user_name: string;
-      /** @description The video’s title. */
+      /** @description The video's title. */
       title: string;
-      /** @description The video’s description. */
+      /** @description The video's description. */
       description: string;
       /**
        * Format: date-time
@@ -5512,21 +5512,21 @@ export interface components {
        * @description The date and time, in UTC, of when the video was published. The timestamp is in RFC3339 format.
        */
       published_at: string;
-      /** @description The video’s URL. */
+      /** @description The video's URL. */
       url: string;
       /** @description A URL to a thumbnail image of the video. Before using the URL, you must replace the `%{width}` and `%{height}` placeholders with the width and height of the thumbnail you want returned. Due to current limitations, `${width}` must be 320 and `${height}` must be 180. */
       thumbnail_url: string;
-      /** @description The video’s viewable state. Always set to **public**. */
+      /** @description The video's viewable state. Always set to **public**. */
       viewable: string;
       /**
        * Format: int32
        * @description The number of times that users have watched the video.
        */
       view_count: number;
-      /** @description The ISO 639-1 two-letter language code that the video was broadcast in. For example, the language code is DE if the video was broadcast in German. For a list of supported languages, see [Supported Stream Language](https://help.twitch.tv/s/article/languages-on-twitch#streamlang). The language value is “other” if the video was broadcast in a language not in the list of supported languages. */
+      /** @description The ISO 639-1 two-letter language code that the video was broadcast in. For example, the language code is DE if the video was broadcast in German. For a list of supported languages, see [Supported Stream Language](https://help.twitch.tv/s/article/languages-on-twitch#streamlang). The language value is "other" if the video was broadcast in a language not in the list of supported languages. */
       language: string;
       /**
-       * @description The video’s type. Possible values are:
+       * @description The video's type. Possible values are:
        *
        * * archive — An on-demand video (VOD) of one of the broadcaster's past streams.
        * * highlight — A highlight reel of one of the broadcaster's past streams. See [Creating Highlights](https://help.twitch.tv/s/article/creating-highlights-and-stream-markers).
@@ -5534,7 +5534,7 @@ export interface components {
        * @enum {string}
        */
       type: "archive" | "highlight" | "upload";
-      /** @description The video’s length in ISO 8601 duration format. For example, 3m21s represents 3 minutes, 21 seconds. */
+      /** @description The video's length in ISO 8601 duration format. For example, 3m21s represents 3 minutes, 21 seconds. */
       duration: string;
       /** @description The segments that Twitch Audio Recognition muted; otherwise, **null**. */
       muted_segments: {
@@ -5555,7 +5555,7 @@ export interface components {
       data: components["schemas"]["Video"][];
       /** @description Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
       pagination?: {
-        /** @description The cursor used to get the next page of results. Use the cursor to set the request’s _after_ or _before_ query parameter depending on whether you’re paging forwards or backwards through the results. */
+        /** @description The cursor used to get the next page of results. Use the cursor to set the request's _after_ or _before_ query parameter depending on whether you're paging forwards or backwards through the results. */
         cursor?: string;
       };
     };
@@ -6192,7 +6192,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the broadcaster’s list of editors. */
+      /** @description Successfully retrieved the broadcaster's list of editors. */
       200: {
         content: {
           "application/json": components["schemas"]["GetChannelEditorsResponse"];
@@ -6236,7 +6236,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the broadcaster’s list of followers. */
+      /** @description Successfully retrieved the broadcaster's list of followers. */
       200: {
         content: {
           "application/json": components["schemas"]["GetFollowedChannelsResponse"];
@@ -6922,7 +6922,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved broadcaster’s list of custom emotes. */
+      /** @description Successfully retrieved broadcaster's list of custom emotes. */
       200: {
         content: {
           "application/json": components["schemas"]["GetChannelEmotesResponse"];
@@ -6958,7 +6958,7 @@ export interface operations {
    */
   "get-global-emotes": {
     responses: {
-      /** @description Successfully retrieved Twitch’s list of global emotes. */
+      /** @description Successfully retrieved Twitch's list of global emotes. */
       200: {
         content: {
           "application/json": components["schemas"]["GetGlobalEmotesResponse"];
@@ -10387,8 +10387,8 @@ export interface operations {
     };
   };
   /**
-   * BETA Gets a list of channels that the specified user has moderator privileges in.
-   * @description BETA Gets a list of channels that the specified user has moderator privileges in.
+   * Gets a list of channels that the specified user has moderator privileges in.
+   * @description Gets a list of channels that the specified user has moderator privileges in.
    *
    * __Authorization:__
    *
@@ -12280,7 +12280,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the team’s information. */
+      /** @description Successfully retrieved the team's information. */
       200: {
         content: {
           "application/json": components["schemas"]["GetTeamsResponse"];
@@ -12332,7 +12332,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the specified users’ information. */
+      /** @description Successfully retrieved the specified users' information. */
       200: {
         content: {
           "application/json": components["schemas"]["GetUsersResponse"];
@@ -12377,7 +12377,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully updated the specified user’s information. */
+      /** @description Successfully updated the specified user's information. */
       200: {
         content: {
           "application/json": components["schemas"]["UpdateUserResponse"];
@@ -12418,7 +12418,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the broadcaster’s list of blocked users. */
+      /** @description Successfully retrieved the broadcaster's list of blocked users. */
       200: {
         content: {
           "application/json": components["schemas"]["GetUserBlockListResponse"];
@@ -12572,7 +12572,7 @@ export interface operations {
    */
   "get-user-extensions": {
     responses: {
-      /** @description Successfully retrieved the user’s installed extensions. */
+      /** @description Successfully retrieved the user's installed extensions. */
       200: {
         content: {
           "application/json": components["schemas"]["GetUserExtensionsResponse"];
@@ -12611,7 +12611,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the user’s active extensions. */
+      /** @description Successfully retrieved the user's active extensions. */
       200: {
         content: {
           "application/json": components["schemas"]["GetUserActiveExtensionsResponse"];
@@ -12687,7 +12687,7 @@ export interface operations {
     parameters: {
       query?: {
         /**
-         * @description A list of IDs that identify the videos you want to get. To get more than one video, include this parameter for each video you want to get. For example, `id=1234&id=5678`. You may specify a maximum of 100 IDs. The endpoint ignores duplicate IDs and IDs that weren’t found (if there’s at least one valid ID).
+         * @description A list of IDs that identify the videos you want to get. To get more than one video, include this parameter for each video you want to get. For example, `id=1234&id=5678`. You may specify a maximum of 100 IDs. The endpoint ignores duplicate IDs and IDs that weren't found (if there's at least one valid ID).
          *
          * The _id_, _user\_id_, and _game\_id_ parameters are mutually exclusive.
          */
@@ -12718,7 +12718,7 @@ export interface operations {
          * * month
          * * week
          *
-         * The default is “all,” which returns videos published in all periods.
+         * The default is "all," which returns videos published in all periods.
          *
          * Specify this parameter only if you specify the _game\_id_ or _user\_id_ query parameter.
          */
@@ -12730,20 +12730,20 @@ export interface operations {
          * * trending — Sort the results in descending order by biggest gains in viewership (i.e., highest trending video first).
          * * views — Sort the results in descending order by most views (i.e., highest number of views first).
          *
-         * The default is “time.”
+         * The default is "time."
          *
          * Specify this parameter only if you specify the _game\_id_ or _user\_id_ query parameter.
          */
         sort?: "time" | "trending" | "views";
         /**
-         * @description A filter used to filter the list of videos by the video’s type. Possible case-sensitive values are:
+         * @description A filter used to filter the list of videos by the video's type. Possible case-sensitive values are:
          *
          * * all
          * * archive — On-demand videos (VODs) of past streams.
          * * highlight — Highlight reels of past streams.
          * * upload — External videos that the broadcaster uploaded using the Video Producer.
          *
-         * The default is “all,” which returns all video types.
+         * The default is "all," which returns all video types.
          *
          * Specify this parameter only if you specify the _game\_id_ or _user\_id_ query parameter.
          */

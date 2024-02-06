@@ -45,9 +45,9 @@ type CallApiOptions = {
   params?: Record<string, any> | null;
   body?: Record<string, any> | null;
   requiresAuth?: boolean;
-  options: {
-    clientId?: string | null,
-    accessToken?: string | null,
+  options?: {
+    clientId?: string,
+    accessToken?: string,
     requestInit?: RequestInit,
   };
 };
@@ -77,10 +77,10 @@ export class TwitchApi {
     body,
     requiresAuth = true,
     options: {
-      clientId = null,
-      accessToken = null,
+      clientId,
+      accessToken,
       requestInit = {},
-    },
+    } = {},
   }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
@@ -128,7 +128,7 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: async (options: CallApiOptions['options']) => 
+%METHOD_NAME%: async (options: CallApiOptions['options'] = {}) => 
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
@@ -141,7 +141,7 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   body: %BODY_TYPE%,
-  options: CallApiOptions['options']
+  options: CallApiOptions['options'] = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
@@ -156,7 +156,7 @@ __URL:__
 ```ts
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
-  options: CallApiOptions['options']
+  options: CallApiOptions['options'] = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
@@ -172,7 +172,7 @@ __URL:__
 %METHOD_NAME%: async (
   params: %PARAMS_TYPE%,
   body: %BODY_TYPE%,
-  options: CallApiOptions['options']
+  options: CallApiOptions['options'] = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
