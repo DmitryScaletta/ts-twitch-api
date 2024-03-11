@@ -32,6 +32,7 @@ export type GetEmoteSetsParams = ParamsSchema<'get-emote-sets'>;
 export type GetChannelChatBadgesParams = ParamsSchema<'get-channel-chat-badges'>;
 export type GetChatSettingsParams = ParamsSchema<'get-chat-settings'>;
 export type UpdateChatSettingsParams = ParamsSchema<'update-chat-settings'>;
+export type GetUserEmotesParams = ParamsSchema<'get-user-emotes'>;
 export type SendChatAnnouncementParams = ParamsSchema<'send-chat-announcement'>;
 export type SendShoutoutParams = ParamsSchema<'send-a-shoutout'>;
 export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
@@ -74,6 +75,8 @@ export type UpdateAutoModSettingsParams = ParamsSchema<'update-automod-settings'
 export type GetBannedUsersParams = ParamsSchema<'get-banned-users'>;
 export type BanUserParams = ParamsSchema<'ban-user'>;
 export type UnbanUserParams = ParamsSchema<'unban-user'>;
+export type GetUnbanRequestsParams = ParamsSchema<'get-unban-requests'>;
+export type ResolveUnbanRequestsParams = ParamsSchema<'resolve-unban-requests'>;
 export type GetBlockedTermsParams = ParamsSchema<'get-blocked-terms'>;
 export type AddBlockedTermParams = ParamsSchema<'add-blocked-term'>;
 export type RemoveBlockedTermParams = ParamsSchema<'remove-blocked-term'>;
@@ -169,6 +172,7 @@ export type GetChannelChatBadgesResponse = Schema<'GetChannelChatBadgesResponse'
 export type GetGlobalChatBadgesResponse = Schema<'GetGlobalChatBadgesResponse'>;
 export type ChatSettings = Schema<'ChatSettings'>;
 export type GetChatSettingsResponse = Schema<'GetChatSettingsResponse'>;
+export type GetUserEmotesResponse = Schema<'GetUserEmotesResponse'>;
 export type UpdateChatSettingsBody = Schema<'UpdateChatSettingsBody'>;
 export type ChatSettingsUpdated = Schema<'ChatSettingsUpdated'>;
 export type UpdateChatSettingsResponse = Schema<'UpdateChatSettingsResponse'>;
@@ -225,6 +229,7 @@ export type CreatorGoal = Schema<'CreatorGoal'>;
 export type GetCreatorGoalsResponse = Schema<'GetCreatorGoalsResponse'>;
 export type GetChannelGuestStarSettingsResponse = Schema<'GetChannelGuestStarSettingsResponse'>;
 export type UpdateChannelGuestStarSettingsBody = Schema<'UpdateChannelGuestStarSettingsBody'>;
+export type Guest = Schema<'Guest'>;
 export type GuestStarSession = Schema<'GuestStarSession'>;
 export type GetGuestStarSessionResponse = Schema<'GetGuestStarSessionResponse'>;
 export type CreateGuestStarSessionResponse = Schema<'CreateGuestStarSessionResponse'>;
@@ -245,6 +250,8 @@ export type BannedUser = Schema<'BannedUser'>;
 export type GetBannedUsersResponse = Schema<'GetBannedUsersResponse'>;
 export type BanUserBody = Schema<'BanUserBody'>;
 export type BanUserResponse = Schema<'BanUserResponse'>;
+export type GetUnbanRequestsResponse = Schema<'GetUnbanRequestsResponse'>;
+export type ResolveUnbanRequestsResponse = Schema<'ResolveUnbanRequestsResponse'>;
 export type BlockedTerm = Schema<'BlockedTerm'>;
 export type GetBlockedTermsResponse = Schema<'GetBlockedTermsResponse'>;
 export type AddBlockedTermBody = Schema<'AddBlockedTermBody'>;
@@ -1808,6 +1815,48 @@ export class TwitchApi {
         options,
       }),
     /**
+     * BETA Retrieves emotes available to the user across all channels.
+     *
+     * __Authorization:__
+     *
+     * * Requires a user access token that includes the **user:read:emotes** scope.
+     * * Query parameter `user_id` must match the `user_id` in the user access token.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/chat/emotes/user`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the emotes.
+     *
+     * _400 Bad Request_
+     *
+     * * The _user\_id_ query parameter is required.
+     * * The ID in the _user\_id_ query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _user\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **user:read:emotes** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-user-emotes
+     */
+    getUserEmotes: async (
+      params: GetUserEmotesParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetUserEmotesResponse, 200, 400 | 401>({
+        path: '/chat/emotes/user',
+        params,
+        options,
+      }),
+    /**
      * Sends an announcement to the broadcaster’s chat room.
      *
      * __Authorization:__
@@ -2436,6 +2485,8 @@ export class TwitchApi {
   entitlements = {
     /**
      * Gets an organization’s list of entitlements that have been granted to a game, a user, or both.
+     *
+     * **NOTE:** Entitlements returned in the response body data are not guaranteed to be sorted by any field returned by the API. To retrieve **CLAIMED** or **FULFILLED** entitlements, use the `fulfillment_status` query parameter to filter results. To retrieve entitlements for a specific game, use the `game_id` query parameter to filter results.
      *
      * The following table identifies the request parameters that you may specify based on the type of access token used.
      *
@@ -3213,7 +3264,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token.
+     * If you use [Webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events) or [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. The token may include any scopes.
      *
@@ -4295,6 +4346,103 @@ export class TwitchApi {
         options,
       }),
     /**
+     * BETA Gets a list of unban requests for a broadcaster’s channel.
+     *
+     * __Authorization:__
+     *
+     * * Requires a user access token that includes the **moderator:read:unban\_requests** or **moderator:manage:unban\_requests** scope.
+     * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/moderation/unban_requests`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the list of unban requests.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The ID in the _broadcaster\_id_ query parameter is not valid.
+     * * The _moderator\_id_ query parameter is required.
+     * * The ID in the _moderator\_id_ query parameter is not valid.
+     * * The pagination cursor is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:read:unban\_requests** or **moderator:manage:unban\_requests** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-unban-requests
+     */
+    getUnbanRequests: async (
+      params: GetUnbanRequestsParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetUnbanRequestsResponse, 200, 400 | 401>({
+        path: '/moderation/unban_requests',
+        params,
+        options,
+      }),
+    /**
+     * BETA Resolves an unban request by approving or denying it.
+     *
+     * __Authorization:__
+     *
+     * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
+     * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/moderation/unban_requests`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully resolved the unban request.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The ID in the _broadcaster\_id_ query parameter is not valid.
+     * * The _moderator\_id_ query parameter is required.
+     * * The ID in the _moderator\_id_ query parameter is not valid.
+     * * The pagination cursor is not valid.
+     * * The broadcaster is not receiving unban requests
+     * * Invalid requested update
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:manage:unban\_requests** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _404 Not Found_
+     *
+     * The unban request ID was not found.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#resolve-unban-requests
+     */
+    resolveUnbanRequests: async (
+      params: ResolveUnbanRequestsParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<ResolveUnbanRequestsResponse, 200, 400 | 401 | 404>({
+        path: '/moderation/unban_requests',
+        method: 'PATCH',
+        params,
+        options,
+      }),
+    /**
      * Gets the broadcaster’s list of non-private, blocked words or phrases. These are the terms that the broadcaster or moderator added manually or that were denied by AutoMod.
      *
      * __Authorization:__
@@ -4958,7 +5106,7 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the broadcaster’s polls.
+     * Successfully retrieved the broadcaster's polls.
      *
      * _400 Bad Request_
      *
