@@ -11,11 +11,13 @@
         "hypetrain",
         "icalendar",
         "igdb",
+        "keyof",
         "leaderboard",
         "openapi",
         "screenshare",
         "shoutout",
         "shoutouts",
+        "tsup",
         "unban",
         "unfollow",
         "unfollows"
