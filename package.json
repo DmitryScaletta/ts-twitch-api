@@ -34,7 +34,7 @@
     "gen": "pnpm dlx openapi-typescript https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.11.26",
+    "@types/node": "^20.11.28",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.2"
