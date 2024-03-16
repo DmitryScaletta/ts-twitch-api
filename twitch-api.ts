@@ -416,10 +416,17 @@ export class TwitchApi {
       options.headers.set('Client-Id', clientId || this._clientId);
     }
     const response = await fetch(url, options);
+    const status = response.status as any;
+    let data = null;
+    if (status === 200 && path === '/schedule/icalendar') {
+      data = await response.text();
+    } else if (status !== 204) {
+      data = await response.json();
+    }
     return {
       ok: response.ok,
-      status: response.status as any,
-      data: await response.json(),
+      status,
+      data,
     };
   }
 

@@ -41,8 +41,8 @@ export const getResponseSchemaName = (endpointName: string) =>
 
 const parseResponseCodes = (responses: ResponsesObject) => {
   const responseCodesText = ['__Response Codes:__'];
-  const responseCodeSuccess = [];
-  const responseCodeError = [];
+  const responseCodeSuccess: string[] = [];
+  const responseCodeError: string[] = [];
   for (const [code, response] of Object.entries(responses)) {
     const { description } = response as ResponseObject;
     const desc = description!.split('__Examples__')[0]!.trim();
