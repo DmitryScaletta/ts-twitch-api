@@ -135,7 +135,7 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: async (options: CallApiOptions['options'] = {}) => 
+%METHOD_NAME%: (options: CallApiOptions['options'] = {}) => 
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
@@ -146,7 +146,7 @@ __URL:__
 ## method-signature-no-params-body
 
 ```ts
-%METHOD_NAME%: async (
+%METHOD_NAME%: (
   body: %BODY_TYPE%,
   options: CallApiOptions['options'] = {}
 ) =>
@@ -161,7 +161,7 @@ __URL:__
 ## method-signature-params-no-body
 
 ```ts
-%METHOD_NAME%: async (
+%METHOD_NAME%: (
   params: %PARAMS_TYPE%,
   options: CallApiOptions['options'] = {}
 ) =>
@@ -176,7 +176,7 @@ __URL:__
 ## method-signature-params-body
 
 ```ts
-%METHOD_NAME%: async (
+%METHOD_NAME%: (
   params: %PARAMS_TYPE%,
   body: %BODY_TYPE%,
   options: CallApiOptions['options'] = {}
