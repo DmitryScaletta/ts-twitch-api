@@ -478,7 +478,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#start-commercial
      */
-    startCommercial: async (
+    startCommercial: (
       body: StartCommercialBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -513,7 +513,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-ad-schedule
      */
-    getAdSchedule: async (
+    getAdSchedule: (
       params: GetAdScheduleParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -553,7 +553,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#snooze-next-ad
      */
-    snoozeNextAd: async (
+    snoozeNextAd: (
       params: SnoozeNextAdParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -604,7 +604,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-analytics
      */
-    getExtensionAnalytics: async (
+    getExtensionAnalytics: (
       params: GetExtensionAnalyticsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -652,7 +652,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-game-analytics
      */
-    getGameAnalytics: async (
+    getGameAnalytics: (
       params: GetGameAnalyticsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -697,7 +697,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-bits-leaderboard
      */
-    getBitsLeaderboard: async (
+    getBitsLeaderboard: (
       params: GetBitsLeaderboardParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -730,7 +730,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-cheermotes
      */
-    getCheermotes: async (
+    getCheermotes: (
       params: GetCheermotesParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -775,7 +775,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-transactions
      */
-    getExtensionTransactions: async (
+    getExtensionTransactions: (
       params: GetExtensionTransactionsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -823,7 +823,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-information
      */
-    getChannelInformation: async (
+    getChannelInformation: (
       params: GetChannelInformationParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -889,7 +889,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#modify-channel-information
      */
-    modifyChannelInformation: async (
+    modifyChannelInformation: (
       params: ModifyChannelInformationParams,
       body: ModifyChannelInformationBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -932,7 +932,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-editors
      */
-    getChannelEditors: async (
+    getChannelEditors: (
       params: GetChannelEditorsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -978,7 +978,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-followed-channels
      */
-    getFollowedChannels: async (
+    getFollowedChannels: (
       params: GetFollowedChannelsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1027,7 +1027,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-followers
      */
-    getChannelFollowers: async (
+    getChannelFollowers: (
       params: GetChannelFollowersParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1084,7 +1084,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-custom-rewards
      */
-    createCustomRewards: async (
+    createCustomRewards: (
       params: CreateCustomRewardsParams,
       body: CreateCustomRewardsBody,
       options: CallApiOptions['options'] = {}
@@ -1140,7 +1140,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-custom-reward
      */
-    deleteCustomReward: async (
+    deleteCustomReward: (
       params: DeleteCustomRewardParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1193,7 +1193,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-custom-reward
      */
-    getCustomReward: async (
+    getCustomReward: (
       params: GetCustomRewardParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1207,7 +1207,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/api/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
      * __Request Body:__
      *
@@ -1225,6 +1225,7 @@ export class TwitchApi {
      *
      * _400 Bad Request_
      *
+     * ul>
      * * The _broadcaster\_id_ query parameter is required.
      * * The _id_ query parameter is required.
      * * The `title` must contain a minimum of 1 character and a maximum of 45 characters.
@@ -1255,7 +1256,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-custom-reward
      */
-    updateCustomReward: async (
+    updateCustomReward: (
       params: UpdateCustomRewardParams,
       body: UpdateCustomRewardBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -1312,7 +1313,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-custom-reward-redemption
      */
-    getCustomRewardRedemption: async (
+    getCustomRewardRedemption: (
       params: GetCustomRewardRedemptionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1366,7 +1367,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-redemption-status
      */
-    updateRedemptionStatus: async (
+    updateRedemptionStatus: (
       params: UpdateRedemptionStatusParams,
       body: UpdateRedemptionStatusBody,
       options: CallApiOptions['options'] = {}
@@ -1418,7 +1419,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-charity-campaign
      */
-    getCharityCampaign: async (
+    getCharityCampaign: (
       params: GetCharityCampaignParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1465,7 +1466,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-charity-campaign-donations
      */
-    getCharityCampaignDonations: async (
+    getCharityCampaignDonations: (
       params: GetCharityCampaignDonationsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1518,7 +1519,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-chatters
      */
-    getChatters: async (
+    getChatters: (
       params: GetChattersParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1560,7 +1561,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-emotes
      */
-    getChannelEmotes: async (
+    getChannelEmotes: (
       params: GetChannelEmotesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1600,7 +1601,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: async (options: CallApiOptions['options'] = {}) => 
+    getGlobalEmotes: (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetGlobalEmotesResponse, 200, 401>({
         path: '/chat/emotes/global',
         options,
@@ -1639,7 +1640,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-emote-sets
      */
-    getEmoteSets: async (
+    getEmoteSets: (
       params: GetEmoteSetsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1677,7 +1678,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-chat-badges
      */
-    getChannelChatBadges: async (
+    getChannelChatBadges: (
       params: GetChannelChatBadgesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1715,7 +1716,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: async (options: CallApiOptions['options'] = {}) => 
+    getGlobalChatBadges: (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetGlobalChatBadgesResponse, 200, 401>({
         path: '/chat/badges/global',
         options,
@@ -1751,7 +1752,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-chat-settings
      */
-    getChatSettings: async (
+    getChatSettings: (
       params: GetChatSettingsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1809,7 +1810,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-chat-settings
      */
-    updateChatSettings: async (
+    updateChatSettings: (
       params: UpdateChatSettingsParams,
       body: UpdateChatSettingsBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -1822,7 +1823,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Retrieves emotes available to the user across all channels.
+     * NEW Retrieves emotes available to the user across all channels.
      *
      * __Authorization:__
      *
@@ -1854,7 +1855,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-emotes
      */
-    getUserEmotes: async (
+    getUserEmotes: (
       params: GetUserEmotesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -1896,7 +1897,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-chat-announcement
      */
-    sendChatAnnouncement: async (
+    sendChatAnnouncement: (
       params: SendChatAnnouncementParams,
       body: SendChatAnnouncementBody,
       options: CallApiOptions['options'] = {}
@@ -1960,7 +1961,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-a-shoutout
      */
-    sendShoutout: async (
+    sendShoutout: (
       params: SendShoutoutParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2014,7 +2015,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-chat-message
      */
-    sendChatMessage: async (
+    sendChatMessage: (
       body: SendChatMessageBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2053,7 +2054,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-chat-color
      */
-    getUserChatColor: async (
+    getUserChatColor: (
       params: GetUserChatColorParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2096,7 +2097,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-user-chat-color
      */
-    updateUserChatColor: async (
+    updateUserChatColor: (
       params: UpdateUserChatColorParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2154,7 +2155,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-clip
      */
-    createClip: async (
+    createClip: (
       params: CreateClipParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2202,7 +2203,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-clips
      */
-    getClips: async (
+    getClips: (
       params: GetClipsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2236,7 +2237,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduits
      */
-    getConduits: async (options: CallApiOptions['options'] = {}) => 
+    getConduits: (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetConduitsResponse, 200, 401>({
         path: '/eventsub/conduits',
         options,
@@ -2272,7 +2273,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-conduits
      */
-    createConduits: async (
+    createConduits: (
       body: CreateConduitsBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2315,7 +2316,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-conduits
      */
-    updateConduits: async (
+    updateConduits: (
       body: UpdateConduitsBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2357,7 +2358,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-conduit
      */
-    deleteConduit: async (
+    deleteConduit: (
       params: DeleteConduitParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2399,7 +2400,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduit-shards
      */
-    getConduitShards: async (
+    getConduitShards: (
       params: GetConduitShardsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2442,7 +2443,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-conduit-shards
      */
-    updateConduitShards: async (
+    updateConduitShards: (
       body: UpdateConduitShardsBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2479,7 +2480,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-content-classification-labels
      */
-    getContentClassificationLabels: async (
+    getContentClassificationLabels: (
       params: GetContentClassificationLabelsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2545,7 +2546,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-drops-entitlements
      */
-    getDropsEntitlements: async (
+    getDropsEntitlements: (
       params: GetDropsEntitlementsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2595,7 +2596,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-drops-entitlements
      */
-    updateDropsEntitlements: async (
+    updateDropsEntitlements: (
       body: UpdateDropsEntitlementsBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2644,7 +2645,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-configuration-segment
      */
-    getExtensionConfigurationSegment: async (
+    getExtensionConfigurationSegment: (
       params: GetExtensionConfigurationSegmentParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2684,7 +2685,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#set-extension-configuration-segment
      */
-    setExtensionConfigurationSegment: async (
+    setExtensionConfigurationSegment: (
       body: SetExtensionConfigurationSegmentBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2726,7 +2727,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#set-extension-required-configuration
      */
-    setExtensionRequiredConfiguration: async (
+    setExtensionRequiredConfiguration: (
       params: SetExtensionRequiredConfigurationParams,
       body: SetExtensionRequiredConfigurationBody,
       options: CallApiOptions['options'] = {}
@@ -2807,7 +2808,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-extension-pubsub-message
      */
-    sendExtensionPubSubMessage: async (
+    sendExtensionPubSubMessage: (
       body: SendExtensionPubSubMessageBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2853,7 +2854,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-live-channels
      */
-    getExtensionLiveChannels: async (
+    getExtensionLiveChannels: (
       params: GetExtensionLiveChannelsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2891,7 +2892,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: async (options: CallApiOptions['options'] = {}) => 
+    getExtensionSecrets: (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetExtensionSecretsResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
         options,
@@ -2926,7 +2927,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-extension-secret
      */
-    createExtensionSecret: async (
+    createExtensionSecret: (
       params: CreateExtensionSecretParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -2972,7 +2973,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-extension-chat-message
      */
-    sendExtensionChatMessage: async (
+    sendExtensionChatMessage: (
       params: SendExtensionChatMessageParams,
       body: SendExtensionChatMessageBody,
       options: CallApiOptions['options'] = {}
@@ -3018,7 +3019,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extensions
      */
-    getExtensions: async (
+    getExtensions: (
       params: GetExtensionsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3060,7 +3061,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-released-extensions
      */
-    getReleasedExtensions: async (
+    getReleasedExtensions: (
       params: GetReleasedExtensionsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3098,7 +3099,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-bits-products
      */
-    getExtensionBitsProducts: async (
+    getExtensionBitsProducts: (
       params: GetExtensionBitsProductsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3143,7 +3144,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-extension-bits-product
      */
-    updateExtensionBitsProduct: async (
+    updateExtensionBitsProduct: (
       body: UpdateExtensionBitsProductBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3211,7 +3212,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription
      */
-    createEventSubSubscription: async (
+    createEventSubSubscription: (
       body: CreateEventSubSubscriptionBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3256,7 +3257,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-eventsub-subscription
      */
-    deleteEventSubSubscription: async (
+    deleteEventSubSubscription: (
       params: DeleteEventSubSubscriptionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3304,7 +3305,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-eventsub-subscriptions
      */
-    getEventSubSubscriptions: async (
+    getEventSubSubscriptions: (
       params: GetEventSubSubscriptionsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3345,7 +3346,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-top-games
      */
-    getTopGames: async (
+    getTopGames: (
       params: GetTopGamesParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3386,7 +3387,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-games
      */
-    getGames: async (
+    getGames: (
       params: GetGamesParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3430,7 +3431,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-creator-goals
      */
-    getCreatorGoals: async (
+    getCreatorGoals: (
       params: GetCreatorGoalsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3468,7 +3469,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-guest-star-settings
      */
-    getChannelGuestStarSettings: async (
+    getChannelGuestStarSettings: (
       params: GetChannelGuestStarSettingsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3503,7 +3504,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-channel-guest-star-settings
      */
-    updateChannelGuestStarSettings: async (
+    updateChannelGuestStarSettings: (
       params: UpdateChannelGuestStarSettingsParams,
       body: UpdateChannelGuestStarSettingsBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -3542,7 +3543,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-guest-star-session
      */
-    getGuestStarSession: async (
+    getGuestStarSession: (
       params: GetGuestStarSessionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3582,7 +3583,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-guest-star-session
      */
-    createGuestStarSession: async (
+    createGuestStarSession: (
       params: CreateGuestStarSessionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3620,7 +3621,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#end-guest-star-session
      */
-    endGuestStarSession: async (
+    endGuestStarSession: (
       params: EndGuestStarSessionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3653,7 +3654,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-guest-star-invites
      */
-    getGuestStarInvites: async (
+    getGuestStarInvites: (
       params: GetGuestStarInvitesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3693,7 +3694,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-guest-star-invite
      */
-    sendGuestStarInvite: async (
+    sendGuestStarInvite: (
       params: SendGuestStarInviteParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3732,7 +3733,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-guest-star-invite
      */
-    deleteGuestStarInvite: async (
+    deleteGuestStarInvite: (
       params: DeleteGuestStarInviteParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3781,7 +3782,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#assign-guest-star-slot
      */
-    assignGuestStarSlot: async (
+    assignGuestStarSlot: (
       params: AssignGuestStarSlotParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3817,7 +3818,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-guest-star-slot
      */
-    updateGuestStarSlot: async (
+    updateGuestStarSlot: (
       params: UpdateGuestStarSlotParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3863,7 +3864,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-guest-star-slot
      */
-    deleteGuestStarSlot: async (
+    deleteGuestStarSlot: (
       params: DeleteGuestStarSlotParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3905,7 +3906,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-guest-star-slot-settings
      */
-    updateGuestStarSlotSettings: async (
+    updateGuestStarSlotSettings: (
       params: UpdateGuestStarSlotSettingsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -3946,7 +3947,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-hype-train-events
      */
-    getHypeTrainEvents: async (
+    getHypeTrainEvents: (
       params: GetHypeTrainEventsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4011,7 +4012,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#check-automod-status
      */
-    checkAutoModStatus: async (
+    checkAutoModStatus: (
       params: CheckAutoModStatusParams,
       body: CheckAutoModStatusBody,
       options: CallApiOptions['options'] = {}
@@ -4067,7 +4068,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#manage-held-automod-messages
      */
-    manageHeldAutoModMessages: async (
+    manageHeldAutoModMessages: (
       body: ManageHeldAutoModMessagesBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4113,7 +4114,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-automod-settings
      */
-    getAutoModSettings: async (
+    getAutoModSettings: (
       params: GetAutoModSettingsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4174,7 +4175,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-automod-settings
      */
-    updateAutoModSettings: async (
+    updateAutoModSettings: (
       params: UpdateAutoModSettingsParams,
       body: UpdateAutoModSettingsBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -4217,7 +4218,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-banned-users
      */
-    getBannedUsers: async (
+    getBannedUsers: (
       params: GetBannedUsersParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4282,7 +4283,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#ban-user
      */
-    banUser: async (
+    banUser: (
       params: BanUserParams,
       body: BanUserBody,
       options: CallApiOptions['options'] = {}
@@ -4342,7 +4343,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#unban-user
      */
-    unbanUser: async (
+    unbanUser: (
       params: UnbanUserParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4353,7 +4354,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Gets a list of unban requests for a broadcaster’s channel.
+     * NEW Gets a list of unban requests for a broadcaster’s channel.
      *
      * __Authorization:__
      *
@@ -4388,7 +4389,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-unban-requests
      */
-    getUnbanRequests: async (
+    getUnbanRequests: (
       params: GetUnbanRequestsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4398,12 +4399,12 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Resolves an unban request by approving or denying it.
+     * NEW Resolves an unban request by approving or denying it.
      *
      * __Authorization:__
      *
-     * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
-     * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     * * Requires a user access token that includes the **moderator:manage:unban\\\_requests** scope.
+     * * Query parameter `moderator_id` must match the `user_id` in the[user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      *
      * __URL:__
      *
@@ -4439,7 +4440,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#resolve-unban-requests
      */
-    resolveUnbanRequests: async (
+    resolveUnbanRequests: (
       params: ResolveUnbanRequestsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4485,7 +4486,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-blocked-terms
      */
-    getBlockedTerms: async (
+    getBlockedTerms: (
       params: GetBlockedTermsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4532,7 +4533,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#add-blocked-term
      */
-    addBlockedTerm: async (
+    addBlockedTerm: (
       params: AddBlockedTermParams,
       body: AddBlockedTermBody,
       options: CallApiOptions['options'] = {}
@@ -4581,7 +4582,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#remove-blocked-term
      */
-    removeBlockedTerm: async (
+    removeBlockedTerm: (
       params: RemoveBlockedTermParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4631,7 +4632,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-chat-messages
      */
-    deleteChatMessages: async (
+    deleteChatMessages: (
       params: DeleteChatMessagesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4667,7 +4668,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-moderated-channels
      */
-    getModeratedChannels: async (
+    getModeratedChannels: (
       params: GetModeratedChannelsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4707,7 +4708,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-moderators
      */
-    getModerators: async (
+    getModerators: (
       params: GetModeratorsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4760,7 +4761,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#add-channel-moderator
      */
-    addChannelModerator: async (
+    addChannelModerator: (
       params: AddChannelModeratorParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4809,7 +4810,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#remove-channel-moderator
      */
-    removeChannelModerator: async (
+    removeChannelModerator: (
       params: RemoveChannelModeratorParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4852,7 +4853,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-vips
      */
-    getVIPs: async (
+    getVIPs: (
       params: GetVIPsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4922,7 +4923,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#add-channel-vip
      */
-    addChannelVIP: async (
+    addChannelVIP: (
       params: AddChannelVIPParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -4985,7 +4986,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#remove-channel-vip
      */
-    removeChannelVIP: async (
+    removeChannelVIP: (
       params: RemoveChannelVIPParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5035,7 +5036,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-shield-mode-status
      */
-    updateShieldModeStatus: async (
+    updateShieldModeStatus: (
       params: UpdateShieldModeStatusParams,
       body: UpdateShieldModeStatusBody,
       options: CallApiOptions['options'] = {}
@@ -5085,7 +5086,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-shield-mode-status
      */
-    getShieldModeStatus: async (
+    getShieldModeStatus: (
       params: GetShieldModeStatusParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5133,7 +5134,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-polls
      */
-    getPolls: async (
+    getPolls: (
       params: GetPollsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5186,7 +5187,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-poll
      */
-    createPoll: async (
+    createPoll: (
       body: CreatePollBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5231,7 +5232,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#end-poll
      */
-    endPoll: async (
+    endPoll: (
       body: EndPollBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5274,7 +5275,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-predictions
      */
-    getPredictions: async (
+    getPredictions: (
       params: GetPredictionsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5327,7 +5328,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-prediction
      */
-    createPrediction: async (
+    createPrediction: (
       body: CreatePredictionBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5379,7 +5380,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#end-prediction
      */
-    endPrediction: async (
+    endPrediction: (
       body: EndPredictionBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5447,7 +5448,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#start-a-raid
      */
-    startRaid: async (
+    startRaid: (
       params: StartRaidParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5500,7 +5501,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#cancel-a-raid
      */
-    cancelRaid: async (
+    cancelRaid: (
       params: CancelRaidParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5552,7 +5553,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-stream-schedule
      */
-    getChannelStreamSchedule: async (
+    getChannelStreamSchedule: (
       params: GetChannelStreamScheduleParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5591,7 +5592,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-icalendar
      */
-    getChannelICalendar: async (
+    getChannelICalendar: (
       params: GetChannelICalendarParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5639,7 +5640,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-channel-stream-schedule
      */
-    updateChannelStreamSchedule: async (
+    updateChannelStreamSchedule: (
       params: UpdateChannelStreamScheduleParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5690,7 +5691,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-channel-stream-schedule-segment
      */
-    createChannelStreamScheduleSegment: async (
+    createChannelStreamScheduleSegment: (
       params: CreateChannelStreamScheduleSegmentParams,
       body: CreateChannelStreamScheduleSegmentBody,
       options: CallApiOptions['options'] = {}
@@ -5747,7 +5748,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-channel-stream-schedule-segment
      */
-    updateChannelStreamScheduleSegment: async (
+    updateChannelStreamScheduleSegment: (
       params: UpdateChannelStreamScheduleSegmentParams,
       body: UpdateChannelStreamScheduleSegmentBody | null | undefined = null,
       options: CallApiOptions['options'] = {}
@@ -5795,7 +5796,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-channel-stream-schedule-segment
      */
-    deleteChannelStreamScheduleSegment: async (
+    deleteChannelStreamScheduleSegment: (
       params: DeleteChannelStreamScheduleSegmentParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5838,7 +5839,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#search-categories
      */
-    searchCategories: async (
+    searchCategories: (
       params: SearchCategoriesParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5882,7 +5883,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#search-channels
      */
-    searchChannels: async (
+    searchChannels: (
       params: SearchChannelsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5925,7 +5926,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-key
      */
-    getStreamKey: async (
+    getStreamKey: (
       params: GetStreamKeyParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -5963,7 +5964,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-streams
      */
-    getStreams: async (
+    getStreams: (
       params: GetStreamsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6003,7 +6004,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-followed-streams
      */
-    getFollowedStreams: async (
+    getFollowedStreams: (
       params: GetFollowedStreamsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6060,7 +6061,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#create-stream-marker
      */
-    createStreamMarker: async (
+    createStreamMarker: (
       body: CreateStreamMarkerBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6108,7 +6109,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-markers
      */
-    getStreamMarkers: async (
+    getStreamMarkers: (
       params: GetStreamMarkersParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6152,7 +6153,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-broadcaster-subscriptions
      */
-    getBroadcasterSubscriptions: async (
+    getBroadcasterSubscriptions: (
       params: GetBroadcasterSubscriptionsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6199,7 +6200,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#check-user-subscription
      */
-    checkUserSubscription: async (
+    checkUserSubscription: (
       params: CheckUserSubscriptionParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6242,7 +6243,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-all-stream-tags
      */
-    getAllStreamTags: async (
+    getAllStreamTags: (
       params: GetAllStreamTagsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6283,7 +6284,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-tags
      */
-    getStreamTags: async (
+    getStreamTags: (
       params: GetStreamTagsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6327,7 +6328,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-teams
      */
-    getChannelTeams: async (
+    getChannelTeams: (
       params: GetChannelTeamsParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6371,7 +6372,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-teams
      */
-    getTeams: async (
+    getTeams: (
       params: GetTeamsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6403,12 +6404,12 @@ export class TwitchApi {
      *
      * _200 OK_
      *
-     * Successfully retrieved the specified users' information.
+     * Successfully retrieved the specified users’ information.
      *
      * _400 Bad Request_
      *
-     * * The _id_ or _login_ query parameter is required unless the request uses a user access token.
-     * * The request exceeded the maximum allowed number of _id_ and/or _login_ query parameters.
+     * * The \*id\* or \*login\* query parameter is required unless the request uses a user access token.
+     * * The request exceeded the maximum allowed number of \*id\* and/or \*login\* query parameters.
      *
      * _401 Unauthorized_
      *
@@ -6418,7 +6419,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-users
      */
-    getUsers: async (
+    getUsers: (
       params: GetUsersParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6459,7 +6460,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-user
      */
-    updateUser: async (
+    updateUser: (
       params: UpdateUserParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6500,7 +6501,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-block-list
      */
-    getUserBlockList: async (
+    getUserBlockList: (
       params: GetUserBlockListParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6544,7 +6545,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#block-user
      */
-    blockUser: async (
+    blockUser: (
       params: BlockUserParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6584,7 +6585,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#unblock-user
      */
-    unblockUser: async (
+    unblockUser: (
       params: UnblockUserParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6620,7 +6621,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: async (options: CallApiOptions['options'] = {}) => 
+    getUserExtensions: (options: CallApiOptions['options'] = {}) => 
       this.callApi<GetUserExtensionsResponse, 200, 401>({
         path: '/users/extensions/list',
         options,
@@ -6656,7 +6657,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-active-extensions
      */
-    getUserActiveExtensions: async (
+    getUserActiveExtensions: (
       params: GetUserActiveExtensionsParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6701,7 +6702,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-user-extensions
      */
-    updateUserExtensions: async (
+    updateUserExtensions: (
       body: UpdateUserExtensionsBody,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6755,7 +6756,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-videos
      */
-    getVideos: async (
+    getVideos: (
       params: GetVideosParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6796,7 +6797,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#delete-videos
      */
-    deleteVideos: async (
+    deleteVideos: (
       params: DeleteVideosParams,
       options: CallApiOptions['options'] = {}
     ) =>
@@ -6864,7 +6865,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-whisper
      */
-    sendWhisper: async (
+    sendWhisper: (
       params: SendWhisperParams,
       body: SendWhisperBody,
       options: CallApiOptions['options'] = {}

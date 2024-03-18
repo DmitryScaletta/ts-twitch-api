@@ -195,7 +195,7 @@ export interface paths {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/api/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
      * __Request Body:__
      *
@@ -371,8 +371,8 @@ export interface paths {
   };
   "/chat/emotes/user": {
     /**
-     * BETA Retrieves emotes available to the user across all channels.
-     * @description BETA Retrieves emotes available to the user across all channels.
+     * NEW Retrieves emotes available to the user across all channels.
+     * @description NEW Retrieves emotes available to the user across all channels.
      *
      * __Authorization:__
      *
@@ -1088,8 +1088,8 @@ export interface paths {
   };
   "/moderation/unban_requests": {
     /**
-     * BETA Gets a list of unban requests for a broadcaster’s channel.
-     * @description BETA Gets a list of unban requests for a broadcaster’s channel.
+     * NEW Gets a list of unban requests for a broadcaster’s channel.
+     * @description NEW Gets a list of unban requests for a broadcaster’s channel.
      *
      * __Authorization:__
      *
@@ -1098,13 +1098,13 @@ export interface paths {
      */
     get: operations["get-unban-requests"];
     /**
-     * BETA Resolves an unban request by approving or denying it.
-     * @description BETA Resolves an unban request by approving or denying it.
+     * NEW Resolves an unban request by approving or denying it.
+     * @description NEW Resolves an unban request by approving or denying it.
      *
      * __Authorization:__
      *
-     * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
-     * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     * * Requires a user access token that includes the **moderator:manage:unban\\\_requests** scope.
+     * * Query parameter `moderator_id` must match the `user_id` in the[user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      */
     patch: operations["resolve-unban-requests"];
   };
@@ -2379,7 +2379,7 @@ export interface components {
        * @description The cost of the reward, in channel points. The minimum is 1 point.
        */
       cost?: number;
-      /** @description The background color to use for the reward. Specify the color using Hex format (for example, #00E5CB). */
+      /** @description The background color to use for the reward. Specify the color using Hex format (for example, \\#00E5CB). */
       background_color?: string;
       /** @description A Boolean value that indicates whether the reward is enabled. Set to **true** to enable the reward. Viewers see only enabled rewards. */
       is_enabled?: boolean;
@@ -3743,7 +3743,7 @@ export interface components {
        * @description The type of subscription to create. For a list of subscriptions that you can create, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). Set this field to the value in the **Name** column of the Subscription Types table.
        * @enum {string}
        */
-      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
       /** @description The version number that identifies the definition of the subscription type that you want the response to use. */
       version: string;
       /** @description A JSON object that contains the parameter values that are specific to the specified subscription type. For the object’s required and optional fields, see the subscription type’s documentation. */
@@ -3802,7 +3802,7 @@ export interface components {
        * @description The subscription's type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types).
        * @enum {string}
        */
-      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
       /** @description The version number that identifies this definition of the subscription's data. */
       version: string;
       /** @description The subscription's parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
@@ -4467,21 +4467,21 @@ export interface components {
           id: string;
           /** @description User ID of broadcaster whose channel is receiving the unban request. */
           broadcaster_id: string;
-          /** @description The broadcaster's display name. */
-          broadcaster_name: string;
-          /** @description The broadcaster's login name. */
+          /** @description The broadcaster’s login name. */
           broadcaster_login: string;
+          /** @description The broadcaster’s display name. */
+          broadcaster_name: string;
           /** @description User ID of moderator who approved/denied the request. */
           moderator_id: string;
-          /** @description The moderator's login name. */
+          /** @description The moderator’s login name. */
           moderator_login: string;
-          /** @description The moderator's display name. */
+          /** @description The moderator’s display name. */
           moderator_name: string;
           /** @description User ID of the requestor who is asking for an unban. */
           user_id: string;
-          /** @description The user's login name. */
+          /** @description The user’s login name. */
           user_login: string;
-          /** @description The user's display name */
+          /** @description The user’s display name. */
           user_name: string;
           /** @description Text of the request from the requesting user. */
           text: string;
@@ -6718,7 +6718,7 @@ export interface operations {
    *
    * __Authorization:__
    *
-   * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
+   * Requires a [user access token](https://dev.twitch.tv/docs/api/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
    *
    * __Request Body:__
    *
@@ -6746,7 +6746,8 @@ export interface operations {
         };
       };
       /**
-       * @description * The _broadcaster\_id_ query parameter is required.
+       * @description ul>
+       * * The _broadcaster\_id_ query parameter is required.
        * * The _id_ query parameter is required.
        * * The `title` must contain a minimum of 1 character and a maximum of 45 characters.
        * * The `title` must be unique amongst all of the broadcaster's custom rewards.
@@ -7394,8 +7395,8 @@ export interface operations {
     };
   };
   /**
-   * BETA Retrieves emotes available to the user across all channels.
-   * @description BETA Retrieves emotes available to the user across all channels.
+   * NEW Retrieves emotes available to the user across all channels.
+   * @description NEW Retrieves emotes available to the user across all channels.
    *
    * __Authorization:__
    *
@@ -8933,7 +8934,7 @@ export interface operations {
          */
         status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "beta_maintenance" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
         /** @description Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
-        type?: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update";
+        type?: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
         /** @description Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
         user_id?: string;
         /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor's value. */
@@ -10380,8 +10381,8 @@ export interface operations {
     };
   };
   /**
-   * BETA Gets a list of unban requests for a broadcaster’s channel.
-   * @description BETA Gets a list of unban requests for a broadcaster’s channel.
+   * NEW Gets a list of unban requests for a broadcaster’s channel.
+   * @description NEW Gets a list of unban requests for a broadcaster’s channel.
    *
    * __Authorization:__
    *
@@ -10443,13 +10444,13 @@ export interface operations {
     };
   };
   /**
-   * BETA Resolves an unban request by approving or denying it.
-   * @description BETA Resolves an unban request by approving or denying it.
+   * NEW Resolves an unban request by approving or denying it.
+   * @description NEW Resolves an unban request by approving or denying it.
    *
    * __Authorization:__
    *
-   * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
-   * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+   * * Requires a user access token that includes the **moderator:manage:unban\\\_requests** scope.
+   * * Query parameter `moderator_id` must match the `user_id` in the[user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
    */
   "resolve-unban-requests": {
     parameters: {
@@ -10458,7 +10459,7 @@ export interface operations {
         broadcaster_id: string;
         /** @description The ID of the broadcaster or a user that has permission to moderate the broadcaster’s unban requests. This ID must match the user ID in the user access token. */
         moderator_id: string;
-        /** @description The UUID of the unban request. */
+        /** @description The ID of the broadcaster or a user that has permission to moderate the broadcaster’s unban requests. This ID must match the user ID in the user access token. */
         unban_request_id: string;
         /**
          * @description Resolution status.
@@ -12702,15 +12703,15 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Successfully retrieved the specified users' information. */
+      /** @description Successfully retrieved the specified users’ information. */
       200: {
         content: {
           "application/json": components["schemas"]["GetUsersResponse"];
         };
       };
       /**
-       * @description * The _id_ or _login_ query parameter is required unless the request uses a user access token.
-       * * The request exceeded the maximum allowed number of _id_ and/or _login_ query parameters.
+       * @description * The \*id\* or \*login\* query parameter is required unless the request uses a user access token.
+       * * The request exceeded the maximum allowed number of \*id\* and/or \*login\* query parameters.
        */
       400: {
         content: never;
