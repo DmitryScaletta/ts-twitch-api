@@ -90,6 +90,7 @@ export type AddChannelVIPParams = ParamsSchema<'add-channel-vip'>;
 export type RemoveChannelVIPParams = ParamsSchema<'remove-channel-vip'>;
 export type UpdateShieldModeStatusParams = ParamsSchema<'update-shield-mode-status'>;
 export type GetShieldModeStatusParams = ParamsSchema<'get-shield-mode-status'>;
+export type WarnChatUserParams = ParamsSchema<'warn-chat-user'>;
 export type GetPollsParams = ParamsSchema<'get-polls'>;
 export type GetPredictionsParams = ParamsSchema<'get-predictions'>;
 export type StartRaidParams = ParamsSchema<'start-a-raid'>;
@@ -264,6 +265,8 @@ export type GetVIPsResponse = Schema<'GetVIPsResponse'>;
 export type UpdateShieldModeStatusBody = Schema<'UpdateShieldModeStatusBody'>;
 export type UpdateShieldModeStatusResponse = Schema<'UpdateShieldModeStatusResponse'>;
 export type GetShieldModeStatusResponse = Schema<'GetShieldModeStatusResponse'>;
+export type WarnChatUserBody = Schema<'WarnChatUserBody'>;
+export type WarnChatUserResponse = Schema<'WarnChatUserResponse'>;
 export type Poll = Schema<'Poll'>;
 export type GetPollsResponse = Schema<'GetPollsResponse'>;
 export type CreatePollBody = Schema<'CreatePollBody'>;
@@ -5093,6 +5096,70 @@ export class TwitchApi {
       this.callApi<GetShieldModeStatusResponse, 200, 400 | 401 | 403>({
         path: '/moderation/shield_mode',
         params,
+        options,
+      }),
+    /**
+     * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+     *
+     * __Authorization:__
+     *
+     * Requires a user access token that includes the **moderator:manage:warnings** scope. Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/moderation/warnings`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully warn a user.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The _moderator\_id_ query parameter is required.
+     * * The _user\_id_ query parameter is required.
+     * * The _reason_ query parameter is required.
+     * * The text in the _reason_ field is too long.
+     * * The user specified in the _user\_id_ may not be warned.
+     *
+     * _401 Unauthorized_
+     *
+     * * The ID in _moderator\_id_ must match the user ID in the user access token.
+     * * The Authorization header is required and must contain a user access token.
+     * * The user access token must include the **moderator:manage:warnings** scope.
+     * * The access token is not valid.
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * The user in _moderator\_id_ is not one of the broadcaster’s moderators.
+     *
+     * _409 Conflict_
+     *
+     * You may not update the user’s warning state while someone else is updating the state. For example, someone else is currently warning the user or the user is acknowledging an existing warning. Please retry your request.
+     *
+     * _429 Too Many Requests_
+     *
+     * The app has exceeded the number of requests it may make per minute for this broadcaster.
+     *
+     * _500 Internal Server Error_
+     *
+     * Internal Server Error.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#warn-chat-user
+     */
+    warnChatUser: (
+      params: WarnChatUserParams,
+      body: WarnChatUserBody,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<WarnChatUserResponse, 200, 400 | 401 | 403 | 409 | 429 | 500>({
+        path: '/moderation/warnings',
+        method: 'POST',
+        params,
+        body,
         options,
       }),
   };
