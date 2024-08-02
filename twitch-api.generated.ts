@@ -1252,6 +1252,17 @@ export interface paths {
      */
     put: operations["update-shield-mode-status"];
   };
+  "/moderation/warnings": {
+    /**
+     * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
+     * @description NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+     *
+     * __Authorization:__
+     *
+     * Requires a user access token that includes the **moderator:manage:warnings** scope. Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     */
+    post: operations["warn-chat-user"];
+  };
   "/polls": {
     /**
      * Gets a list of polls that the broadcaster created.
@@ -2819,12 +2830,23 @@ export interface components {
           /**
            * @description The type of emote. The possible values are:
            *
+           * * **none** — No emote type was assigned to this emote.
            * * **bitstier** — A Bits tier emote.
            * * **follower** — A follower emote.
            * * **subscriptions** — A subscriber emote.
+           * * **channelpoints** — An emote granted by using channel points.
+           * * **rewards** — An emote granted to the user through a special event.
+           * * **hypetrain** — An emote granted for participation in a Hype Train.
+           * * **prime** — An emote granted for linking an Amazon Prime account.
+           * * **turbo** — An emote granted for having Twitch Turbo.
+           * * **smilies** — Emoticons supported by Twitch.
+           * * **globals** — An emote accessible by everyone.
+           * * **owl2019** — Emotes related to Overwatch League 2019.
+           * * **twofactor** — Emotes granted by enabling two-factor authentication on an account.
+           * * **limitedtime** — Emotes that were granted for only a limited time.
            * @enum {string}
            */
-          emote_type: "bitstier" | "follower" | "subscriptions";
+          emote_type: "none" | "bitstier" | "follower" | "subscriptions" | "channelpoints" | "rewards" | "hypetrain" | "prime" | "turbo" | "smilies" | "globals" | "owl2019" | "twofactor" | "limitedtime";
           /** @description An ID that identifies the emote set that the emote belongs to. */
           emote_set_id: string;
           /** @description The ID of the broadcaster who owns the emote. */
@@ -3026,11 +3048,11 @@ export interface components {
           is_sent: boolean;
           /** @description The reason the message was dropped, if any. */
           drop_reason?: {
-              /** @description Code for why the message was dropped. */
-              code: string;
-              /** @description Message for why the message was dropped. */
-              message: string;
-            }[];
+            /** @description Code for why the message was dropped. */
+            code: string;
+            /** @description Message for why the message was dropped. */
+            message: string;
+          };
         }[];
     };
     UserChatColor: {
@@ -3188,9 +3210,10 @@ export interface components {
            * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
            * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
            * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
+           * * websocket\_failed\_to\_reconnect - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
            * @enum {string}
            */
-          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error" | "websocket_failed_to_reconnect";
           /** @description The transport details used to send the notifications. */
           transport: {
             /**
@@ -3267,9 +3290,10 @@ export interface components {
            * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
            * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
            * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
+           * * websocket\_failed\_to\_reconnect - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
            * @enum {string}
            */
-          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+          status: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error" | "websocket_failed_to_reconnect";
           /** @description The transport details used to send the notifications. */
           transport: {
             /**
@@ -3743,7 +3767,7 @@ export interface components {
        * @description The type of subscription to create. For a list of subscriptions that you can create, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). Set this field to the value in the **Name** column of the Subscription Types table.
        * @enum {string}
        */
-      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
+      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward_redemption.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.suspicious_user.message" | "channel.suspicious_user.update" | "channel.vip.add" | "channel.vip.remove" | "channel.warning.acknowledge" | "channel.warning.send" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
       /** @description The version number that identifies the definition of the subscription type that you want the response to use. */
       version: string;
       /** @description A JSON object that contains the parameter values that are specific to the specified subscription type. For the object’s required and optional fields, see the subscription type’s documentation. */
@@ -3802,7 +3826,7 @@ export interface components {
        * @description The subscription's type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types).
        * @enum {string}
        */
-      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
+      type: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward_redemption.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.suspicious_user.message" | "channel.suspicious_user.update" | "channel.vip.add" | "channel.vip.remove" | "channel.warning.acknowledge" | "channel.warning.send" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
       /** @description The version number that identifies this definition of the subscription's data. */
       version: string;
       /** @description The subscription's parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
@@ -4646,6 +4670,28 @@ export interface components {
            * @description The UTC timestamp (in RFC3339 format) of when Shield Mode was last activated. Is an empty string if Shield Mode hasn’t been previously activated.
            */
           last_activated_at: string;
+        }[];
+    };
+    WarnChatUserBody: {
+      /** @description A list that contains information about the warning. */
+      data: {
+        /** @description The ID of the twitch user to be warned. */
+        user_id: string;
+        /** @description A custom reason for the warning. **Max 500 chars.** */
+        reason: string;
+      };
+    };
+    WarnChatUserResponse: {
+      /** @description A list that contains information about the warning. */
+      data: {
+          /** @description The ID of the channel in which the warning will take effect. */
+          broadcaster_id: string;
+          /** @description The ID of the warned user. */
+          user_id: string;
+          /** @description The ID of the user who applied the warning. */
+          moderator_id: string;
+          /** @description The reason provided for warning. */
+          reason: string;
         }[];
     };
     Poll: {
@@ -7408,10 +7454,14 @@ export interface operations {
       query: {
         /** @description The ID of the user. This ID must match the user ID in the user access token. */
         user_id: string;
-        /** @description Returns all emotes available to the user within the chat owned by the specified broadcaster. This includes the Global and Subscriber Emotes the user has access to, as well as channel-only specific emotes such as Follower Emotes. */
-        broadcaster_id?: string;
         /** @description The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value. */
         after?: string;
+        /**
+         * @description The User ID of a broadcaster you wish to get follower emotes of. Using this query parameter will guarantee inclusion of the broadcaster’s follower emotes in the response body.
+         *
+         * **Note:** If the user specified in `user_id` is subscribed to the broadcaster specified, their follower emotes will appear in the response body regardless if this query parameter is used.
+         */
+        broadcaster_id?: string;
       };
     };
     responses: {
@@ -8922,6 +8972,7 @@ export interface operations {
          * * authorization\_revoked — The authorization was revoked for one or more users specified in the **Condition** object.
          * * moderator\_removed — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
          * * user\_removed — One of the users specified in the **Condition** object was removed.
+         * * chat\_user\_banned - The user specified in the **Condition** object was banned from the broadcaster's chat.
          * * version\_removed — The subscription to subscription type and version is no longer supported.
          * * beta\_maintenance — The subscription to the beta subscription type was removed due to maintenance.
          * * websocket\_disconnected — The client closed the connection.
@@ -8931,10 +8982,11 @@ export interface operations {
          * * websocket\_internal\_error — The Twitch WebSocket server experienced an unexpected error.
          * * websocket\_network\_timeout — The Twitch WebSocket server timed out writing the message to the client.
          * * websocket\_network\_error — The Twitch WebSocket server experienced a network error writing the message to the client.
+         * * websocket\_failed\_to\_reconnect - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
          */
-        status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "version_removed" | "beta_maintenance" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error";
+        status?: "enabled" | "webhook_callback_verification_pending" | "webhook_callback_verification_failed" | "notification_failures_exceeded" | "authorization_revoked" | "moderator_removed" | "user_removed" | "chat_user_banned" | "version_removed" | "beta_maintenance" | "websocket_disconnected" | "websocket_failed_ping_pong" | "websocket_received_inbound_traffic" | "websocket_connection_unused" | "websocket_internal_error" | "websocket_network_timeout" | "websocket_network_error" | "websocket_failed_to_reconnect";
         /** @description Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
-        type?: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.vip.add" | "channel.vip.remove" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
+        type?: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward_redemption.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.suspicious_user.message" | "channel.suspicious_user.update" | "channel.vip.add" | "channel.vip.remove" | "channel.warning.acknowledge" | "channel.warning.send" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
         /** @description Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
         user_id?: string;
         /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor's value. */
@@ -10468,7 +10520,7 @@ export interface operations {
          * * denied
          */
         status: string;
-        /** @description Message supplied by the unban request resolver */
+        /** @description Message supplied by the unban request resolver. The message is limited to a maximum of 500 characters. */
         resolution_text?: string;
       };
     };
@@ -11287,6 +11339,74 @@ export interface operations {
       };
       /** @description * The user in _moderator\_id_ is not one of the broadcaster's moderators. */
       403: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
+   * @description NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+   *
+   * __Authorization:__
+   *
+   * Requires a user access token that includes the **moderator:manage:warnings** scope. Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+   */
+  "warn-chat-user": {
+    parameters: {
+      query: {
+        /** @description The ID of the channel in which the warning will take effect. */
+        broadcaster_id: string;
+        /** @description The ID of the twitch user who requested the warning. */
+        moderator_id: string;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["WarnChatUserBody"];
+      };
+    };
+    responses: {
+      /** @description Successfully warn a user. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["WarnChatUserResponse"];
+        };
+      };
+      /**
+       * @description * The _broadcaster\_id_ query parameter is required.
+       * * The _moderator\_id_ query parameter is required.
+       * * The _user\_id_ query parameter is required.
+       * * The _reason_ query parameter is required.
+       * * The text in the _reason_ field is too long.
+       * * The user specified in the _user\_id_ may not be warned.
+       */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The ID in _moderator\_id_ must match the user ID in the user access token.
+       * * The Authorization header is required and must contain a user access token.
+       * * The user access token must include the **moderator:manage:warnings** scope.
+       * * The access token is not valid.
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description The user in _moderator\_id_ is not one of the broadcaster’s moderators. */
+      403: {
+        content: never;
+      };
+      /** @description You may not update the user’s warning state while someone else is updating the state. For example, someone else is currently warning the user or the user is acknowledging an existing warning. Please retry your request. */
+      409: {
+        content: never;
+      };
+      /** @description The app has exceeded the number of requests it may make per minute for this broadcaster. */
+      429: {
+        content: never;
+      };
+      /** @description Internal Server Error. */
+      500: {
         content: never;
       };
     };
