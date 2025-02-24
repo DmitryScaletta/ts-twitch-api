@@ -1,4 +1,4 @@
-import type { components, operations } from './twitch-api.generated';
+import type { components, operations } from './twitch-api.generated.ts';
 
 type Schema<T extends keyof components['schemas']> = components['schemas'][T];
 type ParamsSchema<T extends keyof operations> =
@@ -32,6 +32,7 @@ export type GetEmoteSetsParams = ParamsSchema<'get-emote-sets'>;
 export type GetChannelChatBadgesParams = ParamsSchema<'get-channel-chat-badges'>;
 export type GetChatSettingsParams = ParamsSchema<'get-chat-settings'>;
 export type UpdateChatSettingsParams = ParamsSchema<'update-chat-settings'>;
+export type GetSharedChatSessionParams = ParamsSchema<'get-shared-chat-session'>;
 export type GetUserEmotesParams = ParamsSchema<'get-user-emotes'>;
 export type SendChatAnnouncementParams = ParamsSchema<'send-chat-announcement'>;
 export type SendShoutoutParams = ParamsSchema<'send-a-shoutout'>;
@@ -173,6 +174,7 @@ export type GetChannelChatBadgesResponse = Schema<'GetChannelChatBadgesResponse'
 export type GetGlobalChatBadgesResponse = Schema<'GetGlobalChatBadgesResponse'>;
 export type ChatSettings = Schema<'ChatSettings'>;
 export type GetChatSettingsResponse = Schema<'GetChatSettingsResponse'>;
+export type GetSharedChatSessionResponse = Schema<'GetSharedChatSessionResponse'>;
 export type GetUserEmotesResponse = Schema<'GetUserEmotesResponse'>;
 export type UpdateChatSettingsBody = Schema<'UpdateChatSettingsBody'>;
 export type ChatSettingsUpdated = Schema<'ChatSettingsUpdated'>;
@@ -1826,6 +1828,47 @@ export class TwitchApi {
         options,
       }),
     /**
+     * NEW Retrieves the active shared chat session for a channel.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/cli/token-command/#app-access-token) or [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/shared_chat/session`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the shared chat session. Returns an empty array if the broadcaster\_id in the request isn’t in a shared chat session.
+     *
+     * _400 Bad Request_
+     *
+     * The ID in the `broadcaster_id` query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The OAuth token is not valid.
+     * * The Authorization header is required and must contain a user access token.
+     *
+     * _500 Internal Server Error_
+     *
+     * Internal Server Error.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-shared-chat-session
+     */
+    getSharedChatSession: (
+      params: GetSharedChatSessionParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetSharedChatSessionResponse, 200, 400 | 401 | 500>({
+        path: '/shared_chat/session',
+        params,
+        options,
+      }),
+    /**
      * NEW Retrieves emotes available to the user across all channels.
      *
      * __Authorization:__
@@ -1870,6 +1913,8 @@ export class TwitchApi {
     /**
      * Sends an announcement to the broadcaster’s chat room.
      *
+     * **Rate Limits**: One announcement may be sent every 2 seconds.
+     *
      * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:announcements** scope.
@@ -1898,6 +1943,10 @@ export class TwitchApi {
      * * The OAuth token is not valid.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
      *
+     * _429 Too Many Requests_
+     *
+     * The sender has exceeded the number of announcements they may send to this **broadcaster\_id** within a given window.
+     *
      * @see https://dev.twitch.tv/docs/api/reference#send-chat-announcement
      */
     sendChatAnnouncement: (
@@ -1905,7 +1954,7 @@ export class TwitchApi {
       body: SendChatAnnouncementBody,
       options: CallApiOptions['options'] = {}
     ) =>
-      this.callApi<void, 204, 400 | 401>({
+      this.callApi<void, 204, 400 | 401 | 429>({
         path: '/chat/announcements',
         method: 'POST',
         params,
@@ -1917,7 +1966,7 @@ export class TwitchApi {
      *
      * Twitch’s Shoutout feature is a great way for you to show support for other broadcasters and help them grow. Viewers who do not follow the other broadcaster will see a pop-up Follow button in your chat that they can click to follow the other broadcaster. [Learn More](https://help.twitch.tv/s/article/shoutouts)
      *
-     * **Rate Limits** The broadcaster may send a Shoutout once every 2 minutes. They may send the same broadcaster a Shoutout once every 60 minutes.
+     * **Rate Limits**: The broadcaster may send a Shoutout once every 2 minutes. They may send the same broadcaster a Shoutout once every 60 minutes.
      *
      * To receive notifications when a Shoutout is sent or received, subscribe to the [channel.shoutout.create](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshoutoutcreate) and [channel.shoutout.receive](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelshoutoutreceive) subscription types. The **channel.shoutout.create** event includes cooldown periods that indicate when the broadcaster may send another Shoutout without exceeding the endpoint’s rate limit.
      *
@@ -2171,6 +2220,8 @@ export class TwitchApi {
     /**
      * Gets one or more video clips that were captured from streams. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
      *
+     * When using pagination for clips, note that the maximum number of results returned over multiple requests will be approximately 1,000\. If additional results are necessary, paginate over different query parameters such as multiple `started_at` and `ended_at` timeframes to refine the search.
+     *
      * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
@@ -2218,7 +2269,7 @@ export class TwitchApi {
   };
   conduits = {
     /**
-     * NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) for a client ID.
+     * NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) for a client ID.
      *
      * __Authorization:__
      *
@@ -2246,7 +2297,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     * NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
      *
      * __Authorization:__
      *
@@ -2287,7 +2338,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+     * NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
      *
      * __Authorization:__
      *
@@ -2330,7 +2381,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+     * NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
      *
      * __Authorization:__
      *
@@ -2372,7 +2423,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     * NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
      *
      * __Authorization:__
      *
@@ -2413,7 +2464,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events).
+     * NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
      *
      * **NOTE:** Shard IDs are indexed starting at 0, so a conduit with a `shard_count` of 5 will have shards with IDs 0 through 4.
      *
@@ -3168,7 +3219,7 @@ export class TwitchApi {
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. If the subscription type requires user authorization, the token must include the required scope. However, if the subscription type doesn’t include user authorization, the token may include any scopes or no scopes.
      *
-     * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
+     * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
      *
      * __URL:__
      *
@@ -3275,7 +3326,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * If you use [Webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events) or [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
+     * If you use [Webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events) or [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. The token may include any scopes.
      *
@@ -4406,7 +4457,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * * Requires a user access token that includes the **moderator:manage:unban\\\_requests** scope.
+     * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
      * * Query parameter `moderator_id` must match the `user_id` in the[user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      *
      * __URL:__
@@ -5991,13 +6042,17 @@ export class TwitchApi {
      * * The access token is not valid.
      * * The client ID specified in the Client-Id header must match the client ID specified in the access token.
      *
+     * _403 Forbidden_
+     *
+     * The user must complete additional steps in order to stream. Present the user with the returned error message.
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-stream-key
      */
     getStreamKey: (
       params: GetStreamKeyParams,
       options: CallApiOptions['options'] = {}
     ) =>
-      this.callApi<GetStreamKeyResponse, 200, 400 | 401>({
+      this.callApi<GetStreamKeyResponse, 200, 400 | 401 | 403>({
         path: '/streams/key',
         params,
         options,
