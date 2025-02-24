@@ -30,13 +30,13 @@
   "type": "module",
   "scripts": {
     "build": "pnpm build:src && tsup",
-    "build:src": "node --import tsx ./scripts/build.ts",
+    "build:src": "node ./scripts/build.ts",
     "gen": "pnpm dlx openapi-typescript@6 https://github.com/DmitryScaletta/twitch-api-swagger/raw/main/openapi.json --output twitch-api.generated.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.11.28",
-    "tsup": "^8.0.2",
-    "tsx": "^4.7.1",
-    "typescript": "^5.4.2"
-  }
+    "@types/node": "^22.13.5",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af"
 }
