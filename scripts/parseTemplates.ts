@@ -1,4 +1,4 @@
-import type { Templates } from './types';
+import type { Templates } from './types.ts';
 
 const TEMPLATE_REGEX = /## ([^\s]+)\s*```(?:ts|md)\s*/gs;
 

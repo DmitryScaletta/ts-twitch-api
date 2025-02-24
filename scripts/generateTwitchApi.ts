@@ -5,8 +5,8 @@ import type {
   ResponseObject,
   ResponsesObject,
   Templates,
-} from './types';
-import responseCodes from './responseCodes.json' assert { type: 'json' };
+} from './types.ts';
+import responseCodes from './responseCodes.json' with { type: 'json' };
 
 type Line = [indentation: number, text: string];
 
