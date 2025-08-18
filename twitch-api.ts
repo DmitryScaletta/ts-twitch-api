@@ -70,6 +70,7 @@ export type UpdateGuestStarSlotParams = ParamsSchema<'update-guest-star-slot'>;
 export type DeleteGuestStarSlotParams = ParamsSchema<'delete-guest-star-slot'>;
 export type UpdateGuestStarSlotSettingsParams = ParamsSchema<'update-guest-star-slot-settings'>;
 export type GetHypeTrainEventsParams = ParamsSchema<'get-hype-train-events'>;
+export type GetHypeTrainStatusParams = ParamsSchema<'get-hype-train-status'>;
 export type CheckAutoModStatusParams = ParamsSchema<'check-automod-status'>;
 export type GetAutoModSettingsParams = ParamsSchema<'get-automod-settings'>;
 export type UpdateAutoModSettingsParams = ParamsSchema<'update-automod-settings'>;
@@ -241,6 +242,7 @@ export type GuestStarInvite = Schema<'GuestStarInvite'>;
 export type GetGuestStarInvitesResponse = Schema<'GetGuestStarInvitesResponse'>;
 export type HypeTrainEvent = Schema<'HypeTrainEvent'>;
 export type GetHypeTrainEventsResponse = Schema<'GetHypeTrainEventsResponse'>;
+export type GetHypeTrainStatusResponse = Schema<'GetHypeTrainStatusResponse'>;
 export type CheckAutoModStatusBody = Schema<'CheckAutoModStatusBody'>;
 export type AutoModStatus = Schema<'AutoModStatus'>;
 export type CheckAutoModStatusResponse = Schema<'CheckAutoModStatusResponse'>;
@@ -2026,6 +2028,11 @@ export class TwitchApi {
     /**
      * NEW Sends a message to the broadcaster’s chat room.
      *
+     * **NOTE:** When sending messages to a Shared Chat session, behaviors differ depending on your authentication token type:
+     *
+     * * When using an _App Access Token_, messages will only be sent to the source channel (defined by the `broadcaster_id` parameter) by default starting on May 19, 2025\. Messages can be sent to all channels by using the `for_source_only` parameter and setting it to `false`.
+     * * When using a _User Access Token_, messages will be sent to all channels in the shared chat session, including the source channel. This behavior cannot be changed with this token type.
+     *
      * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
@@ -2048,6 +2055,7 @@ export class TwitchApi {
      * * The ID in the _sender\_id_ query parameter is not valid.
      * * The _text_ query parameter is required.
      * * The ID in the _reply\_parent\_message\_id_ query parameter is not valid.
+     * * Cannot set \*for\_source\_only\* if User Access Token is used.
      *
      * _401 Unauthorized_
      *
@@ -2566,7 +2574,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      *
      * __URL:__
      *
@@ -2622,7 +2630,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      *
      * __URL:__
      *
@@ -3332,7 +3340,7 @@ export class TwitchApi {
      *
      * __Request Query Parameters:__
      *
-     * Use the _status_, _type_, and _user\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
+     * Use the _status_, _type_, _user\_id_, and _subscription\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
      *
      * __URL:__
      *
@@ -4007,6 +4015,49 @@ export class TwitchApi {
     ) =>
       this.callApi<GetHypeTrainEventsResponse, 200, 401>({
         path: '/hypetrain/events',
+        params,
+        options,
+      }),
+    /**
+     * BETA Get the status of a Hype Train for the specified broadcaster.
+     *
+     * __Authorization:__
+     *
+     * * Requires an [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     * * Requires OAuth Scope: `channel:read:hype_train`.
+     * * Requires that `broadcaster_id` and `user_id` match in the User-Access token.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/hypetrain/status`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the status object.
+     *
+     * _400 Bad Request_
+     *
+     * The ID in the `broadcaster_id` query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The OAuth token is not valid.
+     * * The Authorization header is required and must contain a user access token.
+     *
+     * _500 Internal Server Error_
+     *
+     * Internal Server Error.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-hype-train-status
+     */
+    getHypeTrainStatus: (
+      params: GetHypeTrainStatusParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetHypeTrainStatusResponse, 200, 400 | 401 | 500>({
+        path: '/hypetrain/status',
         params,
         options,
       }),
@@ -6580,13 +6631,17 @@ export class TwitchApi {
      * * The access token is not valid.
      * * The ID specified in the Client-Id header does not match the client ID specified in the access token.
      *
+     * _429 Too Many Requests_
+     *
+     * The app exceeded the number of requests that it may make.
+     *
      * @see https://dev.twitch.tv/docs/api/reference#update-user
      */
     updateUser: (
       params: UpdateUserParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
-      this.callApi<UpdateUserResponse, 200, 400 | 401>({
+      this.callApi<UpdateUserResponse, 200, 400 | 401 | 429>({
         path: '/users',
         method: 'PUT',
         params,

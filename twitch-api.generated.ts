@@ -427,6 +427,11 @@ export interface paths {
      * NEW Sends a message to the broadcaster’s chat room.
      * @description NEW Sends a message to the broadcaster’s chat room.
      *
+     * **NOTE:** When sending messages to a Shared Chat session, behaviors differ depending on your authentication token type:
+     *
+     * * When using an _App Access Token_, messages will only be sent to the source channel (defined by the `broadcaster_id` parameter) by default starting on May 19, 2025\. Messages can be sent to all channels by using the `for_source_only` parameter and setting it to `false`.
+     * * When using a _User Access Token_, messages will be sent to all channels in the shared chat session, including the source channel. This behavior cannot be changed with this token type.
+     *
      * __Authorization:__
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
@@ -579,7 +584,7 @@ export interface paths {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      */
     get: operations["get-drops-entitlements"];
     /**
@@ -596,7 +601,7 @@ export interface paths {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      */
     patch: operations["update-drops-entitlements"];
   };
@@ -783,7 +788,7 @@ export interface paths {
      *
      * __Request Query Parameters:__
      *
-     * Use the _status_, _type_, and _user\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
+     * Use the _status_, _type_, _user\_id_, and _subscription\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
      */
     get: operations["get-eventsub-subscriptions"];
     /**
@@ -990,6 +995,19 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:hype\_train** scope.
      */
     get: operations["get-hype-train-events"];
+  };
+  "/hypetrain/status": {
+    /**
+     * BETA Gets the status of a Hype Train for the specified broadcaster.
+     * @description BETA Get the status of a Hype Train for the specified broadcaster.
+     *
+     * __Authorization:__
+     *
+     * * Requires an [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     * * Requires OAuth Scope: `channel:read:hype_train`.
+     * * Requires that `broadcaster_id` and `user_id` match in the User-Access token.
+     */
+    get: operations["get-hype-train-status"];
   };
   "/moderation/enforcements/status": {
     /**
@@ -3070,9 +3088,10 @@ export interface components {
        * * primary (default)
        *
        * If `color` is set to _primary_ or is not set, the channel’s accent color is used to highlight the announcement (see **Profile Accent Color** under [profile settings](https://www.twitch.tv/settings/profile), **Channel and Videos**, and **Brand**).
+       * @default primary
        * @enum {string}
        */
-      color?: "blue" | "green" | "orange" | "purple" | "primary (default)";
+      color?: "blue" | "green" | "orange" | "purple" | "primary";
     };
     SendChatMessageBody: {
       /** @description The ID of the broadcaster whose chat room the message will be sent to. */
@@ -3083,6 +3102,14 @@ export interface components {
       message: string;
       /** @description The ID of the chat message being replied to. */
       reply_parent_message_id?: string;
+      /**
+       * @description **NOTE:** This parameter can only be set when utilizing an App Access Token. It cannot be specified when a User Access Token is used, and will instead result in an HTTP 400 error.
+       *
+       * Determines if the chat message is sent only to the source channel (defined by _broadcaster\_id_) during a shared chat session. This has no effect if the message is sent during a shared chat session.
+       *
+       * If this parameter is not set, the default value when using an App Access Token is `false`. On May 19, 2025 the default value for this parameter will be updated to `true`, and chat messages sent using an App Access Token will only be shared with the source channel by default. If you prefer to send a chat message to both channels in a shared chat session, make sure this parameter is explicitly set to `false` in your API request before May 19.
+       */
+      for_source_only?: Record<string, never>;
     };
     SendChatMessageResponse: {
       data: {
@@ -4260,6 +4287,124 @@ export interface components {
       pagination?: {
         /** @description The cursor used to get the next page of results. Use the cursor to set the request’s _after_ query parameter. */
         cursor?: string;
+      };
+    };
+    GetHypeTrainStatusResponse: {
+      /** @description A list that contains information related to the channel’s Hype Train. */
+      data: ({
+          /** @description An object describing the current Hype Train. Null if a Hype Train is not active. */
+          current: {
+            /** @description The Hype Train ID. */
+            id: string;
+            /** @description The broadcaster ID. */
+            broadcaster_user_id: string;
+            /** @description The broadcaster login. */
+            broadcaster_user_login: string;
+            /** @description The broadcaster display name. */
+            broadcaster_user_name: string;
+            /**
+             * Format: int32
+             * @description The current level of the Hype Train.
+             */
+            level: number;
+            /**
+             * Format: int32
+             * @description Total points contributed to the Hype Train.
+             */
+            total: number;
+            /**
+             * Format: int32
+             * @description The number of points contributed to the Hype Train at the current level.
+             */
+            progress: number;
+            /**
+             * Format: int32
+             * @description The number of points required to reach the next level.
+             */
+            goal: number;
+            /** @description The contributors with the most points contributed. */
+            top_contributions: ({
+                /** @description The ID of the user that made the contribution. */
+                user_id: string;
+                /** @description The user’s login name. */
+                user_login: string;
+                /** @description The user’s display name. */
+                user_name: string;
+                /**
+                 * @description The type of the Hype Train. Possible values are:
+                 *
+                 * * **treasure**
+                 * * **golden\_kappa**
+                 * * **regular**
+                 *
+                 * [Learn More](https://help.twitch.tv/s/article/hype-train-guide#special)
+                 * @enum {string}
+                 */
+                type: "treasure" | "golden_kappa" | "regular";
+                /**
+                 * Format: int32
+                 * @description The total number of points contributed for the type.
+                 */
+                total: number;
+                /** @description A list containing the broadcasters participating in the shared Hype Train. Null if the Hype Train is not shared. */
+                shared_train_participants: {
+                    /** @description The broadcaster ID. */
+                    broadcaster_user_id: string;
+                    /** @description The broadcaster login. */
+                    broadcaster_user_login: string;
+                    /** @description The broadcaster display name. */
+                    broadcaster_user_name: string;
+                  }[];
+                /**
+                 * Format: date-time
+                 * @description The time when the Hype Train started.
+                 */
+                started_at: string;
+                /**
+                 * Format: date-time
+                 * @description The time when the Hype Train expires. The expiration is extended when the Hype Train reaches a new level.
+                 */
+                expires_at: string;
+                /** @description Indicates if the Hype Train is shared. When true, shared\_train\_participants will contain the list of broadcasters the train is shared with. */
+                is_shared_train: boolean;
+              })[];
+          };
+        })[];
+      /** @description An object with information about the channel’s Hype Train records. Null if a Hype Train has not occurred. */
+      all_time_high: {
+        /**
+         * Format: int32
+         * @description The level of the record Hype Train.
+         */
+        level: number;
+        /**
+         * Format: int32
+         * @description Total points contributed to the record Hype Train.
+         */
+        total: number;
+        /**
+         * Format: date-time
+         * @description The time when the record was achieved.
+         */
+        achieved_at: string;
+      };
+      /** @description An object with information about the channel’s shared Hype Train records. Null if a Hype Train has not occurred. */
+      shared_all_time_high: {
+        /**
+         * Format: int32
+         * @description The level of the record Hype Train.
+         */
+        level: number;
+        /**
+         * Format: int32
+         * @description Total points contributed to the record Hype Train.
+         */
+        total: number;
+        /**
+         * Format: date-time
+         * @description The time when the record was achieved.
+         */
+        achieved_at: string;
       };
     };
     CheckAutoModStatusBody: {
@@ -7740,6 +7885,11 @@ export interface operations {
    * NEW Sends a message to the broadcaster’s chat room.
    * @description NEW Sends a message to the broadcaster’s chat room.
    *
+   * **NOTE:** When sending messages to a Shared Chat session, behaviors differ depending on your authentication token type:
+   *
+   * * When using an _App Access Token_, messages will only be sent to the source channel (defined by the `broadcaster_id` parameter) by default starting on May 19, 2025\. Messages can be sent to all channels by using the `for_source_only` parameter and setting it to `false`.
+   * * When using a _User Access Token_, messages will be sent to all channels in the shared chat session, including the source channel. This behavior cannot be changed with this token type.
+   *
    * __Authorization:__
    *
    * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
@@ -7764,6 +7914,7 @@ export interface operations {
        * * The ID in the _sender\_id_ query parameter is not valid.
        * * The _text_ query parameter is required.
        * * The ID in the _reply\_parent\_message\_id_ query parameter is not valid.
+       * * Cannot set \*for\_source\_only\* if User Access Token is used.
        */
       400: {
         content: never;
@@ -8325,7 +8476,7 @@ export interface operations {
    *
    * __Authorization:__
    *
-   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
    */
   "get-drops-entitlements": {
     parameters: {
@@ -8399,7 +8550,7 @@ export interface operations {
    *
    * __Authorization:__
    *
-   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The client ID in the access token must own the game.
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
    */
   "update-drops-entitlements": {
     requestBody?: {
@@ -9063,7 +9214,7 @@ export interface operations {
    *
    * __Request Query Parameters:__
    *
-   * Use the _status_, _type_, and _user\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
+   * Use the _status_, _type_, _user\_id_, and _subscription\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
    */
   "get-eventsub-subscriptions": {
     parameters: {
@@ -9095,6 +9246,8 @@ export interface operations {
         type?: "automod.message.hold" | "automod.message.update" | "automod.settings.update" | "automod.terms.update" | "channel.bits.use" | "channel.update" | "channel.follow" | "channel.ad_break.begin" | "channel.chat.clear" | "channel.chat.clear_user_messages" | "channel.chat.message" | "channel.chat.message_delete" | "channel.chat.notification" | "channel.chat_settings.update" | "channel.chat.user_message_hold" | "channel.chat.user_message_update" | "channel.shared_chat.begin" | "channel.shared_chat.update" | "channel.shared_chat.end" | "channel.subscribe" | "channel.subscription.end" | "channel.subscription.gift" | "channel.subscription.message" | "channel.cheer" | "channel.raid" | "channel.ban" | "channel.unban" | "channel.unban_request.create" | "channel.unban_request.resolve" | "channel.moderate" | "channel.moderator.add" | "channel.moderator.remove" | "channel.guest_star_session.begin" | "channel.guest_star_session.end" | "channel.guest_star_guest.update" | "channel.guest_star_settings.update" | "channel.channel_points_automatic_reward_redemption.add" | "channel.channel_points_custom_reward.add" | "channel.channel_points_custom_reward.update" | "channel.channel_points_custom_reward.remove" | "channel.channel_points_custom_reward_redemption.add" | "channel.channel_points_custom_reward_redemption.update" | "channel.poll.begin" | "channel.poll.progress" | "channel.poll.end" | "channel.prediction.begin" | "channel.prediction.progress" | "channel.prediction.lock" | "channel.prediction.end" | "channel.suspicious_user.message" | "channel.suspicious_user.update" | "channel.vip.add" | "channel.vip.remove" | "channel.warning.acknowledge" | "channel.warning.send" | "channel.charity_campaign.donate" | "channel.charity_campaign.start" | "channel.charity_campaign.progress" | "channel.charity_campaign.stop" | "conduit.shard.disabled" | "drop.entitlement.grant" | "extension.bits_transaction.create" | "channel.goal.begin" | "channel.goal.progress" | "channel.goal.end" | "channel.hype_train.begin" | "channel.hype_train.progress" | "channel.hype_train.end" | "channel.shield_mode.begin" | "channel.shield_mode.end" | "channel.shoutout.create" | "channel.shoutout.receive" | "stream.online" | "stream.offline" | "user.authorization.grant" | "user.authorization.revoke" | "user.update" | "user.whisper.message";
         /** @description Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
         user_id?: string;
+        /** @description Returns an array with the subscription matching the ID (as long as it is owned by the client making the request), or an empty array if there is no matching subscription. */
+        subscription_id?: string;
         /** @description The cursor used to get the next page of results. The `pagination` object in the response contains the cursor's value. */
         after?: string;
       };
@@ -10084,6 +10237,47 @@ export interface operations {
        * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
        */
       401: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * BETA Gets the status of a Hype Train for the specified broadcaster.
+   * @description BETA Get the status of a Hype Train for the specified broadcaster.
+   *
+   * __Authorization:__
+   *
+   * * Requires an [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+   * * Requires OAuth Scope: `channel:read:hype_train`.
+   * * Requires that `broadcaster_id` and `user_id` match in the User-Access token.
+   */
+  "get-hype-train-status": {
+    parameters: {
+      query: {
+        /** @description The User ID of the channel broadcaster. */
+        broadcaster_id: string;
+      };
+    };
+    responses: {
+      /** @description Successfully retrieved the status object. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetHypeTrainStatusResponse"];
+        };
+      };
+      /** @description The ID in the `broadcaster_id` query parameter is not valid. */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The OAuth token is not valid.
+       * * The Authorization header is required and must contain a user access token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description Internal Server Error. */
+      500: {
         content: never;
       };
     };
@@ -12995,6 +13189,10 @@ export interface operations {
        * * The ID specified in the Client-Id header does not match the client ID specified in the access token.
        */
       401: {
+        content: never;
+      };
+      /** @description The app exceeded the number of requests that it may make. */
+      429: {
         content: never;
       };
     };
