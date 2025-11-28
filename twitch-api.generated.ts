@@ -490,6 +490,19 @@ export interface paths {
      */
     post: operations["create-clip"];
   };
+  "/clips/downloads": {
+    /**
+     * NEW Provides URLs to download the video file(s) for the specified clips.
+     * @description NEW Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
+     *
+     * **Rate Limits**: Limited to 100 requests per minute.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `editor:manage:clips` or `channel:manage:clips` scope.
+     */
+    get: operations["get-clips-download"];
+  };
   "/eventsub/conduits": {
     /**
      * NEW  Gets the conduits for a client ID.
@@ -985,8 +998,11 @@ export interface paths {
   };
   "/hypetrain/events": {
     /**
+     * DEPRECATED Gets information about the broadcaster’s current or most recent Hype Train event.
+     * @deprecated
+     * @description DEPRECATED Scheduled for removal on December 4, 2025\. Use “Get Hype Train Status” instead. See [announcement](https://discuss.dev.twitch.com/t/legacy-get-hype-train-events-api-and-eventsub-hype-train-v1-subscription-types-deprecation-and-withdrawal-timeline/64299).
+     *
      * Gets information about the broadcaster’s current or most recent Hype Train event.
-     * @description Gets information about the broadcaster’s current or most recent Hype Train event.
      *
      * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
      *
@@ -998,8 +1014,8 @@ export interface paths {
   };
   "/hypetrain/status": {
     /**
-     * BETA Gets the status of a Hype Train for the specified broadcaster.
-     * @description BETA Get the status of a Hype Train for the specified broadcaster.
+     * NEW Gets the status of a Hype Train for the specified broadcaster.
+     * @description NEW Get the status of a Hype Train for the specified broadcaster.
      *
      * __Authorization:__
      *
@@ -1657,6 +1673,17 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit** scope.
      */
     put: operations["update-user"];
+  };
+  "/authorization/users": {
+    /**
+     * NEW Gets the authorization scopes that the specified user has granted the application.
+     * @description NEW Gets the authorization scopes that the specified user(s) have granted the application.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     */
+    get: operations["get-authorization-by-user"];
   };
   "/users/blocks": {
     /**
@@ -3109,7 +3136,7 @@ export interface components {
        *
        * If this parameter is not set, the default value when using an App Access Token is `false`. On May 19, 2025 the default value for this parameter will be updated to `true`, and chat messages sent using an App Access Token will only be shared with the source channel by default. If you prefer to send a chat message to both channels in a shared chat session, make sure this parameter is explicitly set to `false` in your API request before May 19.
        */
-      for_source_only?: Record<string, never>;
+      for_source_only?: boolean;
     };
     SendChatMessageResponse: {
       data: {
@@ -3210,6 +3237,17 @@ export interface components {
         /** @description The cursor used to get the next page of results. Set the request’s _after_ or _before_ query parameter to this value depending on whether you’re paging forwards or backwards. */
         cursor?: string;
       };
+    };
+    GetClipsDownloadResponse: {
+      /** @description List of clips and their download URLs. */
+      data: {
+          /** @description An ID that uniquely identifies the clip. */
+          clip_id: string;
+          /** @description The landscape URL to download the clip. This field is `null` if the URL is not available. */
+          landscape_download_url: string;
+          /** @description The portrait URL to download the clip. This field is `null` if the URL is not available. */
+          portrait_download_url: string;
+        }[];
     };
     GetConduitsResponse: {
       /** @description List of information about the client’s conduits. */
@@ -5488,27 +5526,28 @@ export interface components {
       /** @description The user’s login name. */
       user_login: string;
       /** @description A list of videos that contain markers. The list contains a single video. */
-      videos: Record<string, never>[];
-      /** @description An ID that identifies this video. */
-      video_id: string;
-      /** @description The list of markers in this video. The list in ascending order by when the marker was created. */
-      markers: {
-          /** @description An ID that identifies this marker. */
-          id: string;
-          /**
-           * Format: date-time
-           * @description The UTC date and time (in RFC3339 format) of when the user created the marker.
-           */
-          created_at: string;
-          /** @description The description that the user gave the marker to help them remember why they marked the location. Is an empty string if the user didn’t provide one. */
-          description: string;
-          /**
-           * Format: int32
-           * @description The relative offset (in seconds) of the marker from the beginning of the stream.
-           */
-          position_seconds: number;
-          /** @description A URL that opens the video in Twitch Highlighter. */
-          url: string;
+      videos: {
+          /** @description An ID that identifies this video. */
+          video_id: string;
+          /** @description The list of markers in this video. The list in ascending order by when the marker was created. */
+          markers: {
+              /** @description An ID that identifies this marker. */
+              id: string;
+              /**
+               * Format: date-time
+               * @description The UTC date and time (in RFC3339 format) of when the user created the marker.
+               */
+              created_at: string;
+              /** @description The description that the user gave the marker to help them remember why they marked the location. Is an empty string if the user didn’t provide one. */
+              description: string;
+              /**
+               * Format: int32
+               * @description The relative offset (in seconds) of the marker from the beginning of the stream.
+               */
+              position_seconds: number;
+              /** @description A URL that opens the video in Twitch Highlighter. */
+              url: string;
+            }[];
         }[];
     };
     GetStreamMarkersResponse: {
@@ -5763,6 +5802,19 @@ export interface components {
     UpdateUserResponse: {
       /** @description A list contains the single user that you updated. */
       data: components["schemas"]["User"][];
+    };
+    GetAuthorizationByUserResponse: {
+      /** @description List of users and their authorized scopes. */
+      data: {
+          /** @description The user’s ID. */
+          user_id: string;
+          /** @description The user’s display name. */
+          user_name: string;
+          /** @description The user’s login name. */
+          user_login: string;
+          /** @description An array of all the scopes the user has granted to the client ID. */
+          scopes: string[];
+        }[];
     };
     UserBlockList: {
       /** @description An ID that identifies the blocked user. */
@@ -8189,6 +8241,58 @@ export interface operations {
     };
   };
   /**
+   * NEW Provides URLs to download the video file(s) for the specified clips.
+   * @description NEW Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
+   *
+   * **Rate Limits**: Limited to 100 requests per minute.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `editor:manage:clips` or `channel:manage:clips` scope.
+   */
+  "get-clips-download": {
+    parameters: {
+      query: {
+        /** @description The User ID of the editor for the channel you want to download a clip for. If using the broadcaster’s auth token, this is the same as `broadcaster_id`. This must match the `user_id` in the user access token. */
+        editor_id: string;
+        /** @description The ID of the broadcaster you want to download clips for. */
+        broadcaster_id: string;
+        /** @description The ID that identifies the clip you want to download. Include this parameter for each clip you want to download, up to a maximum of 10 clips. For example, `clip_id=SleepyGiftedPeppermintNerfRedBlaster-KbkBXYt3lOk3jy8-&clip_id=WimpyAltruisticKleeKeyboardCat-EiY5yMrEwZ4i4gwC`. */
+        clip_id: string[];
+      };
+    };
+    responses: {
+      /** @description Successfully retrieved the clip download URL(s). */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetClipsDownloadResponse"];
+        };
+      };
+      /** @description The ID in the broadcaster\_id, editor\_id, or clip\_id query parameter is not valid. */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The OAuth token is not valid.
+       * * The Authorization header is required and must contain a user access token or app access token.
+       * * The access token must include the editor:manage:clips or channel:manage:clips scope
+       * * The access token is not valid
+       * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description The user is not an editor for the specified broadcaster. */
+      403: {
+        content: never;
+      };
+      /** @description Internal Server Error. */
+      500: {
+        content: never;
+      };
+    };
+  };
+  /**
    * NEW  Gets the conduits for a client ID.
    * @description NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) for a client ID.
    *
@@ -10202,8 +10306,11 @@ export interface operations {
     };
   };
   /**
+   * DEPRECATED Gets information about the broadcaster’s current or most recent Hype Train event.
+   * @deprecated
+   * @description DEPRECATED Scheduled for removal on December 4, 2025\. Use “Get Hype Train Status” instead. See [announcement](https://discuss.dev.twitch.com/t/legacy-get-hype-train-events-api-and-eventsub-hype-train-v1-subscription-types-deprecation-and-withdrawal-timeline/64299).
+   *
    * Gets information about the broadcaster’s current or most recent Hype Train event.
-   * @description Gets information about the broadcaster’s current or most recent Hype Train event.
    *
    * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
    *
@@ -10242,8 +10349,8 @@ export interface operations {
     };
   };
   /**
-   * BETA Gets the status of a Hype Train for the specified broadcaster.
-   * @description BETA Get the status of a Hype Train for the specified broadcaster.
+   * NEW Gets the status of a Hype Train for the specified broadcaster.
+   * @description NEW Get the status of a Hype Train for the specified broadcaster.
    *
    * __Authorization:__
    *
@@ -13193,6 +13300,49 @@ export interface operations {
       };
       /** @description The app exceeded the number of requests that it may make. */
       429: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * NEW Gets the authorization scopes that the specified user has granted the application.
+   * @description NEW Gets the authorization scopes that the specified user(s) have granted the application.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+   */
+  "get-authorization-by-user": {
+    parameters: {
+      query: {
+        /** @description The ID of the user(s) you want to check authorization for. To specify more than one user, include the user\_id parameter for each user to get. For example, `user_id=1234&user_id=5678`. The maximum number of IDs you may specify is 10. */
+        user_id: string[];
+      };
+    };
+    responses: {
+      /** @description Successfully retrieved user authorization. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetAuthorizationByUserResponse"];
+        };
+      };
+      /** @description Request is malformed - invalid parameters or missing parameters. */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The access token is not valid.
+       * * Authorization header is required and must specify an app access token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description The client-id in the header must match the client ID in the access token. */
+      403: {
+        content: never;
+      };
+      /** @description Internal Server Error. */
+      500: {
         content: never;
       };
     };

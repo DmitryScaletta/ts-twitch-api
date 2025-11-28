@@ -40,6 +40,7 @@ export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
 export type UpdateUserChatColorParams = ParamsSchema<'update-user-chat-color'>;
 export type CreateClipParams = ParamsSchema<'create-clip'>;
 export type GetClipsParams = ParamsSchema<'get-clips'>;
+export type GetClipsDownloadParams = ParamsSchema<'get-clips-download'>;
 export type DeleteConduitParams = ParamsSchema<'delete-conduit'>;
 export type GetConduitShardsParams = ParamsSchema<'get-conduit-shards'>;
 export type GetContentClassificationLabelsParams = ParamsSchema<'get-content-classification-labels'>;
@@ -117,6 +118,7 @@ export type GetChannelTeamsParams = ParamsSchema<'get-channel-teams'>;
 export type GetTeamsParams = ParamsSchema<'get-teams'>;
 export type GetUsersParams = ParamsSchema<'get-users'>;
 export type UpdateUserParams = ParamsSchema<'update-user'>;
+export type GetAuthorizationByUserParams = ParamsSchema<'get-authorization-by-user'>;
 export type GetUserBlockListParams = ParamsSchema<'get-user-block-list'>;
 export type BlockUserParams = ParamsSchema<'block-user'>;
 export type UnblockUserParams = ParamsSchema<'unblock-user'>;
@@ -188,6 +190,7 @@ export type GetUserChatColorResponse = Schema<'GetUserChatColorResponse'>;
 export type CreateClipResponse = Schema<'CreateClipResponse'>;
 export type Clip = Schema<'Clip'>;
 export type GetClipsResponse = Schema<'GetClipsResponse'>;
+export type GetClipsDownloadResponse = Schema<'GetClipsDownloadResponse'>;
 export type GetConduitsResponse = Schema<'GetConduitsResponse'>;
 export type CreateConduitsBody = Schema<'CreateConduitsBody'>;
 export type CreateConduitsResponse = Schema<'CreateConduitsResponse'>;
@@ -318,6 +321,7 @@ export type GetTeamsResponse = Schema<'GetTeamsResponse'>;
 export type User = Schema<'User'>;
 export type GetUsersResponse = Schema<'GetUsersResponse'>;
 export type UpdateUserResponse = Schema<'UpdateUserResponse'>;
+export type GetAuthorizationByUserResponse = Schema<'GetAuthorizationByUserResponse'>;
 export type UserBlockList = Schema<'UserBlockList'>;
 export type GetUserBlockListResponse = Schema<'GetUserBlockListResponse'>;
 export type UserExtension = Schema<'UserExtension'>;
@@ -2274,6 +2278,56 @@ export class TwitchApi {
         params,
         options,
       }),
+    /**
+     * NEW Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
+     *
+     * **Rate Limits**: Limited to 100 requests per minute.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `editor:manage:clips` or `channel:manage:clips` scope.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/clips/downloads`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the clip download URL(s).
+     *
+     * _400 Bad Request_
+     *
+     * The ID in the broadcaster\_id, editor\_id, or clip\_id query parameter is not valid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The OAuth token is not valid.
+     * * The Authorization header is required and must contain a user access token or app access token.
+     * * The access token must include the editor:manage:clips or channel:manage:clips scope
+     * * The access token is not valid
+     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     *
+     * _403 Forbidden_
+     *
+     * The user is not an editor for the specified broadcaster.
+     *
+     * _500 Internal Server Error_
+     *
+     * Internal Server Error.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-clips-download
+     */
+    getClipsDownload: (
+      params: GetClipsDownloadParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetClipsDownloadResponse, 200, 400 | 401 | 403 | 500>({
+        path: '/clips/downloads',
+        params,
+        options,
+      }),
   };
   conduits = {
     /**
@@ -3981,6 +4035,8 @@ export class TwitchApi {
   };
   hypeTrain = {
     /**
+     * DEPRECATED Scheduled for removal on December 4, 2025\. Use “Get Hype Train Status” instead. See [announcement](https://discuss.dev.twitch.com/t/legacy-get-hype-train-events-api-and-eventsub-hype-train-v1-subscription-types-deprecation-and-withdrawal-timeline/64299).
+     *
      * Gets information about the broadcaster’s current or most recent Hype Train event.
      *
      * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
@@ -4019,7 +4075,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Get the status of a Hype Train for the specified broadcaster.
+     * NEW Get the status of a Hype Train for the specified broadcaster.
      *
      * __Authorization:__
      *
@@ -6644,6 +6700,51 @@ export class TwitchApi {
       this.callApi<UpdateUserResponse, 200, 400 | 401 | 429>({
         path: '/users',
         method: 'PUT',
+        params,
+        options,
+      }),
+    /**
+     * NEW Gets the authorization scopes that the specified user(s) have granted the application.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/authorization/users`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved user authorization.
+     *
+     * _400 Bad Request_
+     *
+     * Request is malformed - invalid parameters or missing parameters.
+     *
+     * _401 Unauthorized_
+     *
+     * * The access token is not valid.
+     * * Authorization header is required and must specify an app access token.
+     *
+     * _403 Forbidden_
+     *
+     * The client-id in the header must match the client ID in the access token.
+     *
+     * _500 Internal Server Error_
+     *
+     * Internal Server Error.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-authorization-by-user
+     */
+    getAuthorizationByUser: (
+      params: GetAuthorizationByUserParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<GetAuthorizationByUserResponse, 200, 400 | 401 | 403 | 500>({
+        path: '/authorization/users',
         params,
         options,
       }),
