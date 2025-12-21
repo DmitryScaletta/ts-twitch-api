@@ -40,6 +40,7 @@ export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
 export type UpdateUserChatColorParams = ParamsSchema<'update-user-chat-color'>;
 export type CreateClipParams = ParamsSchema<'create-clip'>;
 export type GetClipsParams = ParamsSchema<'get-clips'>;
+export type CreateClipFromVODParams = ParamsSchema<'create-clip-from-vod'>;
 export type GetClipsDownloadParams = ParamsSchema<'get-clips-download'>;
 export type DeleteConduitParams = ParamsSchema<'delete-conduit'>;
 export type GetConduitShardsParams = ParamsSchema<'get-conduit-shards'>;
@@ -188,6 +189,7 @@ export type SendChatMessageResponse = Schema<'SendChatMessageResponse'>;
 export type UserChatColor = Schema<'UserChatColor'>;
 export type GetUserChatColorResponse = Schema<'GetUserChatColorResponse'>;
 export type CreateClipResponse = Schema<'CreateClipResponse'>;
+export type CreateClipFromVODResponse = Schema<'CreateClipFromVODResponse'>;
 export type Clip = Schema<'Clip'>;
 export type GetClipsResponse = Schema<'GetClipsResponse'>;
 export type GetClipsDownloadResponse = Schema<'GetClipsDownloadResponse'>;
@@ -2176,7 +2178,7 @@ export class TwitchApi {
     /**
      * Creates a clip from the broadcaster’s stream.
      *
-     * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 3:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
+     * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 2:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
      *
      * By default, Twitch publishes up to the last 30 seconds of the 90 seconds window and provides a default title for the clip. To specify the title and the portion of the 90 seconds window that’s used for the clip, use the URL in the response’s `edit_url` field. You can specify a clip that’s from 5 seconds to 60 seconds in length. The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
      *
@@ -2200,6 +2202,8 @@ export class TwitchApi {
      *
      * * The _broadcaster\_id_ query parameter is required.
      * * The ID in the _broadcaster\_id_ query parameter was not found.
+     * * The category is not clippable.
+     * * The title did not pass AutoMod checks.
      *
      * _401 Unauthorized_
      *
@@ -2212,6 +2216,7 @@ export class TwitchApi {
      *
      * * The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.
      * * The specified broadcaster has not enabled clips on their channel.
+     * * The user is banned or timed out from the broadcaster’s channel.
      *
      * _404 Not Found_
      *
@@ -2275,6 +2280,70 @@ export class TwitchApi {
     ) =>
       this.callApi<GetClipsResponse, 200, 400 | 401 | 404>({
         path: '/clips',
+        params,
+        options,
+      }),
+    /**
+     * BETA Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
+     *
+     * The duration of a clip can be from 5 seconds to 60 seconds in length, with a default of 30 seconds if not specified.
+     *
+     * `vod_offset` indicates where the clip will end. In other words, the clip will start at (`vod_offset` \- `duration`) and end at `vod_offset`. This means that the value of `vod_offset` must greater than or equal to the value of `duration`.
+     *
+     * The URL in the response’s `edit_url` field allows you to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to social platforms.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **editor:manage:clips** or **channel:manage:clips** scope.
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/videos/clips`
+     *
+     * __Response Codes:__
+     *
+     * _202 Accepted_
+     *
+     * Successfully started the clip process.
+     *
+     * _400 Bad Request_
+     *
+     * * Validation errors: Invalid source type, missing required fields.
+     * * The broadcaster\_id query parameter is required.
+     * * The ID in the broadcaster\_id query parameter was not found.
+     * * The category is not clippable.
+     * * The title did not pass AutoMod checks.
+     * * Broadcaster is banned.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify user access token.
+     * * The user access token must include the **editor:manage:clips** or **channel:manage:clips** scope.
+     * * The OAuth token is not valid.
+     * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+     *
+     * _403 Forbidden_
+     *
+     * * The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.
+     * * The specified broadcaster has not enabled clips on their channel.
+     * * The user defined by the _editor\_id_ is not authorized to create Clips.
+     * * The user is banned or timed out from the broadcaster's channel.
+     *
+     * _404 Not Found_
+     *
+     * * The broadcaster in the _broadcaster\_id_ query parameter must be broadcasting live.
+     * * The VOD is not found..
+     * * The _broadcaster\_id_ or the _editor\_id_ does not exist.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#create-clip-from-vod
+     */
+    createClipFromVOD: (
+      params: CreateClipFromVODParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<CreateClipFromVODResponse, 202, 400 | 401 | 403 | 404>({
+        path: '/videos/clips',
+        method: 'POST',
         params,
         options,
       }),

@@ -478,7 +478,7 @@ export interface paths {
      * Creates a clip from the broadcaster’s stream.
      * @description Creates a clip from the broadcaster’s stream.
      *
-     * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 3:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
+     * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 2:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
      *
      * By default, Twitch publishes up to the last 30 seconds of the 90 seconds window and provides a default title for the clip. To specify the title and the portion of the 90 seconds window that’s used for the clip, use the URL in the response’s `edit_url` field. You can specify a clip that’s from 5 seconds to 60 seconds in length. The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
      *
@@ -489,6 +489,23 @@ export interface paths {
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **clips:edit** scope.
      */
     post: operations["create-clip"];
+  };
+  "/videos/clips": {
+    /**
+     * BETA Creates a clip from the broadcaster’s VOD.
+     * @description BETA Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
+     *
+     * The duration of a clip can be from 5 seconds to 60 seconds in length, with a default of 30 seconds if not specified.
+     *
+     * `vod_offset` indicates where the clip will end. In other words, the clip will start at (`vod_offset` \- `duration`) and end at `vod_offset`. This means that the value of `vod_offset` must greater than or equal to the value of `duration`.
+     *
+     * The URL in the response’s `edit_url` field allows you to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to social platforms.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **editor:manage:clips** or **channel:manage:clips** scope.
+     */
+    post: operations["create-clip-from-vod"];
   };
   "/clips/downloads": {
     /**
@@ -3168,15 +3185,25 @@ export interface components {
       data: components["schemas"]["UserChatColor"][];
     };
     CreateClipResponse: {
+      /** @description A list containing the created clip. */
       data: {
+          /** @description An ID that uniquely identifies the clip. */
+          id: string;
           /**
            * @description A URL that you can use to edit the clip’s title, identify the part of the clip to publish, and publish the clip. [Learn More](https://help.twitch.tv/s/article/how-to-use-clips)
            *
            * The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
            */
           edit_url: string;
+        }[];
+    };
+    CreateClipFromVODResponse: {
+      /** @description A list containing the created clip. */
+      data: {
           /** @description An ID that uniquely identifies the clip. */
           id: string;
+          /** @description A URL you can use to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to third-party platforms. */
+          edit_url: string;
         }[];
     };
     Clip: {
@@ -4318,6 +4345,7 @@ export interface components {
         total: number;
       };
     };
+    /** @deprecated */
     GetHypeTrainEventsResponse: {
       /** @description The list of Hype Train events. The list is empty if the broadcaster hasn’t run a Hype Train within the last 5 days. */
       data: components["schemas"]["HypeTrainEvent"][];
@@ -5778,6 +5806,7 @@ export interface components {
       offline_image_url: string;
       /**
        * Format: int32
+       * @deprecated
        * @description The number of times the user's channel has been viewed.
        *
        * **NOTE**: This field has been deprecated (see [Get Users API endpoint – "view\_count" deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
@@ -5805,7 +5834,7 @@ export interface components {
     };
     GetAuthorizationByUserResponse: {
       /** @description List of users and their authorized scopes. */
-      data: {
+      data: ({
           /** @description The user’s ID. */
           user_id: string;
           /** @description The user’s display name. */
@@ -5813,8 +5842,8 @@ export interface components {
           /** @description The user’s login name. */
           user_login: string;
           /** @description An array of all the scopes the user has granted to the client ID. */
-          scopes: string[];
-        }[];
+          scopes: ("analytics:read:extensions" | "analytics:read:games" | "bits:read" | "channel:bot" | "channel:manage:ads" | "channel:read:ads" | "channel:manage:broadcast" | "channel:read:charity" | "channel:manage:clips" | "channel:edit:commercial" | "channel:read:editors" | "channel:manage:extensions" | "channel:read:goals" | "channel:read:guest_star" | "channel:manage:guest_star" | "channel:read:hype_train" | "channel:manage:moderators" | "channel:read:polls" | "channel:manage:polls" | "channel:read:predictions" | "channel:manage:predictions" | "channel:manage:raids" | "channel:read:redemptions" | "channel:manage:redemptions" | "channel:manage:schedule" | "channel:read:stream_key" | "channel:read:subscriptions" | "channel:manage:videos" | "channel:read:vips" | "channel:manage:vips" | "channel:moderate" | "clips:edit" | "editor:manage:clips" | "moderation:read" | "moderator:manage:announcements" | "moderator:manage:automod" | "moderator:read:automod_settings" | "moderator:manage:automod_settings" | "moderator:read:banned_users" | "moderator:manage:banned_users" | "moderator:read:blocked_terms" | "moderator:read:chat_messages" | "moderator:manage:blocked_terms" | "moderator:manage:chat_messages" | "moderator:read:chat_settings" | "moderator:manage:chat_settings" | "moderator:read:chatters" | "moderator:read:followers" | "moderator:read:guest_star" | "moderator:manage:guest_star" | "moderator:read:moderators" | "moderator:read:shield_mode" | "moderator:manage:shield_mode" | "moderator:read:shoutouts" | "moderator:manage:shoutouts" | "moderator:read:suspicious_users" | "moderator:read:unban_requests" | "moderator:manage:unban_requests" | "moderator:read:vips" | "moderator:read:warnings" | "moderator:manage:warnings" | "user:bot" | "user:edit" | "user:edit:broadcast" | "user:read:blocked_users" | "user:manage:blocked_users" | "user:read:broadcast" | "user:read:chat" | "user:manage:chat_color" | "user:read:email" | "user:read:emotes" | "user:read:follows" | "user:read:moderated_channels" | "user:read:subscriptions" | "user:read:whispers" | "user:manage:whispers" | "user:write:chat" | "chat:edit" | "chat:read" | "whispers:read")[];
+        })[];
     };
     UserBlockList: {
       /** @description An ID that identifies the blocked user. */
@@ -8185,7 +8214,7 @@ export interface operations {
    * Creates a clip from the broadcaster’s stream.
    * @description Creates a clip from the broadcaster’s stream.
    *
-   * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 3:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
+   * This API captures up to 90 seconds of the broadcaster’s stream. The 90 seconds spans the point in the stream from when you called the API. For example, if you call the API at the 4:00 minute mark, the API captures from approximately the 2:35 mark to approximately the 4:05 minute mark. Twitch tries its best to capture 90 seconds of the stream, but the actual length may be less. This may occur if you begin capturing the clip near the beginning or end of the stream.
    *
    * By default, Twitch publishes up to the last 30 seconds of the 90 seconds window and provides a default title for the clip. To specify the title and the portion of the 90 seconds window that’s used for the clip, use the URL in the response’s `edit_url` field. You can specify a clip that’s from 5 seconds to 60 seconds in length. The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
    *
@@ -8200,8 +8229,10 @@ export interface operations {
       query: {
         /** @description The ID of the broadcaster whose stream you want to create a clip from. */
         broadcaster_id: string;
-        /** @description A Boolean value that determines whether the API captures the clip at the moment the viewer requests it or after a delay. If **false** (default), Twitch captures the clip at the moment the viewer requests it (this is the same clip experience as the Twitch UX). If **true**, Twitch adds a delay before capturing the clip (this basically shifts the capture window to the right slightly). */
-        has_delay?: boolean;
+        /** @description The title of the clip. */
+        title?: string;
+        /** @description The length of the clip in seconds. Possible values range from 5 to 60 inclusively with a precision of 0.1\. The default is 30. */
+        duration?: Record<string, never>;
       };
     };
     responses: {
@@ -8214,6 +8245,8 @@ export interface operations {
       /**
        * @description * The _broadcaster\_id_ query parameter is required.
        * * The ID in the _broadcaster\_id_ query parameter was not found.
+       * * The category is not clippable.
+       * * The title did not pass AutoMod checks.
        */
       400: {
         content: never;
@@ -8230,11 +8263,89 @@ export interface operations {
       /**
        * @description * The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.
        * * The specified broadcaster has not enabled clips on their channel.
+       * * The user is banned or timed out from the broadcaster’s channel.
        */
       403: {
         content: never;
       };
       /** @description * The broadcaster in the _broadcaster\_id_ query parameter must be broadcasting live. */
+      404: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * BETA Creates a clip from the broadcaster’s VOD.
+   * @description BETA Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
+   *
+   * The duration of a clip can be from 5 seconds to 60 seconds in length, with a default of 30 seconds if not specified.
+   *
+   * `vod_offset` indicates where the clip will end. In other words, the clip will start at (`vod_offset` \- `duration`) and end at `vod_offset`. This means that the value of `vod_offset` must greater than or equal to the value of `duration`.
+   *
+   * The URL in the response’s `edit_url` field allows you to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to social platforms.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **editor:manage:clips** or **channel:manage:clips** scope.
+   */
+  "create-clip-from-vod": {
+    parameters: {
+      query: {
+        /** @description The user ID of the editor for the channel you want to create a clip for. If using the broadcaster’s auth token, this is the same as broadcaster\_id. This must match the user\_id in the user access token. */
+        editor_id: string;
+        /** @description The user ID for the channel you want to create a clip for. */
+        broadcaster_id: string;
+        /** @description ID of the VOD the user wants to clip. */
+        vod_id: string;
+        /** @description Offset in the VOD to create the clip. See notes above. */
+        vod_offset: number;
+        /** @description The length of the clip, in seconds. Precision is 0.1\. Defaults to 30\. Min: 5 seconds, Max: 60 seconds. */
+        duration?: Record<string, never>;
+        /** @description The title of the clip. */
+        title: string;
+      };
+    };
+    responses: {
+      /** @description Successfully started the clip process. */
+      202: {
+        content: {
+          "application/json": components["schemas"]["CreateClipFromVODResponse"];
+        };
+      };
+      /**
+       * @description * Validation errors: Invalid source type, missing required fields.
+       * * The broadcaster\_id query parameter is required.
+       * * The ID in the broadcaster\_id query parameter was not found.
+       * * The category is not clippable.
+       * * The title did not pass AutoMod checks.
+       * * Broadcaster is banned.
+       */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The Authorization header is required and must specify user access token.
+       * * The user access token must include the **editor:manage:clips** or **channel:manage:clips** scope.
+       * * The OAuth token is not valid.
+       * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+       */
+      401: {
+        content: never;
+      };
+      /**
+       * @description * The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.
+       * * The specified broadcaster has not enabled clips on their channel.
+       * * The user defined by the _editor\_id_ is not authorized to create Clips.
+       * * The user is banned or timed out from the broadcaster's channel.
+       */
+      403: {
+        content: never;
+      };
+      /**
+       * @description * The broadcaster in the _broadcaster\_id_ query parameter must be broadcasting live.
+       * * The VOD is not found..
+       * * The _broadcaster\_id_ or the _editor\_id_ does not exist.
+       */
       404: {
         content: never;
       };
