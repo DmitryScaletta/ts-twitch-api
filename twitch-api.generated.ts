@@ -1320,14 +1320,34 @@ export interface paths {
   };
   "/moderation/warnings": {
     /**
-     * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
-     * @description NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+     * Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
+     * @description Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
      *
      * __Authorization:__
      *
      * Requires a user access token that includes the **moderator:manage:warnings** scope. Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      */
     post: operations["warn-chat-user"];
+  };
+  "/moderation/suspicious_users": {
+    /**
+     * BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+     * @description BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+     */
+    post: operations["add-suspicious-status-to-chat-user"];
+    /**
+     * BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+     * @description BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+     */
+    delete: operations["remove-suspicious-status-from-chat-user"];
   };
   "/polls": {
     /**
@@ -3149,7 +3169,7 @@ export interface components {
       /**
        * @description **NOTE:** This parameter can only be set when utilizing an App Access Token. It cannot be specified when a User Access Token is used, and will instead result in an HTTP 400 error.
        *
-       * Determines if the chat message is sent only to the source channel (defined by _broadcaster\_id_) during a shared chat session. This has no effect if the message is sent during a shared chat session.
+       * Determines if the chat message is sent only to the source channel (defined by _broadcaster\_id_) during a shared chat session. This has no effect if the message is not sent during a shared chat session.
        *
        * If this parameter is not set, the default value when using an App Access Token is `false`. On May 19, 2025 the default value for this parameter will be updated to `true`, and chat messages sent using an App Access Token will only be shared with the source channel by default. If you prefer to send a chat message to both channels in a shared chat session, make sure this parameter is explicitly set to `false` in your API request before May 19.
        */
@@ -4949,6 +4969,61 @@ export interface components {
           reason: string;
         }[];
     };
+    AddSuspiciousStatusToChatUserBody: {
+      /** @description The ID of the user being given the suspicious status. */
+      user_id: string;
+      /**
+       * @description The type of suspicious status. Possible values are: ACTIVE\_MONITORING, RESTRICTED
+       * @enum {string}
+       */
+      status: "ACTIVE_MONITORING" | "RESTRICTED";
+    };
+    AddSuspiciousStatusToChatUserResponse: {
+      /** @description An array with one object containing information about the suspicious user action. */
+      data: ({
+          /** @description The ID of the user being given the suspicious status. */
+          user_id: string;
+          /** @description The user ID of the broadcaster indicating in which channel the status is being applied. */
+          broadcaster_id: string;
+          /** @description The user ID of the moderator who applied the last status. */
+          moderator_id: string;
+          /**
+           * Format: date-time
+           * @description The timestamp of the last time this user’s status was updated.
+           */
+          updated_at: string;
+          /**
+           * @description The type of suspicious status. Possible values are: ACTIVE\_MONITORING, RESTRICTED
+           * @enum {string}
+           */
+          status: "ACTIVE_MONITORING" | "RESTRICTED";
+          /** @description An array of strings representing the type(s) of suspicious user this is. Possible values are: MANUALLY\_ADDED, DETECTED\_BAN\_EVADER, DETECTED\_SUS\_CHATTER, BANNED\_IN\_SHARED\_CHANNEL */
+          types: ("MANUALLY_ADDED" | "DETECTED_BAN_EVADER" | "DETECTED_SUS_CHATTER" | "BANNED_IN_SHARED_CHANNEL")[];
+        })[];
+    };
+    RemoveSuspiciousStatusFromChatUserResponse: {
+      /** @description An array with one object containing information about the suspicious user action. */
+      data: ({
+          /** @description The ID of the user having the suspicious status removed. */
+          user_id: string;
+          /** @description The user ID of the broadcaster indicating in which channel the status is being removed. */
+          broadcaster_id: string;
+          /** @description The user ID of the moderator who modified the last status. */
+          moderator_id: string;
+          /**
+           * Format: date-time
+           * @description The timestamp of the last time this user’s status was updated.
+           */
+          updated_at: string;
+          /**
+           * @description The type of suspicious status. Possible values are: NO\_TREATMENT
+           * @enum {string}
+           */
+          status: "NO_TREATMENT";
+          /** @description An array of strings representing the type(s) of suspicious user this is. Possible values are: MANUALLY\_ADDED, DETECTED\_BAN\_EVADER, DETECTED\_SUS\_CHATTER, BANNED\_IN\_SHARED\_CHANNEL */
+          types: ("MANUALLY_ADDED" | "DETECTED_BAN_EVADER" | "DETECTED_SUS_CHATTER" | "BANNED_IN_SHARED_CHANNEL")[];
+        })[];
+    };
     Poll: {
       /** @description An ID that identifies the poll. */
       id: string;
@@ -5223,7 +5298,7 @@ export interface components {
       /** @description A list that contains the single prediction that you updated. */
       data: components["schemas"]["Prediction"][];
     };
-    StartRaidResponse: {
+    StartARaidResponse: {
       /** @description A list that contains a single object with information about the pending raid. */
       data: {
           /**
@@ -5231,7 +5306,11 @@ export interface components {
            * @description The UTC date and time, in RFC3339 format, of when the raid was requested.
            */
           created_at: string;
-          /** @description A Boolean value that indicates whether the channel being raided contains mature content. */
+          /**
+           * @description **IMPORTANT** This field is deprecated and returns only `false`.
+           *
+           * A Boolean value that indicates whether the channel being raided contains mature content.
+           */
           is_mature: boolean;
         }[];
     };
@@ -5499,7 +5578,11 @@ export interface components {
       tag_ids: string[];
       /** @description The tags applied to the stream. */
       tags: string[];
-      /** @description A Boolean value that indicates whether the stream is meant for mature audiences. */
+      /**
+       * @description **IMPORTANT** This field is deprecated and returns only `false`.
+       *
+       * A Boolean value that indicates whether the stream is meant for mature audiences.
+       */
       is_mature: boolean;
     };
     GetStreamsResponse: {
@@ -5842,7 +5925,7 @@ export interface components {
           /** @description The user’s login name. */
           user_login: string;
           /** @description An array of all the scopes the user has granted to the client ID. */
-          scopes: ("analytics:read:extensions" | "analytics:read:games" | "bits:read" | "channel:bot" | "channel:manage:ads" | "channel:read:ads" | "channel:manage:broadcast" | "channel:read:charity" | "channel:manage:clips" | "channel:edit:commercial" | "channel:read:editors" | "channel:manage:extensions" | "channel:read:goals" | "channel:read:guest_star" | "channel:manage:guest_star" | "channel:read:hype_train" | "channel:manage:moderators" | "channel:read:polls" | "channel:manage:polls" | "channel:read:predictions" | "channel:manage:predictions" | "channel:manage:raids" | "channel:read:redemptions" | "channel:manage:redemptions" | "channel:manage:schedule" | "channel:read:stream_key" | "channel:read:subscriptions" | "channel:manage:videos" | "channel:read:vips" | "channel:manage:vips" | "channel:moderate" | "clips:edit" | "editor:manage:clips" | "moderation:read" | "moderator:manage:announcements" | "moderator:manage:automod" | "moderator:read:automod_settings" | "moderator:manage:automod_settings" | "moderator:read:banned_users" | "moderator:manage:banned_users" | "moderator:read:blocked_terms" | "moderator:read:chat_messages" | "moderator:manage:blocked_terms" | "moderator:manage:chat_messages" | "moderator:read:chat_settings" | "moderator:manage:chat_settings" | "moderator:read:chatters" | "moderator:read:followers" | "moderator:read:guest_star" | "moderator:manage:guest_star" | "moderator:read:moderators" | "moderator:read:shield_mode" | "moderator:manage:shield_mode" | "moderator:read:shoutouts" | "moderator:manage:shoutouts" | "moderator:read:suspicious_users" | "moderator:read:unban_requests" | "moderator:manage:unban_requests" | "moderator:read:vips" | "moderator:read:warnings" | "moderator:manage:warnings" | "user:bot" | "user:edit" | "user:edit:broadcast" | "user:read:blocked_users" | "user:manage:blocked_users" | "user:read:broadcast" | "user:read:chat" | "user:manage:chat_color" | "user:read:email" | "user:read:emotes" | "user:read:follows" | "user:read:moderated_channels" | "user:read:subscriptions" | "user:read:whispers" | "user:manage:whispers" | "user:write:chat" | "chat:edit" | "chat:read" | "whispers:read")[];
+          scopes: ("analytics:read:extensions" | "analytics:read:games" | "bits:read" | "channel:bot" | "channel:manage:ads" | "channel:read:ads" | "channel:manage:broadcast" | "channel:read:charity" | "channel:manage:clips" | "channel:edit:commercial" | "channel:read:editors" | "channel:manage:extensions" | "channel:read:goals" | "channel:read:guest_star" | "channel:manage:guest_star" | "channel:read:hype_train" | "channel:manage:moderators" | "channel:read:polls" | "channel:manage:polls" | "channel:read:predictions" | "channel:manage:predictions" | "channel:manage:raids" | "channel:read:redemptions" | "channel:manage:redemptions" | "channel:manage:schedule" | "channel:read:stream_key" | "channel:read:subscriptions" | "channel:manage:videos" | "channel:read:vips" | "channel:manage:vips" | "channel:moderate" | "clips:edit" | "editor:manage:clips" | "moderation:read" | "moderator:manage:announcements" | "moderator:manage:automod" | "moderator:read:automod_settings" | "moderator:manage:automod_settings" | "moderator:read:banned_users" | "moderator:manage:banned_users" | "moderator:read:blocked_terms" | "moderator:read:chat_messages" | "moderator:manage:blocked_terms" | "moderator:manage:chat_messages" | "moderator:read:chat_settings" | "moderator:manage:chat_settings" | "moderator:read:chatters" | "moderator:read:followers" | "moderator:read:guest_star" | "moderator:manage:guest_star" | "moderator:read:moderators" | "moderator:read:shield_mode" | "moderator:manage:shield_mode" | "moderator:read:shoutouts" | "moderator:manage:shoutouts" | "moderator:read:suspicious_users" | "moderator:manage:suspicious_users" | "moderator:read:unban_requests" | "moderator:manage:unban_requests" | "moderator:read:vips" | "moderator:read:warnings" | "moderator:manage:warnings" | "user:bot" | "user:edit" | "user:edit:broadcast" | "user:read:blocked_users" | "user:manage:blocked_users" | "user:read:broadcast" | "user:read:chat" | "user:manage:chat_color" | "user:read:email" | "user:read:emotes" | "user:read:follows" | "user:read:moderated_channels" | "user:read:subscriptions" | "user:read:whispers" | "user:manage:whispers" | "user:write:chat" | "chat:edit" | "chat:read" | "whispers:read")[];
         })[];
     };
     UserBlockList: {
@@ -8232,7 +8315,7 @@ export interface operations {
         /** @description The title of the clip. */
         title?: string;
         /** @description The length of the clip in seconds. Possible values range from 5 to 60 inclusively with a precision of 0.1\. The default is 30. */
-        duration?: Record<string, never>;
+        duration?: number;
       };
     };
     responses: {
@@ -8300,7 +8383,7 @@ export interface operations {
         /** @description Offset in the VOD to create the clip. See notes above. */
         vod_offset: number;
         /** @description The length of the clip, in seconds. Precision is 0.1\. Defaults to 30\. Min: 5 seconds, Max: 60 seconds. */
-        duration?: Record<string, never>;
+        duration?: number;
         /** @description The title of the clip. */
         title: string;
       };
@@ -9958,23 +10041,10 @@ export interface operations {
       };
     };
     responses: {
-      /**
-       * @description
-       *
-       * __Examples__
-       *
-       * _Request:_
-       *
-       * End Guest Star session
-       *
-       * ```bash
-       * curl -x DELETE `https://api.twitch.tv/helix/guest_star/session?broadcaster_id=9321049&session_id=2KFRQbFtpmfyD3IevNRnCzOPRJI` \
-       * -H 'Authorization: Bearer cfabdegwdoklmawdzdo98xt2fo512y' \
-       * -H 'Client-Id: uo6dggojyb8d6soh92zknwmi5ej1q2'
-       * ```
-       */
-      204: {
-        content: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["EndGuestStarSessionResponse"];
+        };
       };
       /**
        * @description * Missing or invalid _broadcaster\_id_
@@ -11862,8 +11932,8 @@ export interface operations {
     };
   };
   /**
-   * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
-   * @description NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+   * Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged.
+   * @description Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
    *
    * __Authorization:__
    *
@@ -11925,6 +11995,108 @@ export interface operations {
       };
       /** @description Internal Server Error. */
       500: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+   * @description BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+   */
+  "add-suspicious-status-to-chat-user": {
+    parameters: {
+      query: {
+        /** @description The user ID of the broadcaster, indicating the channel where the status is being applied. */
+        broadcaster_id: string;
+        /** @description The user ID of the moderator who is applying the status. */
+        moderator_id: string;
+      };
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["AddSuspiciousStatusToChatUserBody"];
+      };
+    };
+    responses: {
+      /** @description Successfully applied a suspicious user status. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AddSuspiciousStatusToChatUserResponse"];
+        };
+      };
+      /**
+       * @description * Validation errors: Missing required fields.
+       * * The ID in the broadcaster\_id query parameter was not found.
+       * * The status specified was invalid. Must either be ACTIVE\_MONITORING or RESTRICTED
+       * * The status update is not allowed for this user.
+       */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The Authorization header is required and must specify user access token.
+       * * The user access token must include the **moderator:manage:suspicious\_users** scope.
+       * * The OAuth token is not valid.
+       * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description * The user in the moderator\_id query parameter is not one of the broadcaster's moderators. */
+      403: {
+        content: never;
+      };
+    };
+  };
+  /**
+   * BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+   * @description BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+   *
+   * __Authorization:__
+   *
+   * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+   */
+  "remove-suspicious-status-from-chat-user": {
+    parameters: {
+      query: {
+        /** @description The user ID of the broadcaster, indicating the channel where the status is being removed. */
+        broadcaster_id: string;
+        /** @description The user ID of the moderator who is removing the status. */
+        moderator_id: string;
+        /** @description The ID of the user having the suspicious status removed. */
+        user_id: string;
+      };
+    };
+    responses: {
+      /** @description Successfully removed a suspicious user status. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["RemoveSuspiciousStatusFromChatUserResponse"];
+        };
+      };
+      /**
+       * @description * Validation errors: Missing required fields.
+       * * The ID in the broadcaster\_id query parameter was not found.
+       * * The status update is not allowed for this user.
+       */
+      400: {
+        content: never;
+      };
+      /**
+       * @description * The Authorization header is required and must specify user access token.
+       * * The user access token must include the **moderator:manage:suspicious\_users** scope.
+       * * The OAuth token is not valid.
+       * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+       */
+      401: {
+        content: never;
+      };
+      /** @description * The user in the moderator\_id query parameter is not one of the broadcaster's moderators. */
+      403: {
         content: never;
       };
     };
@@ -12256,7 +12428,7 @@ export interface operations {
       /** @description Successfully requested to start a raid. To determine whether the raid successfully occurred (that is, the broadcaster clicked **Raid Now** or the countdown expired), you must subscribe to the [Channel Raid](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelraid) event. */
       200: {
         content: {
-          "application/json": components["schemas"]["StartRaidResponse"];
+          "application/json": components["schemas"]["StartARaidResponse"];
         };
       };
       /**

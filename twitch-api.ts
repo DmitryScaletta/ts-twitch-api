@@ -35,7 +35,7 @@ export type UpdateChatSettingsParams = ParamsSchema<'update-chat-settings'>;
 export type GetSharedChatSessionParams = ParamsSchema<'get-shared-chat-session'>;
 export type GetUserEmotesParams = ParamsSchema<'get-user-emotes'>;
 export type SendChatAnnouncementParams = ParamsSchema<'send-chat-announcement'>;
-export type SendShoutoutParams = ParamsSchema<'send-a-shoutout'>;
+export type SendAShoutoutParams = ParamsSchema<'send-a-shoutout'>;
 export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
 export type UpdateUserChatColorParams = ParamsSchema<'update-user-chat-color'>;
 export type CreateClipParams = ParamsSchema<'create-clip'>;
@@ -95,10 +95,12 @@ export type RemoveChannelVIPParams = ParamsSchema<'remove-channel-vip'>;
 export type UpdateShieldModeStatusParams = ParamsSchema<'update-shield-mode-status'>;
 export type GetShieldModeStatusParams = ParamsSchema<'get-shield-mode-status'>;
 export type WarnChatUserParams = ParamsSchema<'warn-chat-user'>;
+export type AddSuspiciousStatusToChatUserParams = ParamsSchema<'add-suspicious-status-to-chat-user'>;
+export type RemoveSuspiciousStatusFromChatUserParams = ParamsSchema<'remove-suspicious-status-from-chat-user'>;
 export type GetPollsParams = ParamsSchema<'get-polls'>;
 export type GetPredictionsParams = ParamsSchema<'get-predictions'>;
-export type StartRaidParams = ParamsSchema<'start-a-raid'>;
-export type CancelRaidParams = ParamsSchema<'cancel-a-raid'>;
+export type StartARaidParams = ParamsSchema<'start-a-raid'>;
+export type CancelARaidParams = ParamsSchema<'cancel-a-raid'>;
 export type GetChannelStreamScheduleParams = ParamsSchema<'get-channel-stream-schedule'>;
 export type GetChannelICalendarParams = ParamsSchema<'get-channel-icalendar'>;
 export type UpdateChannelStreamScheduleParams = ParamsSchema<'update-channel-stream-schedule'>;
@@ -276,6 +278,9 @@ export type UpdateShieldModeStatusResponse = Schema<'UpdateShieldModeStatusRespo
 export type GetShieldModeStatusResponse = Schema<'GetShieldModeStatusResponse'>;
 export type WarnChatUserBody = Schema<'WarnChatUserBody'>;
 export type WarnChatUserResponse = Schema<'WarnChatUserResponse'>;
+export type AddSuspiciousStatusToChatUserBody = Schema<'AddSuspiciousStatusToChatUserBody'>;
+export type AddSuspiciousStatusToChatUserResponse = Schema<'AddSuspiciousStatusToChatUserResponse'>;
+export type RemoveSuspiciousStatusFromChatUserResponse = Schema<'RemoveSuspiciousStatusFromChatUserResponse'>;
 export type Poll = Schema<'Poll'>;
 export type GetPollsResponse = Schema<'GetPollsResponse'>;
 export type CreatePollBody = Schema<'CreatePollBody'>;
@@ -289,7 +294,7 @@ export type CreatePredictionBody = Schema<'CreatePredictionBody'>;
 export type CreatePredictionResponse = Schema<'CreatePredictionResponse'>;
 export type EndPredictionBody = Schema<'EndPredictionBody'>;
 export type EndPredictionResponse = Schema<'EndPredictionResponse'>;
-export type StartRaidResponse = Schema<'StartRaidResponse'>;
+export type StartARaidResponse = Schema<'StartARaidResponse'>;
 export type ChannelStreamScheduleSegment = Schema<'ChannelStreamScheduleSegment'>;
 export type GetChannelStreamScheduleResponse = Schema<'GetChannelStreamScheduleResponse'>;
 export type CreateChannelStreamScheduleSegmentBody = Schema<'CreateChannelStreamScheduleSegmentBody'>;
@@ -2021,8 +2026,8 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#send-a-shoutout
      */
-    sendShoutout: (
-      params: SendShoutoutParams,
+    sendAShoutout: (
+      params: SendAShoutoutParams,
       options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 429>({
@@ -3792,7 +3797,7 @@ export class TwitchApi {
      *
      * __Response Codes:__
      *
-     * _204 No Content_
+     * _200 OK_
      *
      * _400 Bad Request_
      *
@@ -3810,7 +3815,7 @@ export class TwitchApi {
       params: EndGuestStarSessionParams,
       options: CallApiOptions['options'] = {}
     ) =>
-      this.callApi<void, 204, 400 | 403>({
+      this.callApi<EndGuestStarSessionResponse, 200, 400 | 403>({
         path: '/guest_star/session',
         method: 'DELETE',
         params,
@@ -5326,7 +5331,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
+     * Warns a user in the specified broadcaster’s chat room, preventing them from chat interaction until the warning is acknowledged. New warnings can be issued to a user when they already have a warning in the channel (new warning will replace old warning).
      *
      * __Authorization:__
      *
@@ -5387,6 +5392,101 @@ export class TwitchApi {
         method: 'POST',
         params,
         body,
+        options,
+      }),
+    /**
+     * BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+     *
+     * __URL:__
+     *
+     * `POST https://api.twitch.tv/helix/moderation/suspicious_users`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully applied a suspicious user status.
+     *
+     * _400 Bad Request_
+     *
+     * * Validation errors: Missing required fields.
+     * * The ID in the broadcaster\_id query parameter was not found.
+     * * The status specified was invalid. Must either be ACTIVE\_MONITORING or RESTRICTED
+     * * The status update is not allowed for this user.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify user access token.
+     * * The user access token must include the **moderator:manage:suspicious\_users** scope.
+     * * The OAuth token is not valid.
+     * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+     *
+     * _403 Forbidden_
+     *
+     * * The user in the moderator\_id query parameter is not one of the broadcaster's moderators.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#add-suspicious-status-to-chat-user
+     */
+    addSuspiciousStatusToChatUser: (
+      params: AddSuspiciousStatusToChatUserParams,
+      body: AddSuspiciousStatusToChatUserBody,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<AddSuspiciousStatusToChatUserResponse, 200, 400 | 401 | 403>({
+        path: '/moderation/suspicious_users',
+        method: 'POST',
+        params,
+        body,
+        options,
+      }),
+    /**
+     * BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+     *
+     * __Authorization:__
+     *
+     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/moderation/suspicious_users`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully removed a suspicious user status.
+     *
+     * _400 Bad Request_
+     *
+     * * Validation errors: Missing required fields.
+     * * The ID in the broadcaster\_id query parameter was not found.
+     * * The status update is not allowed for this user.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify user access token.
+     * * The user access token must include the **moderator:manage:suspicious\_users** scope.
+     * * The OAuth token is not valid.
+     * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+     *
+     * _403 Forbidden_
+     *
+     * * The user in the moderator\_id query parameter is not one of the broadcaster's moderators.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#remove-suspicious-status-from-chat-user
+     */
+    removeSuspiciousStatusFromChatUser: (
+      params: RemoveSuspiciousStatusFromChatUserParams,
+      options: CallApiOptions['options'] = {}
+    ) =>
+      this.callApi<RemoveSuspiciousStatusFromChatUserResponse, 200, 400 | 401 | 403>({
+        path: '/moderation/suspicious_users',
+        method: 'DELETE',
+        params,
         options,
       }),
   };
@@ -5742,11 +5842,11 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#start-a-raid
      */
-    startRaid: (
-      params: StartRaidParams | null | undefined = null,
+    startARaid: (
+      params: StartARaidParams | null | undefined = null,
       options: CallApiOptions['options'] = {}
     ) =>
-      this.callApi<StartRaidResponse, 200, 400 | 401 | 404 | 409 | 429>({
+      this.callApi<StartARaidResponse, 200, 400 | 401 | 404 | 409 | 429>({
         path: '/raids',
         method: 'POST',
         params,
@@ -5795,8 +5895,8 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#cancel-a-raid
      */
-    cancelRaid: (
-      params: CancelRaidParams,
+    cancelARaid: (
+      params: CancelARaidParams,
       options: CallApiOptions['options'] = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404 | 429>({

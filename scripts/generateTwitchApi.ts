@@ -18,14 +18,10 @@ const joinLines = (lines: Line[]) =>
 export const lowerFirstLetter = (text: string): string =>
   text.charAt(0).toLowerCase() + text.slice(1);
 
-const endpointNamesMap: Record<string, string> = {
-  'Send a Shoutout': 'SendShoutout',
-  'Start a raid': 'StartRaid',
-  'Cancel a raid': 'CancelRaid',
-  'Get Channel iCalendar': 'GetChannelICalendar',
-};
+const capitalizeWord = (word: string) => word[0].toUpperCase() + word.slice(1);
+
 export const getSchemaNamePrefix = (endpointName: string) =>
-  endpointNamesMap[endpointName] || endpointName.replaceAll(' ', '');
+  endpointName.split(' ').filter(Boolean).map(capitalizeWord).join('');
 
 export const getMethodName = (endpointName: string) =>
   lowerFirstLetter(getSchemaNamePrefix(endpointName));
