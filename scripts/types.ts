@@ -97,15 +97,7 @@ export type OperationObject = {
   servers?: ServerObject[];
 };
 
-export type Method =
-  | 'get'
-  | 'put'
-  | 'post'
-  | 'delete'
-  | 'options'
-  | 'head'
-  | 'patch'
-  | 'trace';
+export type Method = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 
 export type PathItemObject = Record<Method, OperationObject>;
 

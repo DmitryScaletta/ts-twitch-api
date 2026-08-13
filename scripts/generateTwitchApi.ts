@@ -5,15 +5,13 @@ import type {
   ResponseObject,
   ResponsesObject,
   Templates,
-} from './types.ts';
-import responseCodes from './responseCodes.json' with { type: 'json' };
+} from "./types.ts";
+import responseCodes from "./responseCodes.json" with { type: "json" };
 
 type Line = [indentation: number, text: string];
 
 const joinLines = (lines: Line[]) =>
-  lines
-    .map(([length, text]) => Array.from({ length }, () => '  ').join('') + text)
-    .join('\n');
+  lines.map(([length, text]) => Array.from({ length }, () => "  ").join("") + text).join("\n");
 
 export const lowerFirstLetter = (text: string): string =>
   text.charAt(0).toLowerCase() + text.slice(1);
@@ -21,41 +19,41 @@ export const lowerFirstLetter = (text: string): string =>
 const capitalizeWord = (word: string) => word[0]!.toUpperCase() + word.slice(1);
 
 export const getSchemaNamePrefix = (endpointName: string) =>
-  endpointName.replaceAll('-', ' ').split(' ').filter(Boolean).map(capitalizeWord).join('');
+  endpointName.replaceAll("-", " ").split(" ").filter(Boolean).map(capitalizeWord).join("");
 
 export const getMethodName = (endpointName: string) =>
   lowerFirstLetter(getSchemaNamePrefix(endpointName));
 
 export const getBodySchemaName = (endpointName: string) =>
-  getSchemaNamePrefix(endpointName) + 'Body';
+  getSchemaNamePrefix(endpointName) + "Body";
 
 export const getParamsSchemaName = (endpointName: string) =>
-  getSchemaNamePrefix(endpointName) + 'Params';
+  getSchemaNamePrefix(endpointName) + "Params";
 
 export const getResponseSchemaName = (endpointName: string) =>
-  getSchemaNamePrefix(endpointName) + 'Response';
+  getSchemaNamePrefix(endpointName) + "Response";
 
 const parseResponseCodes = (responses: ResponsesObject) => {
-  const responseCodesText = ['__Response Codes:__'];
+  const responseCodesText = ["__Response Codes:__"];
   const responseCodeSuccess: string[] = [];
   const responseCodeError: string[] = [];
   for (const [code, response] of Object.entries(responses)) {
     const { description } = response as ResponseObject;
-    const desc = description!.split('__Examples__')[0]!.trim();
+    const desc = description!.split("__Examples__")[0]!.trim();
     const codeText = responseCodes[code as keyof typeof responseCodes];
-    if (!codeText) throw new Error('No response code: ' + code);
+    if (!codeText) throw new Error("No response code: " + code);
     responseCodesText.push(`_${code} ${codeText}_`);
     if (desc) responseCodesText.push(desc);
-    if (code.startsWith('2')) {
+    if (code.startsWith("2")) {
       responseCodeSuccess.push(code);
     } else {
       responseCodeError.push(code);
     }
   }
   return {
-    responseCodesText: responseCodesText.join('\n\n'),
-    responseCodeSuccess: responseCodeSuccess.join(' | '),
-    responseCodeError: responseCodeError.join(' | '),
+    responseCodesText: responseCodesText.join("\n\n"),
+    responseCodeSuccess: responseCodeSuccess.join(" | "),
+    responseCodeError: responseCodeError.join(" | "),
   };
 };
 
@@ -64,8 +62,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   let api: Line[] = [];
 
   const baseUrl = openApi.servers[0]!.url;
-  const mainTemplate = templates['main']!;
-  const methodCommentTemplate = templates['method-comment']!;
+  const mainTemplate = templates["main"]!;
+  const methodCommentTemplate = templates["method-comment"]!;
 
   type Endpoint = {
     path: string;
@@ -76,8 +74,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
   for (const [path, methods] of Object.entries(openApi.paths)) {
     for (const [method, endpoint] of Object.entries(methods)) {
       const tag = endpoint.tags![0]!;
-      let tagName = lowerFirstLetter(tag!.replaceAll(' ', ''));
-      if (tag === 'CCLs') tagName = 'ccls';
+      let tagName = lowerFirstLetter(tag!.replaceAll(" ", ""));
+      if (tag === "CCLs") tagName = "ccls";
       if (!endpointsByTags[tagName]) endpointsByTags[tagName] = [];
       endpointsByTags[tagName]!.push({ path, method, endpoint });
     }
@@ -87,14 +85,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
     api.push([1, `${tag} = {`]);
 
     for (const { path, method, endpoint } of endpoints) {
-      const {
-        description,
-        externalDocs,
-        parameters,
-        requestBody,
-        responses,
-        operationId,
-      } = endpoint;
+      const { description, externalDocs, parameters, requestBody, responses, operationId } =
+        endpoint;
       const id = operationId;
 
       const url = `${baseUrl}${path}`;
@@ -102,91 +94,84 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
       let docsUrl = externalDocs?.url;
       let name = externalDocs?.description;
 
-      const { responseCodesText, responseCodeSuccess, responseCodeError } =
-        parseResponseCodes(responses!);
+      const { responseCodesText, responseCodeSuccess, responseCodeError } = parseResponseCodes(
+        responses!,
+      );
 
       let comment = methodCommentTemplate
-        .replace('%DESCRIPTION%', description!)
-        .replace('%METHOD%', method.toUpperCase())
-        .replace('%URL%', url)
-        .replace('%RESPONSE_CODES%', responseCodesText);
+        .replace("%DESCRIPTION%", description!)
+        .replace("%METHOD%", method.toUpperCase())
+        .replace("%URL%", url)
+        .replace("%RESPONSE_CODES%", responseCodesText);
 
       if (docsUrl) {
-        comment = comment.replace('%DOCS_URL%', docsUrl);
+        comment = comment.replace("%DOCS_URL%", docsUrl);
       } else {
-        comment = comment.replace('@see %DOCS_URL%', '').trim();
+        comment = comment.replace("@see %DOCS_URL%", "").trim();
       }
 
-      api.push([2, '/**']);
-      comment
-        .split('\n')
-        .forEach((line) => api.push([2, ` * ${line}`.trimEnd()]));
-      api.push([2, ' */']);
+      api.push([2, "/**"]);
+      comment.split("\n").forEach((line) => api.push([2, ` * ${line}`.trimEnd()]));
+      api.push([2, " */"]);
 
       const hasParams = !!parameters;
       const hasBody = !!requestBody;
-      const hasResponse = !responses!['204'];
+      const hasResponse = !responses!["204"];
 
-      let methodTemplate = '';
+      let methodTemplate = "";
 
       if (!hasParams && !hasBody) {
-        methodTemplate = templates['method-signature-no-params-no-body']!;
+        methodTemplate = templates["method-signature-no-params-no-body"]!;
       }
       if (!hasParams && hasBody) {
-        methodTemplate = templates['method-signature-no-params-body']!;
+        methodTemplate = templates["method-signature-no-params-body"]!;
       }
       if (hasParams && !hasBody) {
-        methodTemplate = templates['method-signature-params-no-body']!;
+        methodTemplate = templates["method-signature-params-no-body"]!;
       }
       if (hasParams && hasBody) {
-        methodTemplate = templates['method-signature-params-body']!;
+        methodTemplate = templates["method-signature-params-body"]!;
       }
 
       const methodName = getMethodName(name!);
       const paramsType = getParamsSchemaName(name!);
       const bodyType = getBodySchemaName(name!);
-      let responseType = hasResponse ? getResponseSchemaName(name!) : 'void';
-      if (id === 'get-channel-icalendar') {
-        responseType = 'string';
+      let responseType = hasResponse ? getResponseSchemaName(name!) : "void";
+      if (id === "get-channel-icalendar") {
+        responseType = "string";
       }
 
       let methodSignature = methodTemplate
-        .replace('%METHOD_NAME%', methodName)
-        .replace('%PATH%', path)
-        .replace('%METHOD%', method.toUpperCase())
-        .replace("    method: 'GET',\n", '');
+        .replace("%METHOD_NAME%", methodName)
+        .replace("%PATH%", path)
+        .replace("%METHOD%", method.toUpperCase())
+        .replace("    method: 'GET',\n", "");
 
       methodSignature = methodSignature
-        .replace('%RESPONSE_TYPE%', responseType)
-        .replace('%RESPONSE_CODE_SUCCESS%', responseCodeSuccess)
-        .replace('%RESPONSE_CODE_ERROR%', responseCodeError);
+        .replace("%RESPONSE_TYPE%", responseType)
+        .replace("%RESPONSE_CODE_SUCCESS%", responseCodeSuccess)
+        .replace("%RESPONSE_CODE_ERROR%", responseCodeError);
 
       if (hasParams) {
         let paramsTypeFinal = paramsType;
-        const hasRequired = (parameters as ParameterObject[]).some(
-          (p) => p.required,
-        );
-        if (!hasRequired) paramsTypeFinal += ' | null | undefined = null';
-        methodSignature = methodSignature.replace(
-          '%PARAMS_TYPE%',
-          paramsTypeFinal,
-        );
+        const hasRequired = (parameters as ParameterObject[]).some((p) => p.required);
+        if (!hasRequired) paramsTypeFinal += " | null | undefined = null";
+        methodSignature = methodSignature.replace("%PARAMS_TYPE%", paramsTypeFinal);
         typeExports.push(`export type ${paramsType} = ParamsSchema<'${id}'>;`);
       }
 
       if (hasBody) {
         let bodyTypeFinal = bodyType;
         const requiredFields = openApi.components.schemas[bodyType]?.required;
-        const hasRequired =
-          Array.isArray(requiredFields) && requiredFields.length > 0;
-        if (!hasRequired) bodyTypeFinal += ' | null | undefined = null';
-        methodSignature = methodSignature.replace('%BODY_TYPE%', bodyTypeFinal);
+        const hasRequired = Array.isArray(requiredFields) && requiredFields.length > 0;
+        if (!hasRequired) bodyTypeFinal += " | null | undefined = null";
+        methodSignature = methodSignature.replace("%BODY_TYPE%", bodyTypeFinal);
       }
 
-      methodSignature.split('\n').map((line) => api.push([2, line]));
+      methodSignature.split("\n").map((line) => api.push([2, line]));
     }
 
-    api.push([1, '};']);
+    api.push([1, "};"]);
   }
 
   for (const schemaName of Object.keys(openApi.components.schemas)) {
@@ -195,8 +180,8 @@ const generateTwitchApi = (openApi: OpenApi, templates: Templates): string => {
 
   return (
     mainTemplate
-      .replace('%TYPE_EXPORTS%', typeExports.join('\n'))
-      .replace('%CONTENT%', joinLines(api).trim()) + '\n'
+      .replace("%TYPE_EXPORTS%", typeExports.join("\n"))
+      .replace("%CONTENT%", joinLines(api).trim()) + "\n"
   );
 };
 

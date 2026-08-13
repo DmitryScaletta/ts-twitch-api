@@ -459,7 +459,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:edit:commercial** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:edit:commercial** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/channels/commercial`
      *
@@ -515,7 +515,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The user ID associated with the token must match the `broadcaster_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:read:ads** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels/ads`
      *
@@ -554,7 +554,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The user ID associated with the token must match the `broadcaster_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:manage:ads** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/channels/ads/schedule/snooze`
      *
@@ -599,7 +599,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **analytics:read:extensions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/analytics/extensions`
      *
@@ -647,7 +647,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **analytics:read:games** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/analytics/games`
      *
@@ -697,7 +697,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **bits:read** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/bits/leaderboard`
      *
@@ -738,7 +738,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/bits/cheermotes`
      *
@@ -773,7 +773,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **bits:read** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/bits/custom_power_ups`
      *
@@ -825,7 +825,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions/transactions`
      *
@@ -872,7 +872,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels`
      *
@@ -924,7 +924,7 @@ export class TwitchApi {
      *
      * All fields are optional, but you must specify at least one field.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/channels`
      *
@@ -990,7 +990,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:editors** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels/editors`
      *
@@ -1030,7 +1030,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels/followed`
      *
@@ -1079,7 +1079,7 @@ export class TwitchApi {
      *
      * This endpoint will return specific follower information only if both of the above are true. If a scope is not provided or the user isn’t the broadcaster or a moderator for the specified channel, only the total follower count will be included in the response.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels/followers`
      *
@@ -1127,7 +1127,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/channel_points/custom_rewards`
      *
@@ -1189,7 +1189,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/channel_points/custom_rewards`
      *
@@ -1245,7 +1245,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** or **channel:manage:redemptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channel_points/custom_rewards`
      *
@@ -1301,7 +1301,7 @@ export class TwitchApi {
      *
      * The body of the request should contain only the fields you’re updating.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/channel_points/custom_rewards`
      *
@@ -1365,7 +1365,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:redemptions** or **channel:manage:redemptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions`
      *
@@ -1419,7 +1419,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions`
      *
@@ -1482,7 +1482,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:charity** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/charity/campaigns`
      *
@@ -1529,7 +1529,7 @@ export class TwitchApi {
      *
      * Requires a user access token that includes the **channel:read:charity** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/charity/donations`
      *
@@ -1583,7 +1583,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:chatters** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:chatters** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/chatters`
      *
@@ -1634,7 +1634,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/emotes`
      *
@@ -1678,7 +1678,7 @@ export class TwitchApi {
      *
      * None
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/emotes/global`
      *
@@ -1696,7 +1696,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: (options: CallApiOptions = {}) => 
+    getGlobalEmotes: (options: CallApiOptions = {}) =>
       this.callApi<GetGlobalEmotesResponse, 200, 401>({
         path: '/chat/emotes/global',
         options,
@@ -1712,7 +1712,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/emotes/set`
      *
@@ -1751,7 +1751,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/badges`
      *
@@ -1793,7 +1793,7 @@ export class TwitchApi {
      *
      * None
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/badges/global`
      *
@@ -1811,7 +1811,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: (options: CallApiOptions = {}) => 
+    getGlobalChatBadges: (options: CallApiOptions = {}) =>
       this.callApi<GetGlobalChatBadgesResponse, 200, 401>({
         path: '/chat/badges/global',
         options,
@@ -1825,7 +1825,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/settings`
      *
@@ -1876,7 +1876,7 @@ export class TwitchApi {
      *
      * To remove the `slow_mode_wait_time`, `follower_mode_duration`, or `non_moderator_chat_delay_duration` field’s value, set the corresponding `slow_mode`, `follower_mode`, or `non_moderator_chat_delay` field to **false** (and don’t include the `slow_mode_wait_time`, `follower_mode_duration`, or `non_moderator_chat_delay_duration` field).
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/chat/settings`
      *
@@ -1927,7 +1927,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/cli/token-command/#app-access-token) or [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/shared_chat/session`
      *
@@ -1969,7 +1969,7 @@ export class TwitchApi {
      * * Requires a user access token that includes the **user:read:emotes** scope.
      * * Query parameter `user_id` must match the `user_id` in the user access token.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/emotes/user`
      *
@@ -2021,7 +2021,7 @@ export class TwitchApi {
      * * The **moderator:manage:announcements** and **user:bot** scopes for the user represented by the `moderator_id` in the query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/chat/announcements`
      *
@@ -2085,7 +2085,7 @@ export class TwitchApi {
      * * The **moderator:manage:shoutouts** and **user:bot** scopes for the user represented by the `moderator_id` in the query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/chat/shoutouts`
      *
@@ -2152,7 +2152,7 @@ export class TwitchApi {
      * * The **user:write:chat** scope and the **user:bot** scope for the user represented by the `sender_id` query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter, unless the user represented by the `sender_id` already has moderator status.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/chat/messages`
      *
@@ -2220,7 +2220,7 @@ export class TwitchApi {
      * * The **moderator:manage:chat\_messages** or **moderator:read:chat\_messages** scope, and the **user:bot** scope for the user represented by the `moderator_id` query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/pins`
      *
@@ -2271,7 +2271,7 @@ export class TwitchApi {
      * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/chat/pins`
      *
@@ -2332,7 +2332,7 @@ export class TwitchApi {
      * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/chat/pins`
      *
@@ -2389,7 +2389,7 @@ export class TwitchApi {
      * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
      * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/chat/pins`
      *
@@ -2439,7 +2439,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/chat/color`
      *
@@ -2477,7 +2477,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:chat\_color** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/chat/color`
      *
@@ -2529,7 +2529,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **clips:edit** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/clips`
      *
@@ -2588,7 +2588,7 @@ export class TwitchApi {
      *
      * The _id_, _game\_id_, and _broadcaster\_id_ query parameters are mutually exclusive.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/clips`
      *
@@ -2637,7 +2637,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **editor:manage:clips** or **channel:manage:clips** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/videos/clips`
      *
@@ -2697,7 +2697,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `editor:manage:clips` or `channel:manage:clips` scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/clips/downloads`
      *
@@ -2747,7 +2747,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/eventsub/conduits`
      *
@@ -2763,7 +2763,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduits
      */
-    getConduits: (options: CallApiOptions = {}) => 
+    getConduits: (options: CallApiOptions = {}) =>
       this.callApi<GetConduitsResponse, 200, 401>({
         path: '/eventsub/conduits',
         options,
@@ -2775,7 +2775,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/eventsub/conduits`
      *
@@ -2816,7 +2816,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/eventsub/conduits`
      *
@@ -2859,7 +2859,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/eventsub/conduits`
      *
@@ -2901,7 +2901,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/eventsub/conduits/shards`
      *
@@ -2944,7 +2944,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/eventsub/conduits/shards`
      *
@@ -2988,7 +2988,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/content_classification_labels`
      *
@@ -3040,7 +3040,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/entitlements/drops`
      *
@@ -3098,7 +3098,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens). The Client ID associated with the access token must be owned by a user who is a member of the [organization](https://dev.twitch.tv/docs/docs/companies/) that holds ownership of the game.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/entitlements/drops`
      *
@@ -3147,7 +3147,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions/configurations`
      *
@@ -3193,7 +3193,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/extensions/configurations`
      *
@@ -3232,7 +3232,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an EBS. For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). Set the `role` field to _external_ and the `user_id` field to the ID of the user that owns the extension.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/extensions/required_configuration`
      *
@@ -3312,7 +3312,7 @@ export class TwitchApi {
      *
      * ```
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/extensions/pubsub`
      *
@@ -3362,7 +3362,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions/live`
      *
@@ -3405,7 +3405,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions/jwt/secrets`
      *
@@ -3427,7 +3427,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: (options: CallApiOptions = {}) => 
+    getExtensionSecrets: (options: CallApiOptions = {}) =>
       this.callApi<GetExtensionSecretsResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
         options,
@@ -3439,7 +3439,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/extensions/jwt/secrets`
      *
@@ -3481,7 +3481,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role` and `user_id` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/extensions/chat`
      *
@@ -3527,7 +3527,7 @@ export class TwitchApi {
      *
      * Requires a signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role` field (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)), and the `role` field must be set to _external_.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions`
      *
@@ -3570,7 +3570,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/extensions/released`
      *
@@ -3612,7 +3612,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the app access token must be the extension’s client ID.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/bits/extensions`
      *
@@ -3650,7 +3650,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). The client ID in the app access token must match the extension’s client ID.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/bits/extensions`
      *
@@ -3702,7 +3702,7 @@ export class TwitchApi {
      *
      * If you use [Conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to receive events, the request must specify an app access token. The request will fail if you use a user access token.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/eventsub/subscriptions`
      *
@@ -3770,7 +3770,7 @@ export class TwitchApi {
      *
      * If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. The token may include any scopes.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/eventsub/subscriptions`
      *
@@ -3819,7 +3819,7 @@ export class TwitchApi {
      *
      * Use the _status_, _type_, _user\_id_, _subscription\_id_, and _conduit\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/eventsub/subscriptions`
      *
@@ -3862,7 +3862,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/games/top`
      *
@@ -3903,7 +3903,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/games`
      *
@@ -3946,7 +3946,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:goals** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/goals`
      *
@@ -3989,7 +3989,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/guest_star/channel_settings`
      *
@@ -4027,7 +4027,7 @@ export class TwitchApi {
      * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/guest_star/channel_settings`
      *
@@ -4065,7 +4065,7 @@ export class TwitchApi {
      * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
      * * Guests must be either invited or assigned a slot within the session
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/guest_star/session`
      *
@@ -4103,7 +4103,7 @@ export class TwitchApi {
      * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/guest_star/session`
      *
@@ -4150,7 +4150,7 @@ export class TwitchApi {
      * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/guest_star/session`
      *
@@ -4190,7 +4190,7 @@ export class TwitchApi {
      * * Query parameter `broadcaster_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/guest_star/invites`
      *
@@ -4232,7 +4232,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/guest_star/invites`
      *
@@ -4275,7 +4275,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/guest_star/invites`
      *
@@ -4320,7 +4320,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/guest_star/slot`
      *
@@ -4369,7 +4369,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/guest_star/slot`
      *
@@ -4405,7 +4405,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/guest_star/slot`
      *
@@ -4451,7 +4451,7 @@ export class TwitchApi {
      * * Query parameter `moderator_id` must match the `user_id` in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
      * * Requires OAuth Scope: `channel:manage:guest_star` or `moderator:manage:guest_star`
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/guest_star/slot_settings`
      *
@@ -4496,7 +4496,7 @@ export class TwitchApi {
      * * Requires OAuth Scope: `channel:read:hype_train`.
      * * Requires that `broadcaster_id` and `user_id` match in the User-Access token.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/hypetrain/status`
      *
@@ -4555,7 +4555,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderation:read** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/enforcements/status`
      *
@@ -4611,7 +4611,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:automod** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:automod** scope for the user represented by the `user_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/automod/message`
      *
@@ -4666,7 +4666,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:automod\_settings** or **moderator:manage:automod\_settings** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:automod\_settings** or **moderator:manage:automod\_settings** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/automod/settings`
      *
@@ -4728,7 +4728,7 @@ export class TwitchApi {
      *
      * Valid values for all levels are from 0 (no filtering) through 4 (most aggressive filtering). These levels affect how aggressively AutoMod holds back messages for moderators to review before they appear in chat or are denied (not shown).
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/moderation/automod/settings`
      *
@@ -4781,7 +4781,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** or **moderator:manage:banned\_users** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderation:read** or **moderator:manage:banned\_users** scope for the user represented by the `broadcaster_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/banned`
      *
@@ -4830,7 +4830,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:banned\_users** and **user:bot** scopes for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/bans`
      *
@@ -4897,7 +4897,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:banned\_users** and **user:bot** scopes for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/moderation/bans`
      *
@@ -4954,7 +4954,7 @@ export class TwitchApi {
      * * Requires a user access token that includes the **moderator:read:unban\_requests** or **moderator:manage:unban\_requests** scope.
      * * Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/unban_requests`
      *
@@ -4999,7 +4999,7 @@ export class TwitchApi {
      * * Requires a user access token that includes the **moderator:manage:unban\_requests** scope.
      * * Query parameter `moderator_id` must match the `user_id` in the[user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/moderation/unban_requests`
      *
@@ -5053,7 +5053,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/blocked_terms`
      *
@@ -5101,7 +5101,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/blocked_terms`
      *
@@ -5154,7 +5154,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/moderation/blocked_terms`
      *
@@ -5204,7 +5204,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:chat\_messages** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/moderation/chat`
      *
@@ -5257,7 +5257,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:moderated\_channels**. The user ID associated with the token must match the `user_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **user:read:moderated\_channels** scope for the user represented by the `user_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/channels`
      *
@@ -5291,7 +5291,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope. If your app also adds and removes moderators, you can use the **channel:manage:moderators** scope instead.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/moderators`
      *
@@ -5333,7 +5333,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:moderators** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/moderators`
      *
@@ -5387,7 +5387,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:moderators** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/moderation/moderators`
      *
@@ -5434,7 +5434,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:vips** scope. If your app also adds and removes VIP status, you can use the **channel:manage:vips** scope instead.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/channels/vips`
      *
@@ -5478,7 +5478,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:vips** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/channels/vips`
      *
@@ -5547,7 +5547,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:vips** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/channels/vips`
      *
@@ -5611,7 +5611,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:shield\_mode** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/moderation/shield_mode`
      *
@@ -5666,7 +5666,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/moderation/shield_mode`
      *
@@ -5714,7 +5714,7 @@ export class TwitchApi {
      * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:warnings** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
      * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:warnings** scope for the user represented by the `moderator_id` query parameter.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/warnings`
      *
@@ -5778,7 +5778,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/moderation/suspicious_users`
      *
@@ -5827,7 +5827,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:suspicious\_users** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/moderation/suspicious_users`
      *
@@ -5877,7 +5877,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:polls** or **channel:manage:polls** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/polls`
      *
@@ -5923,7 +5923,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:polls** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/polls`
      *
@@ -5975,7 +5975,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:polls** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/polls`
      *
@@ -6022,7 +6022,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:predictions** or **channel:manage:predictions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/predictions`
      *
@@ -6064,7 +6064,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:predictions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/predictions`
      *
@@ -6116,7 +6116,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:predictions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/predictions`
      *
@@ -6178,7 +6178,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:raids** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/raids`
      *
@@ -6240,7 +6240,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:raids** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/raids`
      *
@@ -6291,7 +6291,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/schedule`
      *
@@ -6346,7 +6346,7 @@ export class TwitchApi {
      *
      * The Content-Type response header is set to `text/calendar`.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/schedule/icalendar`
      *
@@ -6379,7 +6379,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:schedule** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/schedule/settings`
      *
@@ -6428,7 +6428,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:schedule** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/schedule/segment`
      *
@@ -6483,7 +6483,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:schedule** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PATCH https://api.twitch.tv/helix/schedule/segment`
      *
@@ -6540,7 +6540,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:schedule** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/schedule/segment`
      *
@@ -6588,7 +6588,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/search/categories`
      *
@@ -6632,7 +6632,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/search/channels`
      *
@@ -6672,7 +6672,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:stream\_key** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/streams/key`
      *
@@ -6717,7 +6717,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/streams`
      *
@@ -6755,7 +6755,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:follows** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/streams/followed`
      *
@@ -6801,7 +6801,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/streams/markers`
      *
@@ -6852,7 +6852,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** or **channel:manage:broadcast** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/streams/markers`
      *
@@ -6903,7 +6903,7 @@ export class TwitchApi {
      *
      * A Twitch extensions may use an app access token if the broadcaster has granted the **channel:read:subscriptions** scope from within the Twitch Extensions manager.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/subscriptions`
      *
@@ -6943,7 +6943,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/subscriptions/user`
      *
@@ -6992,7 +6992,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/tags/streams`
      *
@@ -7033,7 +7033,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/streams/tags`
      *
@@ -7074,7 +7074,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/teams/channel`
      *
@@ -7116,7 +7116,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/teams`
      *
@@ -7168,7 +7168,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/users`
      *
@@ -7209,7 +7209,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/users`
      *
@@ -7253,7 +7253,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/authorization/users`
      *
@@ -7298,7 +7298,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:blocked\_users** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/users/blocks`
      *
@@ -7340,7 +7340,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:blocked\_users** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/users/blocks`
      *
@@ -7383,7 +7383,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:blocked\_users** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/users/blocks`
      *
@@ -7423,7 +7423,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:broadcast** or **user:edit:broadcast** scope. To include inactive extensions, you must include the **user:edit:broadcast** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/users/extensions/list`
      *
@@ -7442,7 +7442,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: (options: CallApiOptions = {}) => 
+    getUserExtensions: (options: CallApiOptions = {}) =>
       this.callApi<GetUserExtensionsResponse, 200, 401>({
         path: '/users/extensions/list',
         options,
@@ -7456,7 +7456,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/users/extensions`
      *
@@ -7496,7 +7496,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit:broadcast** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `PUT https://api.twitch.tv/helix/users/extensions`
      *
@@ -7544,7 +7544,7 @@ export class TwitchApi {
      *
      * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens).
      *
-     * __URL:__
+     * **URL:**
      *
      * `GET https://api.twitch.tv/helix/videos`
      *
@@ -7593,7 +7593,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:videos** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `DELETE https://api.twitch.tv/helix/videos`
      *
@@ -7643,7 +7643,7 @@ export class TwitchApi {
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:whispers** scope.
      *
-     * __URL:__
+     * **URL:**
      *
      * `POST https://api.twitch.tv/helix/whispers`
      *

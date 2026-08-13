@@ -2,13 +2,13 @@
 
 Very simple `TwitchApi` class and TypeScript interfaces for all Twitch API endpoints
 
-* Auto-generated from [twitch-api-swagger](https://github.com/DmitryScaletta/twitch-api-swagger)
-* Uses `fetch` under the hood
-* Includes types for all endpoints
-  * _Request Query Parameters_
-  * _Request Body_
-  * _Response Body_
-* Includes descriptions for the fields
+- Auto-generated from [twitch-api-swagger](https://github.com/DmitryScaletta/twitch-api-swagger)
+- Uses `fetch` under the hood
+- Includes types for all endpoints
+  - _Request Query Parameters_
+  - _Request Body_
+  - _Response Body_
+- Includes descriptions for the fields
 
 ## Installation
 
@@ -29,7 +29,7 @@ import type {
   UpdateAutoModSettingsParams,
   UpdateAutoModSettingsBody,
   UpdateAutoModSettingsResponse,
-} from 'ts-twitch-api';
+} from "ts-twitch-api";
 
 const updateAutoModSettings = async (
   params: UpdateAutoModSettingsParams,
@@ -38,22 +38,22 @@ const updateAutoModSettings = async (
   const searchParams = new URLSearchParams(params);
   const url = `https://api.twitch.tv/helix/moderation/automod/settings?${searchParams}`;
   const response = await fetch(url, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(body),
     headers: {
       Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
-      'Client-Id': process.env.CLIENT_ID,
-      'Content-Type': 'application/json',
+      "Client-Id": process.env.CLIENT_ID,
+      "Content-Type": "application/json",
     },
   });
   return response.json() as Promise<UpdateAutoModSettingsResponse>;
-}
+};
 ```
 
 ### `TwitchApi` class
 
 ```ts
-import { TwitchApi } from 'ts-twitch-api';
+import { TwitchApi } from "ts-twitch-api";
 
 const twitchApi = new TwitchApi({
   accessToken: process.env.ACCESS_TOKEN,
@@ -62,7 +62,7 @@ const twitchApi = new TwitchApi({
 
 const response = await twitchApi.chat.updateChatSettings(
   // query params
-  { broadcaster_id: '1', moderator_id: '2' },
+  { broadcaster_id: "1", moderator_id: "2" },
   // body
   { emote_mode: true },
 );
@@ -75,11 +75,11 @@ if (response.ok) {
 
 const streams = await twitchApi.streams.getStreams(
   // some endpoints accept multiple ids like this: `id=1234&id=5678`
-  { user_id: ['1', '2'] },
+  { user_id: ["1", "2"] },
   // override accessToken and/or clientId for different requests
   {
-    accessToken: '<accessToken>',
-    clientId: '<clientId>'
+    accessToken: "<accessToken>",
+    clientId: "<clientId>",
   },
 );
 
@@ -90,7 +90,7 @@ if (streams.ok) {
 // pass fetch options via RequestInit object
 const ac = new AbortController();
 const users = twitchApi.users.getUsers(
-  { id: ['1', '2'] },
+  { id: ["1", "2"] },
   { requestInit: { signal: ac.signal } },
 );
 

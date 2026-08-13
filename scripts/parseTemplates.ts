@@ -1,4 +1,4 @@
-import type { Templates } from './types.ts';
+import type { Templates } from "./types.ts";
 
 const TEMPLATE_REGEX = /## ([^\s]+)\s*```(?:ts|md)\s*/gs;
 
@@ -8,7 +8,7 @@ const parseTemplates = (text: string): Templates => {
 
   for (let i = 0; i < arr.length; i += 2) {
     const name = arr[i]!.trim();
-    const template = arr[i + 1]!.replace('```', '').trim();
+    const template = arr[i + 1]!.replace("```", "").trim();
     templates[name] = template;
   }
 

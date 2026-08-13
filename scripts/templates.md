@@ -115,7 +115,7 @@ export class TwitchApi {
 ```md
 %DESCRIPTION%
 
-__URL:__
+**URL:**
 
 `%METHOD% %URL%`
 
@@ -127,7 +127,7 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: (options: CallApiOptions = {}) => 
+%METHOD_NAME%: (options: CallApiOptions = {}) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
