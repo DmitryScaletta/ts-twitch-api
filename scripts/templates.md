@@ -14,7 +14,7 @@ type ParamsSchema<T extends keyof operations> =
 %TYPE_EXPORTS%
 
 type SuccessCode = 200 | 202 | 204;
-type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
+type ErrorCode = 400 | 401 | 403 | 404 | 409 | 410 | 422 | 425 | 429 | 500;
 export type ApiResponse<
   TData,
   TSuccessCode extends SuccessCode = SuccessCode,
@@ -40,16 +40,16 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
 };
 
 type CallApiOptions = {
+  clientId?: string,
+  accessToken?: string,
+  requestInit?: RequestInit,
+}
+type CallApiConfig = {
   path: string;
   method?: string;
   params?: Record<string, any> | null;
   body?: Record<string, any> | null;
-  requiresAuth?: boolean;
-  options?: {
-    clientId?: string,
-    accessToken?: string,
-    requestInit?: RequestInit,
-  };
+  options?: CallApiOptions;
 };
 
 export type TwitchApiOptions = {
@@ -75,43 +75,35 @@ export class TwitchApi {
     method = 'GET',
     params,
     body,
-    requiresAuth = true,
     options: {
       clientId,
       accessToken,
       requestInit = {},
     } = {},
-  }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
+  }: CallApiConfig): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
       : `${BASE_URL}${path}`;
     const options: RequestInit = { ...requestInit, method };
-    const headers = new Headers();
-    options.headers = headers;
+    options.headers = new Headers();
     if (body) {
-      headers.set('Content-Type', 'application/json');
+      options.headers.set('Content-Type', 'application/json');
       options.body = JSON.stringify(body);
     }
-    if (requiresAuth) {
-      options.headers.set(
-        'Authorization',
-        `Bearer ${accessToken || this._accessToken}`,
-      );
-      options.headers.set('Client-Id', clientId || this._clientId);
-    }
+    options.headers.set(
+      'Authorization',
+      `Bearer ${accessToken || this._accessToken}`,
+    );
+    options.headers.set('Client-Id', clientId || this._clientId);
     const response = await fetch(url, options);
     const status = response.status as any;
-    let data = null;
+    let data: any = null;
     if (status === 200 && path === '/schedule/icalendar') {
       data = await response.text();
     } else if (status !== 204) {
       data = await response.json();
     }
-    return {
-      ok: response.ok,
-      status,
-      data,
-    };
+    return { ok: response.ok, status, data };
   }
 
   %CONTENT%
@@ -135,7 +127,7 @@ __URL:__
 ## method-signature-no-params-no-body
 
 ```ts
-%METHOD_NAME%: (options: CallApiOptions['options'] = {}) => 
+%METHOD_NAME%: (options: CallApiOptions = {}) => 
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
     method: '%METHOD%',
@@ -148,7 +140,7 @@ __URL:__
 ```ts
 %METHOD_NAME%: (
   body: %BODY_TYPE%,
-  options: CallApiOptions['options'] = {}
+  options: CallApiOptions = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
@@ -163,7 +155,7 @@ __URL:__
 ```ts
 %METHOD_NAME%: (
   params: %PARAMS_TYPE%,
-  options: CallApiOptions['options'] = {}
+  options: CallApiOptions = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
@@ -179,7 +171,7 @@ __URL:__
 %METHOD_NAME%: (
   params: %PARAMS_TYPE%,
   body: %BODY_TYPE%,
-  options: CallApiOptions['options'] = {}
+  options: CallApiOptions = {}
 ) =>
   this.callApi<%RESPONSE_TYPE%, %RESPONSE_CODE_SUCCESS%, %RESPONSE_CODE_ERROR%>({
     path: '%PATH%',
