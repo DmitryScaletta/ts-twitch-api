@@ -18,4 +18,4 @@ const [openApi, templatesText] = await Promise.all([
 const templates = parseTemplates(templatesText);
 const twitchApi = generateTwitchApi(openApi, templates);
 
-await fsp.writeFile('./twitch-api.ts', twitchApi);
+await fsp.writeFile('./src/twitch-api.ts', twitchApi);

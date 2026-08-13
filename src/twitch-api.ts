@@ -12,6 +12,7 @@ export type GetExtensionAnalyticsParams = ParamsSchema<'get-extension-analytics'
 export type GetGameAnalyticsParams = ParamsSchema<'get-game-analytics'>;
 export type GetBitsLeaderboardParams = ParamsSchema<'get-bits-leaderboard'>;
 export type GetCheermotesParams = ParamsSchema<'get-cheermotes'>;
+export type GetCustomPowerUpParams = ParamsSchema<'get-custom-power-up'>;
 export type GetExtensionTransactionsParams = ParamsSchema<'get-extension-transactions'>;
 export type GetChannelInformationParams = ParamsSchema<'get-channel-information'>;
 export type ModifyChannelInformationParams = ParamsSchema<'modify-channel-information'>;
@@ -36,6 +37,10 @@ export type GetSharedChatSessionParams = ParamsSchema<'get-shared-chat-session'>
 export type GetUserEmotesParams = ParamsSchema<'get-user-emotes'>;
 export type SendChatAnnouncementParams = ParamsSchema<'send-chat-announcement'>;
 export type SendAShoutoutParams = ParamsSchema<'send-a-shoutout'>;
+export type GetPinnedChatMessageParams = ParamsSchema<'get-pinned-chat-message'>;
+export type PinChatMessageParams = ParamsSchema<'pin-chat-message'>;
+export type UpdatePinnedChatMessageParams = ParamsSchema<'update-pinned-chat-message'>;
+export type UnpinChatMessageParams = ParamsSchema<'unpin-chat-message'>;
 export type GetUserChatColorParams = ParamsSchema<'get-user-chat-color'>;
 export type UpdateUserChatColorParams = ParamsSchema<'update-user-chat-color'>;
 export type CreateClipParams = ParamsSchema<'create-clip'>;
@@ -71,7 +76,6 @@ export type AssignGuestStarSlotParams = ParamsSchema<'assign-guest-star-slot'>;
 export type UpdateGuestStarSlotParams = ParamsSchema<'update-guest-star-slot'>;
 export type DeleteGuestStarSlotParams = ParamsSchema<'delete-guest-star-slot'>;
 export type UpdateGuestStarSlotSettingsParams = ParamsSchema<'update-guest-star-slot-settings'>;
-export type GetHypeTrainEventsParams = ParamsSchema<'get-hype-train-events'>;
 export type GetHypeTrainStatusParams = ParamsSchema<'get-hype-train-status'>;
 export type CheckAutoModStatusParams = ParamsSchema<'check-automod-status'>;
 export type GetAutoModSettingsParams = ParamsSchema<'get-automod-settings'>;
@@ -144,6 +148,7 @@ export type CheermoteImageTheme = Schema<'CheermoteImageTheme'>;
 export type CheermoteImages = Schema<'CheermoteImages'>;
 export type Cheermote = Schema<'Cheermote'>;
 export type GetCheermotesResponse = Schema<'GetCheermotesResponse'>;
+export type GetCustomPowerUpResponse = Schema<'GetCustomPowerUpResponse'>;
 export type ExtensionTransaction = Schema<'ExtensionTransaction'>;
 export type GetExtensionTransactionsResponse = Schema<'GetExtensionTransactionsResponse'>;
 export type ChannelInformation = Schema<'ChannelInformation'>;
@@ -188,6 +193,7 @@ export type UpdateChatSettingsResponse = Schema<'UpdateChatSettingsResponse'>;
 export type SendChatAnnouncementBody = Schema<'SendChatAnnouncementBody'>;
 export type SendChatMessageBody = Schema<'SendChatMessageBody'>;
 export type SendChatMessageResponse = Schema<'SendChatMessageResponse'>;
+export type GetPinnedChatMessageResponse = Schema<'GetPinnedChatMessageResponse'>;
 export type UserChatColor = Schema<'UserChatColor'>;
 export type GetUserChatColorResponse = Schema<'GetUserChatColorResponse'>;
 export type CreateClipResponse = Schema<'CreateClipResponse'>;
@@ -247,8 +253,6 @@ export type CreateGuestStarSessionResponse = Schema<'CreateGuestStarSessionRespo
 export type EndGuestStarSessionResponse = Schema<'EndGuestStarSessionResponse'>;
 export type GuestStarInvite = Schema<'GuestStarInvite'>;
 export type GetGuestStarInvitesResponse = Schema<'GetGuestStarInvitesResponse'>;
-export type HypeTrainEvent = Schema<'HypeTrainEvent'>;
-export type GetHypeTrainEventsResponse = Schema<'GetHypeTrainEventsResponse'>;
 export type GetHypeTrainStatusResponse = Schema<'GetHypeTrainStatusResponse'>;
 export type CheckAutoModStatusBody = Schema<'CheckAutoModStatusBody'>;
 export type AutoModStatus = Schema<'AutoModStatus'>;
@@ -348,7 +352,7 @@ export type DeleteVideosResponse = Schema<'DeleteVideosResponse'>;
 export type SendWhisperBody = Schema<'SendWhisperBody'>;
 
 type SuccessCode = 200 | 202 | 204;
-type ErrorCode = 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429 | 500;
+type ErrorCode = 400 | 401 | 403 | 404 | 409 | 410 | 422 | 425 | 429 | 500;
 export type ApiResponse<
   TData,
   TSuccessCode extends SuccessCode = SuccessCode,
@@ -374,16 +378,16 @@ const getSearchParams = <T extends Record<string, any>>(params: T) => {
 };
 
 type CallApiOptions = {
+  clientId?: string,
+  accessToken?: string,
+  requestInit?: RequestInit,
+}
+type CallApiConfig = {
   path: string;
   method?: string;
   params?: Record<string, any> | null;
   body?: Record<string, any> | null;
-  requiresAuth?: boolean;
-  options?: {
-    clientId?: string,
-    accessToken?: string,
-    requestInit?: RequestInit,
-  };
+  options?: CallApiOptions;
 };
 
 export type TwitchApiOptions = {
@@ -409,43 +413,35 @@ export class TwitchApi {
     method = 'GET',
     params,
     body,
-    requiresAuth = true,
     options: {
       clientId,
       accessToken,
       requestInit = {},
     } = {},
-  }: CallApiOptions): ApiResponse<TData, TSuccessCode, TErrorCode> {
+  }: CallApiConfig): ApiResponse<TData, TSuccessCode, TErrorCode> {
     const url = params
       ? `${BASE_URL}${path}?${getSearchParams(params)}`
       : `${BASE_URL}${path}`;
     const options: RequestInit = { ...requestInit, method };
-    const headers = new Headers();
-    options.headers = headers;
+    options.headers = new Headers();
     if (body) {
-      headers.set('Content-Type', 'application/json');
+      options.headers.set('Content-Type', 'application/json');
       options.body = JSON.stringify(body);
     }
-    if (requiresAuth) {
-      options.headers.set(
-        'Authorization',
-        `Bearer ${accessToken || this._accessToken}`,
-      );
-      options.headers.set('Client-Id', clientId || this._clientId);
-    }
+    options.headers.set(
+      'Authorization',
+      `Bearer ${accessToken || this._accessToken}`,
+    );
+    options.headers.set('Client-Id', clientId || this._clientId);
     const response = await fetch(url, options);
     const status = response.status as any;
-    let data = null;
+    let data: any = null;
     if (status === 200 && path === '/schedule/icalendar') {
       data = await response.text();
     } else if (status !== 204) {
       data = await response.json();
     }
-    return {
-      ok: response.ok,
-      status,
-      data,
-    };
+    return { ok: response.ok, status, data };
   }
 
   ads = {
@@ -458,7 +454,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:edit:commercial** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:edit:commercial** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:edit:commercial** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -498,7 +497,7 @@ export class TwitchApi {
      */
     startCommercial: (
       body: StartCommercialBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<StartCommercialResponse, 200, 400 | 401 | 404 | 429>({
         path: '/channels/commercial',
@@ -511,7 +510,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope. The user ID associated with the token must match the `broadcaster_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:read:ads** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -529,11 +531,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-ad-schedule
      */
     getAdSchedule: (
       params: GetAdScheduleParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetAdScheduleResponse, 200, 400 | 500>({
         path: '/channels/ads',
@@ -545,7 +549,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The `user_id` in the user access token must match the `broadcaster_id`.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope. The user ID associated with the token must match the `broadcaster_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **channel:manage:ads** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -569,11 +576,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#snooze-next-ad
      */
     snoozeNextAd: (
       params: SnoozeNextAdParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<SnoozeNextAdResponse, 200, 400 | 429 | 500>({
         path: '/channels/ads/schedule/snooze',
@@ -624,7 +633,7 @@ export class TwitchApi {
      */
     getExtensionAnalytics: (
       params: GetExtensionAnalyticsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionAnalyticsResponse, 200, 400 | 401 | 404>({
         path: '/analytics/extensions',
@@ -672,7 +681,7 @@ export class TwitchApi {
      */
     getGameAnalytics: (
       params: GetGameAnalyticsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetGameAnalyticsResponse, 200, 400 | 401 | 404>({
         path: '/analytics/games',
@@ -711,15 +720,13 @@ export class TwitchApi {
      * * The access token is not valid.
      * * The ID in the Client-Id header must match the client ID in the access token.
      *
-     * _403 Forbidden_
-     *
      * @see https://dev.twitch.tv/docs/api/reference#get-bits-leaderboard
      */
     getBitsLeaderboard: (
       params: GetBitsLeaderboardParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<GetBitsLeaderboardResponse, 200, 400 | 401 | 403>({
+      this.callApi<GetBitsLeaderboardResponse, 200, 400 | 401>({
         path: '/bits/leaderboard',
         params,
         options,
@@ -750,10 +757,64 @@ export class TwitchApi {
      */
     getCheermotes: (
       params: GetCheermotesParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCheermotesResponse, 200, 401>({
         path: '/bits/cheermotes',
+        params,
+        options,
+      }),
+    /**
+     * NEW Gets a list of custom Power-ups that the specified broadcaster created.
+     *
+     * **NOTE**: A channel may offer a maximum of 50 custom Power-ups, which includes both enabled and disabled Power-ups.
+     *
+     * __Authorization:__
+     *
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **bits:read** scope.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/bits/custom_power_ups`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved the broadcaster’s list of custom Power-ups.
+     *
+     * _400 Bad Request_
+     *
+     * * The _broadcaster\_id_ query parameter is required.
+     * * The request exceeds the maximum number of _id_ query parameters that you may specify.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header must specify a user access token.
+     * * The user access token must include the **bits:read** scope.
+     * * The OAuth token is not valid.
+     * * The ID in the Client-Id header must match the Client ID in the OAuth token.
+     *
+     * _403 Forbidden_
+     *
+     * * The broadcaster is not a partner or affiliate.
+     *
+     * _404 Not Found_
+     *
+     * * All of the custom Power-ups specified using the _id_ query parameter were not found.
+     *
+     * _500 Internal Server Error_
+     *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-custom-power-up
+     */
+    getCustomPowerUp: (
+      params: GetCustomPowerUpParams,
+      options: CallApiOptions = {}
+    ) =>
+      this.callApi<GetCustomPowerUpResponse, 200, 400 | 401 | 403 | 404 | 500>({
+        path: '/bits/custom_power_ups',
         params,
         options,
       }),
@@ -795,7 +856,7 @@ export class TwitchApi {
      */
     getExtensionTransactions: (
       params: GetExtensionTransactionsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionTransactionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/transactions',
@@ -839,11 +900,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-channel-information
      */
     getChannelInformation: (
       params: GetChannelInformationParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelInformationResponse, 200, 400 | 401 | 429 | 500>({
         path: '/channels',
@@ -884,6 +947,7 @@ export class TwitchApi {
      * * A tag in the `tags` field contains special characters or spaces.
      * * One or more tags in the `tags` field failed AutoMod review.
      * * Game restricted for user's age and region
+     * * Title exceeds the 140 character limit.
      *
      * _401 Unauthorized_
      *
@@ -910,7 +974,7 @@ export class TwitchApi {
     modifyChannelInformation: (
       params: ModifyChannelInformationParams,
       body: ModifyChannelInformationBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 409 | 500>({
         path: '/channels',
@@ -952,7 +1016,7 @@ export class TwitchApi {
      */
     getChannelEditors: (
       params: GetChannelEditorsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelEditorsResponse, 200, 400 | 401>({
         path: '/channels/editors',
@@ -998,7 +1062,7 @@ export class TwitchApi {
      */
     getFollowedChannels: (
       params: GetFollowedChannelsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetFollowedChannelsResponse, 200, 400 | 401>({
         path: '/channels/followed',
@@ -1047,7 +1111,7 @@ export class TwitchApi {
      */
     getChannelFollowers: (
       params: GetChannelFollowersParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelFollowersResponse, 200, 400 | 401>({
         path: '/channels/followers',
@@ -1100,12 +1164,14 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#create-custom-rewards
      */
     createCustomRewards: (
       params: CreateCustomRewardsParams,
       body: CreateCustomRewardsBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateCustomRewardsResponse, 200, 400 | 401 | 403 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1156,11 +1222,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#delete-custom-reward
      */
     deleteCustomReward: (
       params: DeleteCustomRewardParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1209,11 +1277,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-custom-reward
      */
     getCustomReward: (
       params: GetCustomRewardParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1225,7 +1295,7 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/api/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
+     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
      *
      * __Request Body:__
      *
@@ -1272,12 +1342,14 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#update-custom-reward
      */
     updateCustomReward: (
       params: UpdateCustomRewardParams,
       body: UpdateCustomRewardBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateCustomRewardResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards',
@@ -1333,7 +1405,7 @@ export class TwitchApi {
      */
     getCustomRewardRedemption: (
       params: GetCustomRewardRedemptionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCustomRewardRedemptionResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards/redemptions',
@@ -1383,12 +1455,14 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#update-redemption-status
      */
     updateRedemptionStatus: (
       params: UpdateRedemptionStatusParams,
       body: UpdateRedemptionStatusBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateRedemptionStatusResponse, 200, 400 | 401 | 403 | 404 | 500>({
         path: '/channel_points/custom_rewards/redemptions',
@@ -1439,7 +1513,7 @@ export class TwitchApi {
      */
     getCharityCampaign: (
       params: GetCharityCampaignParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCharityCampaignResponse, 200, 400 | 401 | 403>({
         path: '/charity/campaigns',
@@ -1486,7 +1560,7 @@ export class TwitchApi {
      */
     getCharityCampaignDonations: (
       params: GetCharityCampaignDonationsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCharityCampaignDonationsResponse, 200, 400 | 401 | 403>({
         path: '/charity/donations',
@@ -1504,7 +1578,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:chatters** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:chatters** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:chatters** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -1539,7 +1616,7 @@ export class TwitchApi {
      */
     getChatters: (
       params: GetChattersParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChattersResponse, 200, 400 | 401 | 403>({
         path: '/chat/chatters',
@@ -1581,7 +1658,7 @@ export class TwitchApi {
      */
     getChannelEmotes: (
       params: GetChannelEmotesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelEmotesResponse, 200, 400 | 401>({
         path: '/chat/emotes',
@@ -1619,7 +1696,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-emotes
      */
-    getGlobalEmotes: (options: CallApiOptions['options'] = {}) => 
+    getGlobalEmotes: (options: CallApiOptions = {}) => 
       this.callApi<GetGlobalEmotesResponse, 200, 401>({
         path: '/chat/emotes/global',
         options,
@@ -1660,7 +1737,7 @@ export class TwitchApi {
      */
     getEmoteSets: (
       params: GetEmoteSetsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetEmoteSetsResponse, 200, 400 | 401>({
         path: '/chat/emotes/set',
@@ -1698,7 +1775,7 @@ export class TwitchApi {
      */
     getChannelChatBadges: (
       params: GetChannelChatBadgesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelChatBadgesResponse, 200, 400 | 401>({
         path: '/chat/badges',
@@ -1734,7 +1811,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-global-chat-badges
      */
-    getGlobalChatBadges: (options: CallApiOptions['options'] = {}) => 
+    getGlobalChatBadges: (options: CallApiOptions = {}) => 
       this.callApi<GetGlobalChatBadgesResponse, 200, 401>({
         path: '/chat/badges/global',
         options,
@@ -1772,7 +1849,7 @@ export class TwitchApi {
      */
     getChatSettings: (
       params: GetChatSettingsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChatSettingsResponse, 200, 400 | 401>({
         path: '/chat/settings',
@@ -1784,7 +1861,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_settings** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_settings** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:chat\_settings** scope for the user represented by the `moderator_id` query parameter.
      *
      * __Request Body:__
      *
@@ -1831,7 +1911,7 @@ export class TwitchApi {
     updateChatSettings: (
       params: UpdateChatSettingsParams,
       body: UpdateChatSettingsBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateChatSettingsResponse, 200, 400 | 401 | 403>({
         path: '/chat/settings',
@@ -1841,7 +1921,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Retrieves the active shared chat session for a channel.
+     * Retrieves the active shared chat session for a channel.
      *
      * __Authorization:__
      *
@@ -1874,7 +1954,7 @@ export class TwitchApi {
      */
     getSharedChatSession: (
       params: GetSharedChatSessionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetSharedChatSessionResponse, 200, 400 | 401 | 500>({
         path: '/shared_chat/session',
@@ -1882,7 +1962,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Retrieves emotes available to the user across all channels.
+     * Retrieves emotes available to the user across all channels.
      *
      * __Authorization:__
      *
@@ -1916,7 +1996,7 @@ export class TwitchApi {
      */
     getUserEmotes: (
       params: GetUserEmotesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUserEmotesResponse, 200, 400 | 401>({
         path: '/chat/emotes/user',
@@ -1926,11 +2006,20 @@ export class TwitchApi {
     /**
      * Sends an announcement to the broadcaster’s chat room.
      *
-     * **Rate Limits**: One announcement may be sent every 2 seconds.
+     * **Rate Limits**: One announcement may be sent every 2 seconds.**NOTE:** When sending announcements during a Shared Chat session, behaviors differ depending on your authentication token type:
+     *
+     * * When using an _App Access Token_, announcements will only be sent to the source channel (defined by the `broadcaster_id` parameter) by default. Announcements can be sent to all channels by using the `for_source_only` parameter and setting it to `false`.
+     * * When using a _User Access Token_, announcements will be sent to all channels in the shared chat session, including the source channel. This behavior cannot be changed with this token type.
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:announcements** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:announcements** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through prior authorizations, has:
+     *
+     * * The **moderator:manage:announcements** and **user:bot** scopes for the user represented by the `moderator_id` in the query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -1948,13 +2037,16 @@ export class TwitchApi {
      * * The `message` field may not contain an empty string.
      * * The string in the `message` field failed review.
      * * The specified color is not valid.
+     * * Cannot set `for_source_only` if User Access Token is used.
      *
      * _401 Unauthorized_
      *
-     * * The Authorization header is required and must contain a user access token.
+     * * The Authorization header is required and must contain an access token.
      * * The user access token is missing the **moderator:manage:announcements** scope.
      * * The OAuth token is not valid.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
+     * * The sender must have authorized the app with the **moderator:manage:announcements** and **user:bot** scopes.
+     * * The broadcaster must have authorized the app with the **channel:bot** scope.
      *
      * _429 Too Many Requests_
      *
@@ -1965,7 +2057,7 @@ export class TwitchApi {
     sendChatAnnouncement: (
       params: SendChatAnnouncementParams,
       body: SendChatAnnouncementBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 429>({
         path: '/chat/announcements',
@@ -1985,7 +2077,13 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shoutouts** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shoutouts** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through prior authorizations, has:
+     *
+     * * The **moderator:manage:shoutouts** and **user:bot** scopes for the user represented by the `moderator_id` in the query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -2028,7 +2126,7 @@ export class TwitchApi {
      */
     sendAShoutout: (
       params: SendAShoutoutParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 429>({
         path: '/chat/shoutouts',
@@ -2037,7 +2135,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Sends a message to the broadcaster’s chat room.
+     * Sends a message to the broadcaster’s chat room.
      *
      * **NOTE:** When sending messages to a Shared Chat session, behaviors differ depending on your authentication token type:
      *
@@ -2046,7 +2144,13 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires an [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:write:chat** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has:
+     *
+     * * The **user:write:chat** scope and the **user:bot** scope for the user represented by the `sender_id` query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter, unless the user represented by the `sender_id` already has moderator status.
      *
      * __URL:__
      *
@@ -2067,12 +2171,15 @@ export class TwitchApi {
      * * The _text_ query parameter is required.
      * * The ID in the _reply\_parent\_message\_id_ query parameter is not valid.
      * * Cannot set \*for\_source\_only\* if User Access Token is used.
+     * * The _reply\_parent\_message\_id_ parameter is not supported when _pin_ is true.
+     * * The _for\_source\_only_ parameter is not supported when _pin_ is true.
      *
      * _401 Unauthorized_
      *
      * * The ID in the user\_id query parameter must match the user ID in the access token.
      * * The Authorization header is required and must contain a user access token.
      * * The user access token must include the user:write:chat scope.
+     * * Pinning requires the **moderator:manage:chat\_messages** scope.
      * * The access token is not valid.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
      *
@@ -2084,16 +2191,245 @@ export class TwitchApi {
      *
      * The message is too large.
      *
+     * _429 Too Many Requests_
+     *
+     * The rate limit has been exceeded.
+     *
      * @see https://dev.twitch.tv/docs/api/reference#send-chat-message
      */
     sendChatMessage: (
       body: SendChatMessageBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<SendChatMessageResponse, 200, 400 | 401 | 403 | 422>({
+      this.callApi<SendChatMessageResponse, 200, 400 | 401 | 403 | 422 | 429>({
         path: '/chat/messages',
         method: 'POST',
         body,
+        options,
+      }),
+    /**
+     * NEW Gets the currently pinned message for the specified broadcaster’s chat room, including message fragments. Only one mod-pinned message can be active per channel at a time.
+     *
+     * __Authorization:__
+     *
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** or **moderator:read:chat\_messages** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has:
+     *
+     * * The **moderator:manage:chat\_messages** or **moderator:read:chat\_messages** scope, and the **user:bot** scope for the user represented by the `moderator_id` query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
+     *
+     * __URL:__
+     *
+     * `GET https://api.twitch.tv/helix/chat/pins`
+     *
+     * __Response Codes:__
+     *
+     * _200 OK_
+     *
+     * Successfully retrieved pinned message(s).
+     *
+     * _400 Bad Request_
+     *
+     * A required query parameter is missing.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify a user access token or app access token.
+     * * The access token must include the **moderator:manage:chat\_messages** or **moderator:read:chat\_messages** scope.
+     *
+     * _403 Forbidden_
+     *
+     * The user does not have permission to moderate the broadcaster’s chat room.
+     *
+     * _500 Internal Server Error_
+     *
+     * An unexpected error occurred.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#get-pinned-chat-message
+     */
+    getPinnedChatMessage: (
+      params: GetPinnedChatMessageParams,
+      options: CallApiOptions = {}
+    ) =>
+      this.callApi<GetPinnedChatMessageResponse, 200, 400 | 401 | 403 | 500>({
+        path: '/chat/pins',
+        params,
+        options,
+      }),
+    /**
+     * NEW Pins a chat message to the top of the specified broadcaster’s chat room. Only one mod-pinned message can be active per channel at a time. If a mod-pinned message already exists, it is automatically replaced.
+     *
+     * __Authorization:__
+     *
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has:
+     *
+     * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
+     *
+     * __URL:__
+     *
+     * `PUT https://api.twitch.tv/helix/chat/pins`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully pinned the message.
+     *
+     * _400 Bad Request_
+     *
+     * * A required query parameter is missing or invalid.
+     * * The _duration\_seconds_ value is invalid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify a user access token or app access token.
+     * * The access token must include the **moderator:manage:chat\_messages** scope.
+     *
+     * _403 Forbidden_
+     *
+     * The user does not have permission to pin messages in this channel.
+     *
+     * _404 Not Found_
+     *
+     * The specified message was not found.
+     *
+     * _409 Conflict_
+     *
+     * The message is already pinned.
+     *
+     * _429 Too Many Requests_
+     *
+     * The rate limit for pinning messages has been exceeded.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#pin-chat-message
+     */
+    pinChatMessage: (
+      params: PinChatMessageParams,
+      options: CallApiOptions = {}
+    ) =>
+      this.callApi<void, 204, 400 | 401 | 403 | 404 | 409 | 429>({
+        path: '/chat/pins',
+        method: 'PUT',
+        params,
+        options,
+      }),
+    /**
+     * NEW Updates the duration of an existing pinned chat message.
+     *
+     * __Authorization:__
+     *
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has:
+     *
+     * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
+     *
+     * __URL:__
+     *
+     * `PATCH https://api.twitch.tv/helix/chat/pins`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully updated the pinned message.
+     *
+     * _400 Bad Request_
+     *
+     * * A required query parameter is missing or invalid.
+     * * The _duration\_seconds_ value is invalid.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify a user access token or app access token.
+     * * The access token must include the **moderator:manage:chat\_messages** scope.
+     *
+     * _403 Forbidden_
+     *
+     * The user does not have permission to update pinned messages in this channel.
+     *
+     * _404 Not Found_
+     *
+     * The specified pinned message was not found.
+     *
+     * _429 Too Many Requests_
+     *
+     * The rate limit for updating pinned messages has been exceeded.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#update-pinned-chat-message
+     */
+    updatePinnedChatMessage: (
+      params: UpdatePinnedChatMessageParams,
+      options: CallApiOptions = {}
+    ) =>
+      this.callApi<void, 204, 400 | 401 | 403 | 404 | 429>({
+        path: '/chat/pins',
+        method: 'PATCH',
+        params,
+        options,
+      }),
+    /**
+     * NEW Unpins a pinned chat message from the specified broadcaster’s chat room.
+     *
+     * __Authorization:__
+     *
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has:
+     *
+     * * The **moderator:manage:chat\_messages** and **user:bot** scopes for the user represented by the `moderator_id` query parameter, and
+     * * The **channel:bot** scope for the user represented by the `broadcaster_id` query parameter.
+     *
+     * __URL:__
+     *
+     * `DELETE https://api.twitch.tv/helix/chat/pins`
+     *
+     * __Response Codes:__
+     *
+     * _204 No Content_
+     *
+     * Successfully unpinned the message.
+     *
+     * _400 Bad Request_
+     *
+     * A required query parameter is missing.
+     *
+     * _401 Unauthorized_
+     *
+     * * The Authorization header is required and must specify a user access token or app access token.
+     * * The access token must include the **moderator:manage:chat\_messages** scope.
+     *
+     * _403 Forbidden_
+     *
+     * The user does not have permission to unpin messages in this channel.
+     *
+     * _404 Not Found_
+     *
+     * The specified pinned message was not found.
+     *
+     * _429 Too Many Requests_
+     *
+     * The rate limit for unpinning messages has been exceeded.
+     *
+     * @see https://dev.twitch.tv/docs/api/reference#unpin-chat-message
+     */
+    unpinChatMessage: (
+      params: UnpinChatMessageParams,
+      options: CallApiOptions = {}
+    ) =>
+      this.callApi<void, 204, 400 | 401 | 403 | 404 | 429>({
+        path: '/chat/pins',
+        method: 'DELETE',
+        params,
         options,
       }),
     /**
@@ -2127,7 +2463,7 @@ export class TwitchApi {
      */
     getUserChatColor: (
       params: GetUserChatColorParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUserChatColorResponse, 200, 400 | 401>({
         path: '/chat/color',
@@ -2170,7 +2506,7 @@ export class TwitchApi {
      */
     updateUserChatColor: (
       params: UpdateUserChatColorParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/chat/color',
@@ -2187,7 +2523,7 @@ export class TwitchApi {
      *
      * By default, Twitch publishes up to the last 30 seconds of the 90 seconds window and provides a default title for the clip. To specify the title and the portion of the 90 seconds window that’s used for the clip, use the URL in the response’s `edit_url` field. You can specify a clip that’s from 5 seconds to 60 seconds in length. The URL is valid for up to 24 hours or until the clip is published, whichever comes first.
      *
-     * Creating a clip is an asynchronous process that can take a short amount of time to complete. To determine whether the clip was successfully created, call [Get Clips](https://dev.twitch.tv/docs/api/reference#get-clips) using the clip ID that this request returned. If Get Clips returns the clip, the clip was successfully created. If after 15 seconds Get Clips hasn’t returned the clip, assume it failed.
+     * Creating a clip is an asynchronous process that can take a short amount of time to complete. To determine whether the clip was successfully created, call [Get Clips](https://dev.twitch.tv/docs/api/reference#get-clips) using the clip ID that this request returned. If Get Clips returns the clip, the clip was successfully created. If after 60 seconds Get Clips hasn’t returned the clip, assume it failed.
      *
      * __Authorization:__
      *
@@ -2231,7 +2567,7 @@ export class TwitchApi {
      */
     createClip: (
       params: CreateClipParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateClipResponse, 202, 400 | 401 | 403 | 404>({
         path: '/clips',
@@ -2281,7 +2617,7 @@ export class TwitchApi {
      */
     getClips: (
       params: GetClipsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetClipsResponse, 200, 400 | 401 | 404>({
         path: '/clips',
@@ -2289,7 +2625,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
+     * NEW Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
      *
      * The duration of a clip can be from 5 seconds to 60 seconds in length, with a default of 30 seconds if not specified.
      *
@@ -2344,7 +2680,7 @@ export class TwitchApi {
      */
     createClipFromVOD: (
       params: CreateClipFromVODParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateClipFromVODResponse, 202, 400 | 401 | 403 | 404>({
         path: '/videos/clips',
@@ -2353,7 +2689,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips).
+     * NEW Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips). These links are temporary and should have a long-term expectation to expire.
      *
      * **Rate Limits**: Limited to 100 requests per minute.
      *
@@ -2395,7 +2731,7 @@ export class TwitchApi {
      */
     getClipsDownload: (
       params: GetClipsDownloadParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetClipsDownloadResponse, 200, 400 | 401 | 403 | 500>({
         path: '/clips/downloads',
@@ -2405,7 +2741,7 @@ export class TwitchApi {
   };
   conduits = {
     /**
-     * NEW Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) for a client ID.
+     * Gets the [conduits](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) for a client ID.
      *
      * __Authorization:__
      *
@@ -2427,13 +2763,13 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-conduits
      */
-    getConduits: (options: CallApiOptions['options'] = {}) => 
+    getConduits: (options: CallApiOptions = {}) => 
       this.callApi<GetConduitsResponse, 200, 401>({
         path: '/eventsub/conduits',
         options,
       }),
     /**
-     * NEW Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
+     * Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
      *
      * __Authorization:__
      *
@@ -2465,7 +2801,7 @@ export class TwitchApi {
      */
     createConduits: (
       body: CreateConduitsBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateConduitsResponse, 200, 400 | 401 | 429>({
         path: '/eventsub/conduits',
@@ -2474,7 +2810,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
+     * Updates a [conduit’s](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) shard count. To delete shards, update the count to a lower number, and the shards above the count will be deleted. For example, if the existing shard count is 100, by resetting shard count to 50, shards 50-99 are disabled.
      *
      * __Authorization:__
      *
@@ -2508,7 +2844,7 @@ export class TwitchApi {
      */
     updateConduits: (
       body: UpdateConduitsBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateConduitsResponse, 200, 400 | 401 | 404>({
         path: '/eventsub/conduits',
@@ -2517,7 +2853,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+     * Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
      *
      * __Authorization:__
      *
@@ -2550,7 +2886,7 @@ export class TwitchApi {
      */
     deleteConduit: (
       params: DeleteConduitParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/eventsub/conduits',
@@ -2559,7 +2895,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
+     * Gets a lists of all shards for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
      *
      * __Authorization:__
      *
@@ -2592,7 +2928,7 @@ export class TwitchApi {
      */
     getConduitShards: (
       params: GetConduitShardsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetConduitShardsResponse, 200, 400 | 401 | 404>({
         path: '/eventsub/conduits/shards',
@@ -2600,7 +2936,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
+     * Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). You can update up to 100 shards in a single request.
      *
      * **NOTE:** Shard IDs are indexed starting at 0, so a conduit with a `shard_count` of 5 will have shards with IDs 0 through 4.
      *
@@ -2616,26 +2952,26 @@ export class TwitchApi {
      *
      * _202 Accepted_
      *
-     * Successfully retrieved shards.
+     * Successfully updated shards.
      *
      * _400 Bad Request_
      *
-     * The id query parameter is required.
+     * * The \`conduit\_id\` query parameter is required.
      *
      * _401 Unauthorized_
      *
-     * Authorization header required with an app access token.
+     * Authorization header requires using an App Access Token for this request.
      *
      * _404 Not Found_
      *
-     * * Conduit not found.
-     * * Conduit’s owner must match the client ID in the access token.
+     * * The specified `conduit_id` does not exist.
+     * * Conduit's owner must match the Client ID in the access token.
      *
      * @see https://dev.twitch.tv/docs/api/reference#update-conduit-shards
      */
     updateConduitShards: (
       body: UpdateConduitShardsBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateConduitShardsResponse, 202, 400 | 401 | 404>({
         path: '/eventsub/conduits/shards',
@@ -2672,7 +3008,7 @@ export class TwitchApi {
      */
     getContentClassificationLabels: (
       params: GetContentClassificationLabelsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetContentClassificationLabelsResponse, 200, 400 | 401 | 500>({
         path: '/content_classification_labels',
@@ -2734,11 +3070,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-drops-entitlements
      */
     getDropsEntitlements: (
       params: GetDropsEntitlementsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetDropsEntitlementsResponse, 200, 400 | 401 | 403 | 500>({
         path: '/entitlements/drops',
@@ -2784,11 +3122,13 @@ export class TwitchApi {
      *
      * _500 Internal Server Error_
      *
+     * An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
+     *
      * @see https://dev.twitch.tv/docs/api/reference#update-drops-entitlements
      */
     updateDropsEntitlements: (
       body: UpdateDropsEntitlementsBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateDropsEntitlementsResponse, 200, 400 | 401 | 500>({
         path: '/entitlements/drops',
@@ -2837,7 +3177,7 @@ export class TwitchApi {
      */
     getExtensionConfigurationSegment: (
       params: GetExtensionConfigurationSegmentParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionConfigurationSegmentResponse, 200, 400 | 401 | 429>({
         path: '/extensions/configurations',
@@ -2877,7 +3217,7 @@ export class TwitchApi {
      */
     setExtensionConfigurationSegment: (
       body: SetExtensionConfigurationSegmentBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/configurations',
@@ -2920,7 +3260,7 @@ export class TwitchApi {
     setExtensionRequiredConfiguration: (
       params: SetExtensionRequiredConfigurationParams,
       body: SetExtensionRequiredConfigurationBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/required_configuration',
@@ -2992,6 +3332,11 @@ export class TwitchApi {
      * * The JWT token is not valid.
      * * The Client-Id header is required.
      *
+     * _403 Forbidden_
+     *
+     * * The channel found in the JWT provided is not the same as the channel specfieid in `broadcaster_id`
+     * * JWT could not be verified
+     *
      * _422 Unprocessable Entity_
      *
      * * The message is too large.
@@ -3000,9 +3345,9 @@ export class TwitchApi {
      */
     sendExtensionPubSubMessage: (
       body: SendExtensionPubSubMessageBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<void, 204, 400 | 401 | 422>({
+      this.callApi<void, 204, 400 | 401 | 403 | 422>({
         path: '/extensions/pubsub',
         method: 'POST',
         body,
@@ -3046,7 +3391,7 @@ export class TwitchApi {
      */
     getExtensionLiveChannels: (
       params: GetExtensionLiveChannelsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionLiveChannelsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/live',
@@ -3082,7 +3427,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-extension-secrets
      */
-    getExtensionSecrets: (options: CallApiOptions['options'] = {}) => 
+    getExtensionSecrets: (options: CallApiOptions = {}) => 
       this.callApi<GetExtensionSecretsResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
         options,
@@ -3119,7 +3464,7 @@ export class TwitchApi {
      */
     createExtensionSecret: (
       params: CreateExtensionSecretParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateExtensionSecretResponse, 200, 400 | 401>({
         path: '/extensions/jwt/secrets',
@@ -3166,7 +3511,7 @@ export class TwitchApi {
     sendExtensionChatMessage: (
       params: SendExtensionChatMessageParams,
       body: SendExtensionChatMessageBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/extensions/chat',
@@ -3211,7 +3556,7 @@ export class TwitchApi {
      */
     getExtensions: (
       params: GetExtensionsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions',
@@ -3253,7 +3598,7 @@ export class TwitchApi {
      */
     getReleasedExtensions: (
       params: GetReleasedExtensionsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetReleasedExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/extensions/released',
@@ -3291,7 +3636,7 @@ export class TwitchApi {
      */
     getExtensionBitsProducts: (
       params: GetExtensionBitsProductsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetExtensionBitsProductsResponse, 200, 400 | 401>({
         path: '/bits/extensions',
@@ -3336,7 +3681,7 @@ export class TwitchApi {
      */
     updateExtensionBitsProduct: (
       body: UpdateExtensionBitsProductBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateExtensionBitsProductResponse, 200, 400 | 401>({
         path: '/bits/extensions',
@@ -3394,7 +3739,11 @@ export class TwitchApi {
      *
      * _409 Conflict_
      *
-     * A subscription already exists for the specified event type and `condition` combination.
+     * A subscription already exists for the specified event type and `condition` combination. The `id` value in the error response represents the existing EventSub subscription.
+     *
+     * _410 Gone_
+     *
+     * The subscription type and version combination has been removed and can no longer be subscribed to.
      *
      * _429 Too Many Requests_
      *
@@ -3404,9 +3753,9 @@ export class TwitchApi {
      */
     createEventSubSubscription: (
       body: CreateEventSubSubscriptionBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<CreateEventSubSubscriptionResponse, 202, 400 | 401 | 403 | 409 | 429>({
+      this.callApi<CreateEventSubSubscriptionResponse, 202, 400 | 401 | 403 | 409 | 410 | 429>({
         path: '/eventsub/subscriptions',
         method: 'POST',
         body,
@@ -3449,7 +3798,7 @@ export class TwitchApi {
      */
     deleteEventSubSubscription: (
       params: DeleteEventSubSubscriptionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/eventsub/subscriptions',
@@ -3468,7 +3817,7 @@ export class TwitchApi {
      *
      * __Request Query Parameters:__
      *
-     * Use the _status_, _type_, _user\_id_, and _subscription\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
+     * Use the _status_, _type_, _user\_id_, _subscription\_id_, and _conduit\_id_ query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
      *
      * __URL:__
      *
@@ -3497,7 +3846,7 @@ export class TwitchApi {
      */
     getEventSubSubscriptions: (
       params: GetEventSubSubscriptionsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetEventSubSubscriptionsResponse, 200, 400 | 401>({
         path: '/eventsub/subscriptions',
@@ -3538,7 +3887,7 @@ export class TwitchApi {
      */
     getTopGames: (
       params: GetTopGamesParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetTopGamesResponse, 200, 400 | 401>({
         path: '/games/top',
@@ -3579,7 +3928,7 @@ export class TwitchApi {
      */
     getGames: (
       params: GetGamesParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetGamesResponse, 200, 400 | 401>({
         path: '/games',
@@ -3623,7 +3972,7 @@ export class TwitchApi {
      */
     getCreatorGoals: (
       params: GetCreatorGoalsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetCreatorGoalsResponse, 200, 400 | 401>({
         path: '/goals',
@@ -3648,6 +3997,8 @@ export class TwitchApi {
      *
      * _200 OK_
      *
+     * Successfully retrieved the Guest Star settings.
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
@@ -3661,7 +4012,7 @@ export class TwitchApi {
      */
     getChannelGuestStarSettings: (
       params: GetChannelGuestStarSettingsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelGuestStarSettingsResponse, 200, 400 | 403>({
         path: '/guest_star/channel_settings',
@@ -3697,7 +4048,7 @@ export class TwitchApi {
     updateChannelGuestStarSettings: (
       params: UpdateChannelGuestStarSettingsParams,
       body: UpdateChannelGuestStarSettingsBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400>({
         path: '/guest_star/channel_settings',
@@ -3722,6 +4073,8 @@ export class TwitchApi {
      *
      * _200 OK_
      *
+     * Successfully retrieved the Guest Star session.
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
@@ -3735,7 +4088,7 @@ export class TwitchApi {
      */
     getGuestStarSession: (
       params: GetGuestStarSessionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetGuestStarSessionResponse, 200, 400 | 401>({
         path: '/guest_star/session',
@@ -3758,6 +4111,8 @@ export class TwitchApi {
      *
      * _200 OK_
      *
+     * Successfully started the Guest Star session.
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
@@ -3771,13 +4126,17 @@ export class TwitchApi {
      *
      * Insufficient authorization for creating session
      *
+     * _409 Conflict_
+     *
+     * Broadcaster is already in another session
+     *
      * @see https://dev.twitch.tv/docs/api/reference#create-guest-star-session
      */
     createGuestStarSession: (
       params: CreateGuestStarSessionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<CreateGuestStarSessionResponse, 200, 400 | 401 | 403>({
+      this.callApi<CreateGuestStarSessionResponse, 200, 400 | 401 | 403 | 409>({
         path: '/guest_star/session',
         method: 'POST',
         params,
@@ -3799,6 +4158,8 @@ export class TwitchApi {
      *
      * _200 OK_
      *
+     * Successfully ended the Guest Star session.
+     *
      * _400 Bad Request_
      *
      * * Missing or invalid _broadcaster\_id_
@@ -3813,7 +4174,7 @@ export class TwitchApi {
      */
     endGuestStarSession: (
       params: EndGuestStarSessionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<EndGuestStarSessionResponse, 200, 400 | 403>({
         path: '/guest_star/session',
@@ -3837,18 +4198,28 @@ export class TwitchApi {
      *
      * _200 OK_
      *
+     * Successfully retrieved the broadcaster’s Guest Star invites.
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
      * * Missing _session\_id_
      *
+     * _403 Forbidden_
+     *
+     * The user specified in the `moderator_id` is not permitted to view the broadcaster’s invites.
+     *
+     * _404 Not Found_
+     *
+     * Invalid `session_id`
+     *
      * @see https://dev.twitch.tv/docs/api/reference#get-guest-star-invites
      */
     getGuestStarInvites: (
       params: GetGuestStarInvitesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<GetGuestStarInvitesResponse, 200, 400>({
+      this.callApi<GetGuestStarInvitesResponse, 200, 400 | 403 | 404>({
         path: '/guest_star/invites',
         params,
         options,
@@ -3869,6 +4240,8 @@ export class TwitchApi {
      *
      * _204 No Content_
      *
+     * Successfully sent the Guest Star invite
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
@@ -3886,7 +4259,7 @@ export class TwitchApi {
      */
     sendGuestStarInvite: (
       params: SendGuestStarInviteParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 403>({
         path: '/guest_star/invites',
@@ -3910,12 +4283,18 @@ export class TwitchApi {
      *
      * _204 No Content_
      *
+     * Successfully deleted the Guest Star invite
+     *
      * _400 Bad Request_
      *
      * * Missing _broadcaster\_id_
      * * Missing _session\_id_
      * * Missing _guest\_id_
      * * Invalid _session\_id_
+     *
+     * _403 Forbidden_
+     *
+     * The user specified in `moderator_id` is not permitted to delete invites for the broadcaster.
      *
      * _404 Not Found_
      *
@@ -3925,9 +4304,9 @@ export class TwitchApi {
      */
     deleteGuestStarInvite: (
       params: DeleteGuestStarInviteParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<void, 204, 400 | 404>({
+      this.callApi<void, 204, 400 | 403 | 404>({
         path: '/guest_star/invites',
         method: 'DELETE',
         params,
@@ -3974,7 +4353,7 @@ export class TwitchApi {
      */
     assignGuestStarSlot: (
       params: AssignGuestStarSlotParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403>({
         path: '/guest_star/slot',
@@ -4010,7 +4389,7 @@ export class TwitchApi {
      */
     updateGuestStarSlot: (
       params: UpdateGuestStarSlotParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400>({
         path: '/guest_star/slot',
@@ -4056,7 +4435,7 @@ export class TwitchApi {
      */
     deleteGuestStarSlot: (
       params: DeleteGuestStarSlotParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 403 | 404>({
         path: '/guest_star/slot',
@@ -4098,7 +4477,7 @@ export class TwitchApi {
      */
     updateGuestStarSlotSettings: (
       params: UpdateGuestStarSlotSettingsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 403>({
         path: '/guest_star/slot_settings',
@@ -4109,47 +4488,7 @@ export class TwitchApi {
   };
   hypeTrain = {
     /**
-     * DEPRECATED Scheduled for removal on December 4, 2025\. Use “Get Hype Train Status” instead. See [announcement](https://discuss.dev.twitch.com/t/legacy-get-hype-train-events-api-and-eventsub-hype-train-v1-subscription-types-deprecation-and-withdrawal-timeline/64299).
-     *
-     * Gets information about the broadcaster’s current or most recent Hype Train event.
-     *
-     * Instead of polling for events, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to Hype Train events ([Begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainbegin), [Progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainprogress), [End](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelhype%5Ftrainend)).
-     *
-     * __Authorization:__
-     *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:hype\_train** scope.
-     *
-     * __URL:__
-     *
-     * `GET https://api.twitch.tv/helix/hypetrain/events`
-     *
-     * __Response Codes:__
-     *
-     * _200 OK_
-     *
-     * Successfully retrieved the broadcaster’s Hype Train events.
-     *
-     * _401 Unauthorized_
-     *
-     * * The ID in _broadcaster\_id_ must match the _user\_id_ in the user access token.
-     * * The Authorization header is required and must contain a user access token.
-     * * The user access token must include the **channel:read:hype\_train** scope.
-     * * The access token is not valid.
-     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
-     *
-     * @see https://dev.twitch.tv/docs/api/reference#get-hype-train-events
-     */
-    getHypeTrainEvents: (
-      params: GetHypeTrainEventsParams,
-      options: CallApiOptions['options'] = {}
-    ) =>
-      this.callApi<GetHypeTrainEventsResponse, 200, 401>({
-        path: '/hypetrain/events',
-        params,
-        options,
-      }),
-    /**
-     * NEW Get the status of a Hype Train for the specified broadcaster.
+     * Get the status of a Hype Train for the specified broadcaster.
      *
      * __Authorization:__
      *
@@ -4184,7 +4523,7 @@ export class TwitchApi {
      */
     getHypeTrainStatus: (
       params: GetHypeTrainStatusParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetHypeTrainStatusResponse, 200, 400 | 401 | 500>({
         path: '/hypetrain/status',
@@ -4211,7 +4550,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderation:read** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -4250,7 +4592,7 @@ export class TwitchApi {
     checkAutoModStatus: (
       params: CheckAutoModStatusParams,
       body: CheckAutoModStatusBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CheckAutoModStatusResponse, 200, 400 | 401 | 403 | 429>({
         path: '/moderation/enforcements/status',
@@ -4262,11 +4604,12 @@ export class TwitchApi {
     /**
      * Allow or deny the message that AutoMod flagged for review. For information about AutoMod, see [How to Use AutoMod](https://help.twitch.tv/s/article/how-to-use-automod).
      *
-     * To get messages that AutoMod is holding for review, subscribe to the **automod-queue.<moderator\_id>.<channel\_id>** [topic](https://dev.twitch.tv/docs/pubsub#topics) using [PubSub](https://dev.twitch.tv/docs/pubsub). PubSub sends a notification to your app when AutoMod holds a message for review.
-     *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:automod** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:automod** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:automod** scope for the user represented by the `user_id` query parameter.
      *
      * __URL:__
      *
@@ -4305,7 +4648,7 @@ export class TwitchApi {
      */
     manageHeldAutoModMessages: (
       body: ManageHeldAutoModMessagesBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404>({
         path: '/moderation/automod/message',
@@ -4318,7 +4661,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:automod\_settings** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:automod\_settings** or **moderator:manage:automod\_settings** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:automod\_settings** or **moderator:manage:automod\_settings** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4351,7 +4697,7 @@ export class TwitchApi {
      */
     getAutoModSettings: (
       params: GetAutoModSettingsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetAutoModSettingsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/automod/settings',
@@ -4363,7 +4709,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:automod\_settings** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:automod\_settings** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:automod\_settings** scope for the user represented by the `moderator_id` query parameter.
      *
      * __Request Body:__
      *
@@ -4413,7 +4762,7 @@ export class TwitchApi {
     updateAutoModSettings: (
       params: UpdateAutoModSettingsParams,
       body: UpdateAutoModSettingsBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateAutoModSettingsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/automod/settings',
@@ -4427,7 +4776,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** or **moderator:manage:banned\_users** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** or **moderator:manage:banned\_users** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderation:read** or **moderator:manage:banned\_users** scope for the user represented by the `broadcaster_id` query parameter.
      *
      * __URL:__
      *
@@ -4455,7 +4807,7 @@ export class TwitchApi {
      */
     getBannedUsers: (
       params: GetBannedUsersParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetBannedUsersResponse, 200, 400 | 401>({
         path: '/moderation/banned',
@@ -4473,7 +4825,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:banned\_users** and **user:bot** scopes for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4521,7 +4876,7 @@ export class TwitchApi {
     banUser: (
       params: BanUserParams,
       body: BanUserBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<BanUserResponse, 200, 400 | 401 | 403 | 409 | 429>({
         path: '/moderation/bans',
@@ -4537,7 +4892,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:banned\_users** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:banned\_users** and **user:bot** scopes for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4580,7 +4938,7 @@ export class TwitchApi {
      */
     unbanUser: (
       params: UnbanUserParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 409 | 429>({
         path: '/moderation/bans',
@@ -4589,7 +4947,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Gets a list of unban requests for a broadcaster’s channel.
+     * Gets a list of unban requests for a broadcaster’s channel.
      *
      * __Authorization:__
      *
@@ -4626,7 +4984,7 @@ export class TwitchApi {
      */
     getUnbanRequests: (
       params: GetUnbanRequestsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUnbanRequestsResponse, 200, 400 | 401>({
         path: '/moderation/unban_requests',
@@ -4634,7 +4992,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * NEW Resolves an unban request by approving or denying it.
+     * Resolves an unban request by approving or denying it.
      *
      * __Authorization:__
      *
@@ -4677,7 +5035,7 @@ export class TwitchApi {
      */
     resolveUnbanRequests: (
       params: ResolveUnbanRequestsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<ResolveUnbanRequestsResponse, 200, 400 | 401 | 404>({
         path: '/moderation/unban_requests',
@@ -4690,7 +5048,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:blocked\_terms** or **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4723,7 +5084,7 @@ export class TwitchApi {
      */
     getBlockedTerms: (
       params: GetBlockedTermsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetBlockedTermsResponse, 200, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4735,7 +5096,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4771,7 +5135,7 @@ export class TwitchApi {
     addBlockedTerm: (
       params: AddBlockedTermParams,
       body: AddBlockedTermBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<AddBlockedTermResponse, 200, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4785,7 +5149,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked\_terms** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:blocked\_terms** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4819,7 +5186,7 @@ export class TwitchApi {
      */
     removeBlockedTerm: (
       params: RemoveBlockedTermParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403>({
         path: '/moderation/blocked_terms',
@@ -4832,7 +5199,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:chat\_messages** scope.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:chat\_messages** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -4869,7 +5239,7 @@ export class TwitchApi {
      */
     deleteChatMessages: (
       params: DeleteChatMessagesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404>({
         path: '/moderation/chat',
@@ -4882,8 +5252,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * * Query parameter `user_id` must match the user ID in the [User-Access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
-     * * Requires OAuth Scope: `user:read:moderated_channels`
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:moderated\_channels**. The user ID associated with the token must match the `user_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **user:read:moderated\_channels** scope for the user represented by the `user_id` query parameter.
      *
      * __URL:__
      *
@@ -4905,7 +5277,7 @@ export class TwitchApi {
      */
     getModeratedChannels: (
       params: GetModeratedChannelsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetModeratedChannelsResponse, 200, 400 | 401 | 500>({
         path: '/moderation/channels',
@@ -4945,7 +5317,7 @@ export class TwitchApi {
      */
     getModerators: (
       params: GetModeratorsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetModeratorsResponse, 200, 400 | 401>({
         path: '/moderation/moderators',
@@ -4998,7 +5370,7 @@ export class TwitchApi {
      */
     addChannelModerator: (
       params: AddChannelModeratorParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 422 | 429>({
         path: '/moderation/moderators',
@@ -5047,7 +5419,7 @@ export class TwitchApi {
      */
     removeChannelModerator: (
       params: RemoveChannelModeratorParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 429>({
         path: '/moderation/moderators',
@@ -5090,7 +5462,7 @@ export class TwitchApi {
      */
     getVIPs: (
       params: GetVIPsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetVIPsResponse, 200, 400 | 401>({
         path: '/channels/vips',
@@ -5130,10 +5502,6 @@ export class TwitchApi {
      * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
      *
-     * _403 Forbidden_
-     *
-     * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token.
-     *
      * _404 Not Found_
      *
      * * The ID in _broadcaster\_id_ was not found.
@@ -5160,9 +5528,9 @@ export class TwitchApi {
      */
     addChannelVIP: (
       params: AddChannelVIPParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
-      this.callApi<void, 204, 400 | 401 | 403 | 404 | 409 | 422 | 425 | 429>({
+      this.callApi<void, 204, 400 | 401 | 404 | 409 | 422 | 425 | 429>({
         path: '/channels/vips',
         method: 'POST',
         params,
@@ -5199,7 +5567,7 @@ export class TwitchApi {
      * * The Authorization header is required and must contain a user access token.
      * * The user access token must include the **channel:manage:vips** scope.
      * * The OAuth token is not valid.
-     * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token.
+     * * The ID in the _broadcaster\_id_ query parameter must match the user ID in the access token, unless the user ID in the access token is removing themselves as a VIP.
      * * The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
      *
      * _403 Forbidden_
@@ -5223,7 +5591,7 @@ export class TwitchApi {
      */
     removeChannelVIP: (
       params: RemoveChannelVIPParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 422 | 429>({
         path: '/channels/vips',
@@ -5238,7 +5606,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:shield\_mode** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:shield\_mode** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -5274,7 +5645,7 @@ export class TwitchApi {
     updateShieldModeStatus: (
       params: UpdateShieldModeStatusParams,
       body: UpdateShieldModeStatusBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateShieldModeStatusResponse, 200, 400 | 401 | 403>({
         path: '/moderation/shield_mode',
@@ -5290,7 +5661,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope.
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:read:shield\_mode** or **moderator:manage:shield\_mode** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -5323,7 +5697,7 @@ export class TwitchApi {
      */
     getShieldModeStatus: (
       params: GetShieldModeStatusParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetShieldModeStatusResponse, 200, 400 | 401 | 403>({
         path: '/moderation/shield_mode',
@@ -5335,7 +5709,10 @@ export class TwitchApi {
      *
      * __Authorization:__
      *
-     * Requires a user access token that includes the **moderator:manage:warnings** scope. Query parameter `moderator_id` must match the `user_id` in the [user access token](https://dev.twitch.tv/docs/authentication/#user-access-tokens).
+     * Requires one of the following:
+     *
+     * * A [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:warnings** scope. The user ID associated with the token must match the `moderator_id` in the query parameter.
+     * * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) where the application, through a prior authorization, has the **moderator:manage:warnings** scope for the user represented by the `moderator_id` query parameter.
      *
      * __URL:__
      *
@@ -5385,7 +5762,7 @@ export class TwitchApi {
     warnChatUser: (
       params: WarnChatUserParams,
       body: WarnChatUserBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<WarnChatUserResponse, 200, 400 | 401 | 403 | 409 | 429 | 500>({
         path: '/moderation/warnings',
@@ -5395,7 +5772,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Adds a suspicious user status to a chatter on the broadcaster’s channel.
+     * NEW Adds a suspicious user status to a chatter on the broadcaster’s channel.
      *
      * __Authorization:__
      *
@@ -5434,7 +5811,7 @@ export class TwitchApi {
     addSuspiciousStatusToChatUser: (
       params: AddSuspiciousStatusToChatUserParams,
       body: AddSuspiciousStatusToChatUserBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<AddSuspiciousStatusToChatUserResponse, 200, 400 | 401 | 403>({
         path: '/moderation/suspicious_users',
@@ -5444,7 +5821,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * BETA Remove a suspicious user status from a chatter on broadcaster’s channel.
+     * NEW Remove a suspicious user status from a chatter on broadcaster’s channel.
      *
      * __Authorization:__
      *
@@ -5481,7 +5858,7 @@ export class TwitchApi {
      */
     removeSuspiciousStatusFromChatUser: (
       params: RemoveSuspiciousStatusFromChatUserParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<RemoveSuspiciousStatusFromChatUserResponse, 200, 400 | 401 | 403>({
         path: '/moderation/suspicious_users',
@@ -5530,7 +5907,7 @@ export class TwitchApi {
      */
     getPolls: (
       params: GetPollsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetPollsResponse, 200, 400 | 401 | 404>({
         path: '/polls',
@@ -5583,7 +5960,7 @@ export class TwitchApi {
      */
     createPoll: (
       body: CreatePollBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreatePollResponse, 200, 400 | 401>({
         path: '/polls',
@@ -5628,7 +6005,7 @@ export class TwitchApi {
      */
     endPoll: (
       body: EndPollBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<EndPollResponse, 200, 400 | 401>({
         path: '/polls',
@@ -5671,7 +6048,7 @@ export class TwitchApi {
      */
     getPredictions: (
       params: GetPredictionsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetPredictionsResponse, 200, 400 | 401>({
         path: '/predictions',
@@ -5724,7 +6101,7 @@ export class TwitchApi {
      */
     createPrediction: (
       body: CreatePredictionBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreatePredictionResponse, 200, 400 | 401 | 429>({
         path: '/predictions',
@@ -5776,7 +6153,7 @@ export class TwitchApi {
      */
     endPrediction: (
       body: EndPredictionBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<EndPredictionResponse, 200, 400 | 401 | 404>({
         path: '/predictions',
@@ -5844,7 +6221,7 @@ export class TwitchApi {
      */
     startARaid: (
       params: StartARaidParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<StartARaidResponse, 200, 400 | 401 | 404 | 409 | 429>({
         path: '/raids',
@@ -5897,7 +6274,7 @@ export class TwitchApi {
      */
     cancelARaid: (
       params: CancelARaidParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404 | 429>({
         path: '/raids',
@@ -5949,7 +6326,7 @@ export class TwitchApi {
      */
     getChannelStreamSchedule: (
       params: GetChannelStreamScheduleParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelStreamScheduleResponse, 200, 400 | 401 | 403 | 404>({
         path: '/schedule',
@@ -5988,7 +6365,7 @@ export class TwitchApi {
      */
     getChannelICalendar: (
       params: GetChannelICalendarParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<string, 200, 400>({
         path: '/schedule/icalendar',
@@ -6036,7 +6413,7 @@ export class TwitchApi {
      */
     updateChannelStreamSchedule: (
       params: UpdateChannelStreamScheduleParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 404>({
         path: '/schedule/settings',
@@ -6088,7 +6465,7 @@ export class TwitchApi {
     createChannelStreamScheduleSegment: (
       params: CreateChannelStreamScheduleSegmentParams,
       body: CreateChannelStreamScheduleSegmentBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 403>({
         path: '/schedule/segment',
@@ -6145,7 +6522,7 @@ export class TwitchApi {
     updateChannelStreamScheduleSegment: (
       params: UpdateChannelStreamScheduleSegmentParams,
       body: UpdateChannelStreamScheduleSegmentBody | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateChannelStreamScheduleSegmentResponse, 200, 400 | 401 | 404>({
         path: '/schedule/segment',
@@ -6192,7 +6569,7 @@ export class TwitchApi {
      */
     deleteChannelStreamScheduleSegment: (
       params: DeleteChannelStreamScheduleSegmentParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/schedule/segment',
@@ -6235,7 +6612,7 @@ export class TwitchApi {
      */
     searchCategories: (
       params: SearchCategoriesParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<SearchCategoriesResponse, 200, 400 | 401>({
         path: '/search/categories',
@@ -6279,7 +6656,7 @@ export class TwitchApi {
      */
     searchChannels: (
       params: SearchChannelsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<SearchChannelsResponse, 200, 400 | 401>({
         path: '/search/channels',
@@ -6326,7 +6703,7 @@ export class TwitchApi {
      */
     getStreamKey: (
       params: GetStreamKeyParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetStreamKeyResponse, 200, 400 | 401 | 403>({
         path: '/streams/key',
@@ -6364,7 +6741,7 @@ export class TwitchApi {
      */
     getStreams: (
       params: GetStreamsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetStreamsResponse, 200, 400 | 401>({
         path: '/streams',
@@ -6404,7 +6781,7 @@ export class TwitchApi {
      */
     getFollowedStreams: (
       params: GetFollowedStreamsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetFollowedStreamsResponse, 200, 400 | 401>({
         path: '/streams/followed',
@@ -6412,14 +6789,13 @@ export class TwitchApi {
         options,
       }),
     /**
-     * Adds a marker to a live stream. A marker is an arbitrary point in a live stream that the broadcaster or editor wants to mark, so they can return to that spot later to create video highlights (see Video Producer, Highlights in the Twitch UX).
+     * Adds a marker to a live stream. A marker is an arbitrary point in a live stream that the broadcaster or editor wants to mark, so they can return to that spot later to create video highlights. For more information on these features, see [Creating Highlights and Stream Markers](https://help.twitch.tv/s/article/creating-highlights-and-stream-markers).
      *
      * You may not add markers:
      *
-     * * If the stream is not live
-     * * If the stream has not enabled video on demand (VOD)
-     * * If the stream is a premiere (a live, first-viewing event that combines uploaded videos with live chat)
-     * * If the stream is a rerun of a past broadcast, including past premieres.
+     * * If the stream is not live.
+     * * If the stream has not enabled video on demand (VOD).
+     * * If the stream is a rerun of a past broadcast.
      *
      * __Authorization:__
      *
@@ -6443,9 +6819,9 @@ export class TwitchApi {
      * _401 Unauthorized_
      *
      * * The Authorization header is required and must contain a user access token.
-     * * The user access token must include the **user:manage:broadcast** scope.
+     * * The user access token must include the **channel:manage:broadcast** scope.
      * * The access token is not valid.
-     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     * * The Client ID specified in the Client-Id header does not match the Client ID specified in the access token.
      *
      * _403 Forbidden_
      *
@@ -6461,7 +6837,7 @@ export class TwitchApi {
      */
     createStreamMarker: (
       body: CreateStreamMarkerBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CreateStreamMarkerResponse, 200, 400 | 401 | 403 | 404>({
         path: '/streams/markers',
@@ -6470,7 +6846,7 @@ export class TwitchApi {
         options,
       }),
     /**
-     * Gets a list of markers from the user’s most recent stream or from the specified VOD/video. A marker is an arbitrary point in a live stream that the broadcaster or editor marked, so they can return to that spot later to create video highlights (see Video Producer, Highlights in the Twitch UX).
+     * Gets a list of markers from the user’s most recent stream or from the specified VOD/video. A marker is an arbitrary point in a live stream that the broadcaster or editor marked, so they can return to that spot later to create video highlights. For more information on these features, see [Creating Highlights and Stream Markers](https://help.twitch.tv/s/article/creating-highlights-and-stream-markers).
      *
      * __Authorization:__
      *
@@ -6493,9 +6869,9 @@ export class TwitchApi {
      * _401 Unauthorized_
      *
      * * The Authorization header is required and must contain a user access token.
-     * * The user access token must include the **user:read:broadcast** or **user:manage:broadcast** scope.
+     * * The user access token must include the **user:read:broadcast** or **channel:manage:broadcast** scope.
      * * The access token is not valid.
-     * * The client ID specified in the Client-Id header does not match the client ID specified in the access token.
+     * * The Client ID specified in the Client-Id header does not match the Client ID specified in the access token.
      *
      * _403 Forbidden_
      *
@@ -6509,7 +6885,7 @@ export class TwitchApi {
      */
     getStreamMarkers: (
       params: GetStreamMarkersParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetStreamMarkersResponse, 200, 400 | 401 | 403 | 404>({
         path: '/streams/markers',
@@ -6553,7 +6929,7 @@ export class TwitchApi {
      */
     getBroadcasterSubscriptions: (
       params: GetBroadcasterSubscriptionsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetBroadcasterSubscriptionsResponse, 200, 400 | 401>({
         path: '/subscriptions',
@@ -6566,8 +6942,6 @@ export class TwitchApi {
      * __Authorization:__
      *
      * Requires a [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
-     *
-     * A Twitch extensions may use an app access token if the broadcaster has granted the **user:read:subscriptions** scope from within the Twitch Extensions manager.
      *
      * __URL:__
      *
@@ -6600,7 +6974,7 @@ export class TwitchApi {
      */
     checkUserSubscription: (
       params: CheckUserSubscriptionParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<CheckUserSubscriptionResponse, 200, 400 | 401 | 404>({
         path: '/subscriptions/user',
@@ -6643,7 +7017,7 @@ export class TwitchApi {
      */
     getAllStreamTags: (
       params: GetAllStreamTagsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetAllStreamTagsResponse, 200, 400 | 401>({
         path: '/tags/streams',
@@ -6684,7 +7058,7 @@ export class TwitchApi {
      */
     getStreamTags: (
       params: GetStreamTagsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetStreamTagsResponse, 200, 400 | 401>({
         path: '/streams/tags',
@@ -6728,7 +7102,7 @@ export class TwitchApi {
      */
     getChannelTeams: (
       params: GetChannelTeamsParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetChannelTeamsResponse, 200, 400 | 401 | 404>({
         path: '/teams/channel',
@@ -6772,7 +7146,7 @@ export class TwitchApi {
      */
     getTeams: (
       params: GetTeamsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetTeamsResponse, 200, 400 | 401 | 404>({
         path: '/teams',
@@ -6819,7 +7193,7 @@ export class TwitchApi {
      */
     getUsers: (
       params: GetUsersParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUsersResponse, 200, 400 | 401>({
         path: '/users',
@@ -6864,7 +7238,7 @@ export class TwitchApi {
      */
     updateUser: (
       params: UpdateUserParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateUserResponse, 200, 400 | 401 | 429>({
         path: '/users',
@@ -6910,7 +7284,7 @@ export class TwitchApi {
      */
     getAuthorizationByUser: (
       params: GetAuthorizationByUserParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetAuthorizationByUserResponse, 200, 400 | 401 | 403 | 500>({
         path: '/authorization/users',
@@ -6950,7 +7324,7 @@ export class TwitchApi {
      */
     getUserBlockList: (
       params: GetUserBlockListParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUserBlockListResponse, 200, 400 | 401>({
         path: '/users/blocks',
@@ -6994,7 +7368,7 @@ export class TwitchApi {
      */
     blockUser: (
       params: BlockUserParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/users/blocks',
@@ -7034,7 +7408,7 @@ export class TwitchApi {
      */
     unblockUser: (
       params: UnblockUserParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401>({
         path: '/users/blocks',
@@ -7068,7 +7442,7 @@ export class TwitchApi {
      *
      * @see https://dev.twitch.tv/docs/api/reference#get-user-extensions
      */
-    getUserExtensions: (options: CallApiOptions['options'] = {}) => 
+    getUserExtensions: (options: CallApiOptions = {}) => 
       this.callApi<GetUserExtensionsResponse, 200, 401>({
         path: '/users/extensions/list',
         options,
@@ -7106,7 +7480,7 @@ export class TwitchApi {
      */
     getUserActiveExtensions: (
       params: GetUserActiveExtensionsParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetUserActiveExtensionsResponse, 200, 400 | 401>({
         path: '/users/extensions',
@@ -7151,7 +7525,7 @@ export class TwitchApi {
      */
     updateUserExtensions: (
       body: UpdateUserExtensionsBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<UpdateUserExtensionsResponse, 200, 400 | 401 | 404>({
         path: '/users/extensions',
@@ -7205,7 +7579,7 @@ export class TwitchApi {
      */
     getVideos: (
       params: GetVideosParams | null | undefined = null,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<GetVideosResponse, 200, 400 | 401 | 404>({
         path: '/videos',
@@ -7246,7 +7620,7 @@ export class TwitchApi {
      */
     deleteVideos: (
       params: DeleteVideosParams,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<DeleteVideosResponse, 200, 400 | 401>({
         path: '/videos',
@@ -7315,7 +7689,7 @@ export class TwitchApi {
     sendWhisper: (
       params: SendWhisperParams,
       body: SendWhisperBody,
-      options: CallApiOptions['options'] = {}
+      options: CallApiOptions = {}
     ) =>
       this.callApi<void, 204, 400 | 401 | 403 | 404 | 429>({
         path: '/whispers',
