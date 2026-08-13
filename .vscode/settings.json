@@ -1,25 +1,35 @@
 {
-    "cSpell.words": [
-        "automod",
-        "autoscale",
-        "bitstier",
-        "cheermote",
-        "cheermotes",
-        "cooldown",
-        "eventsub",
-        "gifter",
-        "hypetrain",
-        "icalendar",
-        "igdb",
-        "keyof",
-        "leaderboard",
-        "openapi",
-        "screenshare",
-        "shoutout",
-        "shoutouts",
-        "tsup",
-        "unban",
-        "unfollow",
-        "unfollows"
-    ]
+  "cSpell.words": [
+    "automod",
+    "autoscale",
+    "bitstier",
+    "cheermote",
+    "cheermotes",
+    "cooldown",
+    "eventsub",
+    "gifter",
+    "hypetrain",
+    "icalendar",
+    "igdb",
+    "keyof",
+    "leaderboard",
+    "openapi",
+    "oxc",
+    "oxfmt",
+    "oxlint",
+    "screenshare",
+    "shoutout",
+    "shoutouts",
+    "tsup",
+    "unban",
+    "unfollow",
+    "unfollows"
+  ],
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always",
+    "source.format.oxc": "always"
+  }
 }
