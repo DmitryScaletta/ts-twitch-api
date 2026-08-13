@@ -18,7 +18,7 @@ const joinLines = (lines: Line[]) =>
 export const lowerFirstLetter = (text: string): string =>
   text.charAt(0).toLowerCase() + text.slice(1);
 
-const capitalizeWord = (word: string) => word[0].toUpperCase() + word.slice(1);
+const capitalizeWord = (word: string) => word[0]!.toUpperCase() + word.slice(1);
 
 export const getSchemaNamePrefix = (endpointName: string) =>
   endpointName.split(' ').filter(Boolean).map(capitalizeWord).join('');
