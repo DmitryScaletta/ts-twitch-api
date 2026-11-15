@@ -39,11 +39,11 @@
     "lint:ts": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "tsdown": "^0.22.14",
+    "@types/node": "^26.6.6",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "tsdown": "^0.23.7",
     "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
+  "packageManager": "pnpm@12.21.0"
 }
